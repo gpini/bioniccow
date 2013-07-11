@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sync"
+        android:icon="@drawable/synch"
+        android:showAsAction="ifRoom"
+        android:title="@string/addTitle"/>
+    <item
+        android:id="@+id/add"
+        android:icon="@drawable/add"
+        android:showAsAction="ifRoom"
+        android:title="@string/syncTitle"/>
+	<item
+        android:id="@+id/reset"
+        android:showAsAction="never|withText"
+        android:title="@string/resetMemory"/>
+	<item
+        android:id="@+id/forget"
+        android:showAsAction="never|withText"
+        android:title="@string/forgetUser"/>
+</menu>

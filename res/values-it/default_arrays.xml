@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_hints_english">
+        <item>"every day"</item>
+        <item>"after 1 day"</item>
+        <item>"every week"</item>
+        <item>"after 1 week"</item>
+        <item>"every 2 weeks"</item>
+        <item>"after 2 weeks"</item>
+		<item>"every month"</item>
+		<item>"after 1 month"</item>
+		<item>"every 3 months"</item>
+		<item>"after 3 months"</item>
+		<item>"every 4 months"</item>
+		<item>"after 4 months"</item>
+		<item>"every 6 months"</item>
+		<item>"after 6 months"</item>
+		<item>"every year"</item>
+		<item>"after 1 year"</item>
+    </string-array>
+    
+</resources>

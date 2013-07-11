@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="web_msg">Login and Authorize Bionic Cow\nthen press Done Button</string>
+    <string name="task_added_OK">Task \"%s\" added</string>
+    <string name="task_added_NOK">Impossible to add task -&#160;</string>
+    <string name="confirmErase">Are you sure to clean memory and resync tasks?</string>
+    <string name="confirmForget">Are you sure to forget user data, clean memory and resync tasks?</string>
+    <string name="confirmDelete">Are you sure to delete selected task(s)?</string>
+    <string name="voteTitle">Enjoying Bionic Cow?</string>
+    <string name="voteMessage">Consider voting Bionic Cow App in Play Store</string>
+    <string name="voteOK">OK, vote now</string>
+    <string name="voteNOK">No, thanks</string>
+    <string name="task_deleted_OK1"> Task deleted</string>
+    <string name="task_deleted_OK2"> %d tasks deleted</string>
+    <string name="task_deleted_NOK1">Impossible to delete task</string>
+    <string name="task_deleted_NOK2">Impossible to delete %d tasks</string>
+    <string name="task_postponed_OK1"> Task postponed</string>
+    <string name="task_postponed_OK2"> %d tasks postponed</string>
+    <string name="task_postponed_NOK1">Impossible to postpone task</string>
+    <string name="task_postponed_NOK2">Impossible to postpone %d tasks</string>
+    <string name="task_completed_OK1"> Task completed</string>
+    <string name="task_completed_OK2"> %d tasks completed</string>
+    <string name="task_completed_NOK1">Impossible to complete task;</string>
+    <string name="task_completed_NOK2">Impossible to complete %d tasks</string>
+    <string name="task_uncompleted_OK1"> Task uncompleted</string>
+    <string name="task_uncompleted_OK2"> %d tasks uncompleted</string>
+    <string name="task_uncompleted_NOK1">Impossible to uncomplete task;</string>
+    <string name="task_uncompleted_NOK2">Impossible to uncomplete %d tasks</string>
+    <string name="task_NOK">Impossible to get Tasks -&#160;</string>
+    <string name="task_modified_OK">task \"%s\" modified</string>
+    <string name="task_modified_NOK">Impossible to edit task \"%s\":</string>
+    <string name="note_deleted_OK"> Note deleted</string>
+    <string name="note_deleted_NOK"> Impossible to delete Note -&#160;</string>
+    <string name="note_added_OK"> Note added</string>
+    <string name="note_added_NOK"> Impossible to add Note -&#160;</string>
+ 	<string name="note_modified_OK"> Note modified</string>
+    <string name="note_modified_NOK"> Impossible to edit Note -&#160;</string>
+    <string name="authentication_NOK">Impossible to authenticate -&#160;</string>
+    <string name="authentication_aborted">Authentication aborted by user</string>
+    <string name="starting_authentication">Starting authentication</string>
+    <string name="finishing_authentication">Finishing authentication</string>
+    <string name="internet_NOK">Missing Internet connection</string>
+    <string name="timeline_NOK">Impossible to get timeline - </string>
+    <string name="sync_NOK">Impossible to synchronize - </string>
+    <string name="folder_add_NOK1">Impossible to add folder - invalid name</string>
+    <string name="folder_add_NOK2">Impossible to add folder - invalid rule</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="loading_data">Loading data</string>
+    <string name="last_synch">Last Synchronization:&#160;</string>
+    <string name="neverSynched">Never</string>
+    <string name="define_rule">Begins with</string>
+    <string name="insert_folder_name">insert folder name</string>
+    <string name="folder_pattern_hint">enter initial characters of Tags, Lists and/or Locations</string>
+    <string name="modify_folder">Modify folder:</string>
+	<string name="coming_soon">Coming soon</string>
+	<string name="synch_reset_message">Task and tags will be synchronized from the beginning at next synchronization</string>
+	<string name="first_synch">First synch will be executed. It may take a long time.</string>
+	<string name="taskModified">Task is changed</string>
+	<string name="folderHelp">Folders can group lists, locations and/or tags.\nExample:\n\"Context\" folder - every tag that begins with \'@\' character</string>
+	<string name="howToTitle">How to use Folders</string>
+	<string name="selected_single">1 selected</string>
+	<string name="selected_multi">%d selected</string>
+	<string name="monthlyWrong">Must repeat monthly, otherwise result is not predictable</string>
+	<string name="weeklyWrong">Must repeat weekly, otherwise result is not predictable</string>
+	<string name="connectionWarningAdd">OFFLINE Mode\nAdded Task will NOT be saved.</string>
+	<string name="connectionWarningEdit">OFFLINE Mode\nEdited fields will NOT be saved.</string>
+	<string name="connectionWarningQuickAdd">You are OFFLINE\nAdd action will NOT be saved\nTurn on Network.</string>
+	<string name="navigation_hint_title">How to Use</string>
+	<string name="navigation_hint">Touch "Lists" text to change view mode</string>
+	
+	
+    
+    
+</resources>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="priorities">
+        <item>"-"</item>
+        <item>"Низкий"</item>
+        <item>"Средний"</item>
+	<item>"Высокий"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="specials">
+        <item>"Без тегов"</item>
+        <item>"Без указания места"</item>
+        <item>"Завершённые в последние 30 дней"</item>
+	<item>"Задачи с приоритетом"</item>
+	<item>"Без папки"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="recurrenceTypes">
+        <item>"----"</item>
+        <item>"N раз"</item>
+        <item>"До указанной даты"</item>
+        <item>"Раз в неделю - Дни недели"</item>
+        <item>"Раз в месяц - День недели"</item>
+	<item>"Раз в месяц - День месяца"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="edit_del_options">
+        <item>"Редактировать"</item>
+        <item>"Удалить"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="smart_date_format_labels">
+        <item>"dd MMM yyyy"</item>
+        <item>"dd MMM"</item>
+        <item>"EEE dd MMM yyyy"</item>
+        <item>"EEE dd MMM"</item>
+	<item>"прошлый понедельник"</item>
+	<item>"прошлый вторник"</item>
+	<item>"прошлая среда"</item>
+	<item>"прошлый четверг"</item>
+	<item>"прошлая пятница"</item>
+	<item>"прошлая суббота"</item>
+	<item>"прошлое воскресенье"</item>
+	<item>"вчера"</item>
+        <item>"сегодня"</item>
+        <item>"завтра"</item>
+	<item>"следующий понедельник"</item>
+	<item>"следующий вторник"</item>
+	<item>"следующая среда"</item>
+	<item>"следующий четверг"</item>
+	<item>"следующая пятница"</item>
+	<item>"следующая суббота"</item>
+	<item>"следующее воскресенье"</item>
+	<item>"%1$s @ %2$s"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="overview_categories">
+	<item>"Просроченные"</item>
+	<item>"Сегодня"</item>
+        <item>"На этой неделе"</item>
+        <item>"В будущем"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_labels1">
+        <item>"-"</item>
+	<item>"каждые"</item>
+	<item>"спустя"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_labels2">
+        <item>"-"</item>
+        <item>"дней"</item>
+        <item>"недель"</item>
+	<item>"месяцев"</item>
+	<item>"лет"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_hints">
+        <item>"каждый день"</item>
+        <item>"спустя 1 день"</item>
+        <item>"каждую неделю"</item>
+        <item>"спустя 1 неделю"</item>
+        <item>"каждые 2 недели"</item>
+        <item>"спустя 2 недели"</item>
+	<item>"каждый месяц"</item>
+	<item>"спустя 1 месяц"</item>
+	<item>"каждые 3 месяца"</item>
+	<item>"спустя 3 месяца"</item>
+	<item>"каждые 4 месяца"</item>
+	<item>"спустя 4 месяца"</item>
+	<item>"каждые 6 месяцев"</item>
+	<item>"спустя 6 месяцев"</item>
+	<item>"каждый 1 год"</item>
+	<item>"спустя 1 год"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_option_strings">
+        <item>"один раз"</item>
+        <item>"%s раз(-а)"</item>
+        <item>"до %s"</item>
+        <item>"%s"</item>
+        <item>"%s"</item>
+        <item>"%1$s %2$s"</item>
+        <item>"и"</item>
+	<item>"unknown day"</item>
+	<item>"unknown by-day option"</item>
+	<item>"unknown month day"</item>
+	<item>"unknown date"</item>
+        <item>"в %s"</item>
+    </string-array>
+    <string-array name="weekdays">
+        <item>"понедельник"</item>
+        <item>"вторник"</item>
+        <item>"среда"</item>
+	<item>"четверг"</item>
+	<item>"пятница"</item>
+	<item>"суббота"</item>
+	<item>"воскресенье"</item>
+    </string-array>
+    <string-array name="ordinals1">
+        <item>"1го"</item>
+        <item>"2го"</item>
+        <item>"3го"</item>
+	<item>"4го"</item>
+	<item>"5го"</item>
+	<item>"6го"</item>
+        <item>"7го"</item>
+        <item>"8го"</item>
+	<item>"9го"</item>
+	<item>"10го"</item>
+	<item>"11го"</item>
+        <item>"12го"</item>
+        <item>"13го"</item>
+	<item>"14го"</item>
+	<item>"15го"</item>
+	<item>"16го"</item>
+        <item>"17го"</item>
+        <item>"18го"</item>
+	<item>"19го"</item>
+	<item>"20го"</item>
+	<item>"21го"</item>
+        <item>"22го"</item>
+        <item>"23го"</item>
+	<item>"24го"</item>
+	<item>"25го"</item>
+	<item>"26го"</item>
+        <item>"27го"</item>
+        <item>"28го"</item>
+	<item>"29го"</item>
+	<item>"30го"</item>
+	<item>"31го"</item>
+    </string-array>
+        <string-array name="ordinals2">
+        <item>"1ый"</item>
+        <item>"2ой"</item>
+        <item>"3ий"</item>
+	<item>"4ый"</item>
+	<item>"5ый"</item>
+	<item>"последний"</item>
+        <item>"2ой с конца"</item>
+        <item>"3ий с конца"</item>
+	<item>"4ый с конца"</item>
+	<item>"5ый с конца"</item>
+    </string-array>
+    
+</resources>

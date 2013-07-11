@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="priorities">
+        <item>"-"</item>
+        <item>"Bassa"</item>
+        <item>"Media"</item>
+		<item>"Alta"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="specials">
+        <item>"Senza tag"</item>
+        <item>"Senza luogo"</item>
+        <item>"Completati negli ultimi 30 giorni"</item>
+		<item>"Attività con priorità"</item>
+		<item>"Senza Cartella"</item>
+    </string-array>
+   <!-- ORDER DOES MATTER -->
+    <string-array name="recurrenceTypes">
+        <item>"----"</item>
+        <item>"N volte"</item>
+        <item>"Fino a "</item>
+        <item>"Settimanale - giorni della settimana"</item>
+        <item>"Mensile - giorno della settimana"</item>
+		<item>"Mensile - giorno del mese"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="edit_del_options">
+        <item>"Modifica"</item>
+        <item>"Elimina"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="smart_date_format_labels">
+        <item>"dd MMM yyyy"</item>
+        <item>"dd MMM"</item>
+        <item>"EEE dd MMM yyyy"</item>
+        <item>"EEE dd MMM"</item>
+		<item>"lo scorso lunedì"</item>
+		<item>"lo scorso martedì"</item>
+		<item>"lo scorso mercoledì"</item>
+		<item>"lo scorso giovedì"</item>
+		<item>"lo scorso venerdì"</item>
+		<item>"lo scorso sabato"</item>
+		<item>"la scorsa domenica"</item>
+		<item>"ieri"</item>
+        <item>"oggi"</item>
+        <item>"domani"</item>
+		<item>"lunedì prossimo"</item>
+		<item>"martedì prossimo"</item>
+		<item>"mercoledì prossimo"</item>
+		<item>"giovedì prossimo"</item>
+		<item>"venerdì prossimo"</item>
+		<item>"sabato prossimo"</item>
+		<item>"domenica prossima"</item>
+		<item>"%1$s alle %2$s"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="overview_categories">
+		<item>"Passati"</item>
+		<item>"Oggi"</item>
+        <item>"Questa settimana"</item>
+        <item>"Futuri"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_labels1">
+        <item>"-"</item>
+		<item>"ogni"</item>
+		<item>"dopo"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_labels2">
+        <item>"-"</item>
+        <item>"giorni"</item>
+        <item>"settimane"</item>
+		<item>"mesi"</item>
+		<item>"anni"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_hints">
+        <item>"ogni giorno"</item>
+        <item>"dopo 1 giorno"</item>
+        <item>"ogni settimana"</item>
+        <item>"dopo 1 settimana"</item>
+        <item>"ogni 2 settimane"</item>
+        <item>"dopo 2 settimane"</item>
+		<item>"ogni mese"</item>
+		<item>"dopo 1 mese"</item>
+		<item>"ogni 3 mesi"</item>
+		<item>"dopo 3 mesi"</item>
+		<item>"ogni 4 mesi"</item>
+		<item>"dopo 4 mesi"</item>
+		<item>"ogni 6 mesi"</item>
+		<item>"dopo 6 mesi"</item>
+		<item>"ogni anno"</item>
+		<item>"dopo 1 anno"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_option_strings">
+        <item>"una volta"</item>
+        <item>"per %s volte"</item>
+        <item>"fino a %s"</item>
+        <item>"%s"</item>
+        <item>"%s del mese"</item>
+        <item>"%1$s %2$s del mese"</item>
+        <item>"e"</item>
+        <item>"giorno sconosciuto"</item>
+        <item>"opzione giorno sconosciuta"</item>
+        <item>"giorno del mese sconosciuto"</item>
+        <item>"data sconosciuta"</item>
+        <item>"alle %s"</item>
+    </string-array>
+    <string-array name="weekdays">
+        <item>"lunedì"</item>
+        <item>"martedì"</item>
+        <item>"mercoledì"</item>
+		<item>"giovedì"</item>
+		<item>"venerdì"</item>
+		<item>"sabato"</item>
+		<item>"domenica"</item>
+    </string-array>
+    <string-array name="ordinals1">
+        <item>"il primo"</item>
+        <item>"il 2"</item>
+        <item>"il 3"</item>
+		<item>"il 4"</item>
+		<item>"il 5"</item>
+		<item>"il 6"</item>
+        <item>"il 7"</item>
+        <item>"il 8"</item>
+		<item>"il 9"</item>
+		<item>"il 10"</item>
+		<item>"il 11"</item>
+        <item>"il 12"</item>
+        <item>"il 13"</item>
+		<item>"il 14"</item>
+		<item>"il 15"</item>
+		<item>"il 16"</item>
+        <item>"il 17"</item>
+        <item>"il 18"</item>
+		<item>"il 19"</item>
+		<item>"il 20"</item>
+		<item>"il 21"</item>
+        <item>"il 22"</item>
+        <item>"il 23"</item>
+		<item>"il 24"</item>
+		<item>"il 25"</item>
+		<item>"il 26"</item>
+        <item>"il 27"</item>
+        <item>"il 28"</item>
+		<item>"il 29"</item>
+		<item>"il 30"</item>
+		<item>"il 31"</item>
+    </string-array>
+        <string-array name="ordinals2">
+        <item>"il primo"</item>
+        <item>"il secondo"</item>
+        <item>"il terzo"</item>
+		<item>"il quarto"</item>
+		<item>"il quinto"</item>
+		<item>"l'ultimo"</item>
+        <item>"il penultimo"</item>
+        <item>"il terzultimo"</item>
+		<item>"il quartultimo"</item>
+		<item>"il quintultimo"</item>
+    </string-array>
+    
+</resources>

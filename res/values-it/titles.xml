@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="addTitle">aggiungi</string>
+    <string name="syncTitle">sincronizza</string>
+	<string name="resetMemory">cancella attività</string>
+	<string name="forgetUser">dimentica utente</string>
+    <string name="cancelTitle">annulla</string>
+    <string name="editTitle">modifica</string>
+</resources>

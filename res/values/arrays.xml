@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="priorities">
+        <item>"-"</item>
+        <item>"Low"</item>
+        <item>"Medium"</item>
+		<item>"High"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="specials">
+        <item>"No Tag"</item>
+        <item>"No Location"</item>
+        <item>"Completed in last 30 days"</item>
+		<item>"Tasks with priority"</item>
+		<item>"No folder"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="recurrenceTypes">
+        <item>"----"</item>
+        <item>"N-times"</item>
+        <item>"Until date"</item>
+        <item>"Weekly - Day(s) of week"</item>
+        <item>"Monthly - Day of Week"</item>
+		<item>"Monthly - Day of Month"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="edit_del_options">
+        <item>"Edit"</item>
+        <item>"Delete"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="smart_date_format_labels">
+        <item>"dd MMM yyyy"</item>
+        <item>"dd MMM"</item>
+        <item>"EEE dd MMM yyyy"</item>
+        <item>"EEE dd MMM"</item>
+		<item>"past Monday"</item>
+		<item>"past Tuesday"</item>
+		<item>"past Wednesday"</item>
+		<item>"past Thursday"</item>
+		<item>"past Friday"</item>
+		<item>"past Saturday"</item>
+		<item>"past Sunday"</item>
+		<item>"yesterday"</item>
+        <item>"today"</item>
+        <item>"tomorrow"</item>
+		<item>"next Monday"</item>
+		<item>"next Tuesday"</item>
+		<item>"next Wednesday"</item>
+		<item>"next Thursday"</item>
+		<item>"next Friday"</item>
+		<item>"next Saturday"</item>
+		<item>"next Sunday"</item>
+		<item>"%1$s @ %2$s"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="overview_categories">
+		<item>"Overdue"</item>
+		<item>"Today"</item>
+        <item>"This Week"</item>
+        <item>"Future"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_labels1">
+        <item>"-"</item>
+		<item>"every"</item>
+		<item>"after"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_labels2">
+        <item>"-"</item>
+        <item>"days"</item>
+        <item>"weeks"</item>
+		<item>"months"</item>
+		<item>"years"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_hints">
+        <item>"every day"</item>
+        <item>"after 1 day"</item>
+        <item>"every week"</item>
+        <item>"after 1 week"</item>
+        <item>"every 2 weeks"</item>
+        <item>"after 2 weeks"</item>
+		<item>"every month"</item>
+		<item>"after 1 month"</item>
+		<item>"every 3 months"</item>
+		<item>"after 3 months"</item>
+		<item>"every 4 months"</item>
+		<item>"after 4 months"</item>
+		<item>"every 6 months"</item>
+		<item>"after 6 months"</item>
+		<item>"every year"</item>
+		<item>"after 1 year"</item>
+    </string-array>
+    <!-- ORDER DOES MATTER -->
+    <string-array name="repeat_option_strings">
+        <item>"once"</item>
+        <item>"for %s times"</item>
+        <item>"until %s"</item>
+        <item>"on %s"</item>
+        <item>"%s"</item>
+        <item>"%1$s %2$s"</item>
+        <item>"and"</item>
+        <item>"unknown day"</item>
+        <item>"unknown by-day option"</item>
+        <item>"unknown month day"</item>
+        <item>"unknown date"</item>
+        <item>"at %s"</item>
+    </string-array>
+    <string-array name="weekdays">
+        <item>"Monday"</item>
+        <item>"Tuesday"</item>
+        <item>"Wednesday"</item>
+		<item>"Thursday"</item>
+		<item>"Friday"</item>
+		<item>"Saturday"</item>
+		<item>"Sunday"</item>
+    </string-array>
+    <string-array name="ordinals1">
+        <item>"on the 1st"</item>
+        <item>"on the 2nd"</item>
+        <item>"on the 3rd"</item>
+		<item>"on the 4th"</item>
+		<item>"on the 5th"</item>
+		<item>"on the 6th"</item>
+        <item>"on the 7th"</item>
+        <item>"on the 8th"</item>
+		<item>"on the 9th"</item>
+		<item>"on the 10th"</item>
+		<item>"on the 11th"</item>
+        <item>"on the 12th"</item>
+        <item>"on the 13th"</item>
+		<item>"on the 14th"</item>
+		<item>"on the 15th"</item>
+		<item>"on the 16th"</item>
+        <item>"on the 17th"</item>
+        <item>"on the 18th"</item>
+		<item>"on the 19th"</item>
+		<item>"on the 20th"</item>
+		<item>"on the 21st"</item>
+        <item>"on the 22nd"</item>
+        <item>"on the 23rd"</item>
+		<item>"on the 24th"</item>
+		<item>"on the 25th"</item>
+		<item>"on the 26th"</item>
+        <item>"on the 27th"</item>
+        <item>"on the 28th"</item>
+		<item>"on the 29th"</item>
+		<item>"on the 30th"</item>
+		<item>"on the 31st"</item>
+    </string-array>
+        <string-array name="ordinals2">
+        <item>"on the 1st"</item>
+        <item>"on the 2nd"</item>
+        <item>"on the 3rd"</item>
+		<item>"on the 4th"</item>
+		<item>"on the 5th"</item>
+		<item>"on the last"</item>
+        <item>"on the 2nd last"</item>
+        <item>"on the 3rd last"</item>
+		<item>"on the 4th last"</item>
+		<item>"on the 5th last"</item>
+    </string-array>
+    
+</resources>

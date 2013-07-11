@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="addTitle">add</string>
+    <string name="syncTitle">sync</string>
+	<string name="resetMemory">reset tasks</string>
+	<string name="forgetUser">forget user</string>
+    <string name="cancelTitle">cancel</string>
+    <string name="editTitle">edit</string>
+</resources>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/light_grey"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/syncInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+
+    <TableLayout
+        android:id="@+id/defocusingView"
+        style="@style/main_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="4dp"
+        android:focusableInTouchMode="true"
+        android:shrinkColumns="0"
+        android:stretchColumns="0" >
+
+        <!-- android:focusableInTouchMode toglie il focus alla EditText -->
+
+        <TableRow android:background="@drawable/edittext_background_simple">
+
+            <it.bova.bioniccow.utilities.LabelAutoCompleteTextView
+                android:id="@+id/quickTaskEditText1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:completionThreshold="1"
+                android:hint="@string/quick_add"
+                android:imeOptions="actionDone"
+                android:background="@android:color/transparent" 
+                android:inputType="text"
+                android:minHeight="40dp"
+                android:textColor="@color/black" />
+
+            <ImageView
+                android:id="@+id/quickAddButton"
+                style="@style/main_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:src="@drawable/send"
+                android:visibility="gone" />
+        </TableRow>
+    </TableLayout>
+
+    <LinearLayout
+        android:id="@+id/dueAndRepeatLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:visibility="gone" >
+
+        <Button
+            android:id="@+id/dueButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:onClick="showDatePickerDialog"
+            android:text="@string/due" />
+
+        <Button
+            android:id="@+id/repeatButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:onClick="showRepeatDialog"
+            android:text="@string/rep" />
+
+        <Button
+            android:id="@+id/priorityButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:text="@string/prio" />
+    </LinearLayout>
+    
+    <ImageView
+    android:layout_width="fill_parent"
+    android:layout_height="3dp"
+    android:background="@drawable/shadow" />
+
+</LinearLayout>

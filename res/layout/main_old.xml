@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light_grey"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/syncInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+
+            <TableLayout
+                android:id="@+id/defocusingView"
+                style="@style/main_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="2dp"
+                android:focusableInTouchMode="true"
+                android:shrinkColumns="0"
+                android:stretchColumns="0" >
+
+                <!-- android:focusableInTouchMode toglie il focus alla EditText -->
+
+                <TableRow android:background="@color/white" >
+
+                    <it.bova.bioniccow.utilities.LabelAutoCompleteTextView
+                        android:id="@+id/quickTaskEditText1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="6dp"
+                        android:background="@color/white"
+                        android:completionThreshold="1"
+                        android:hint="@string/quick_add"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:minHeight="40dp"
+                        android:textColor="@color/black" />
+
+                    <ImageView
+                        android:id="@+id/quickAddButton"
+                        style="@style/main_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:onClick="quickAdd"
+                        android:src="@drawable/send"
+                        android:visibility="gone" />
+                </TableRow>
+            </TableLayout>
+
+            <LinearLayout
+                android:id="@+id/dueAndRepeatLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" >
+
+                <Button
+                    android:id="@+id/dueButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:onClick="showDatePickerDialog"
+                    android:text="@string/due" />
+
+                <Button
+                    android:id="@+id/repeatButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:onClick="showRepeatDialog"
+                    android:text="@string/rep" />
+
+                <Button
+                    android:id="@+id/priorityButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:onClick="quickAddPriority"
+                    android:text="@string/prio" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/shadow" />
+
+        <RelativeLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:background="@drawable/popup_bg"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/navigation_hint_title"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_marginTop="5dp"
+            android:text="@string/navigation_hint" />
+
+        <Button
+            android:id="@+id/closePopup"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/selector_standard"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/ok" />
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="web_msg">Войдите и разрешите доступ Bionic Cow\nзатем нажмите кнопку "Готово"</string>
+    <string name="task_added_OK">Задача \"%s\" добавлена</string>
+    <string name="task_added_NOK">Не удалось добавить задачу -&#160;</string>
+    <string name="confirmErase">Вы действительно хотите очистить память и заново синхронизировать задачи?</string>
+    <string name="confirmForget">Вы действительно хотите удалить данные о пользователе, очистить память и заново синхронизировать задачи?</string>
+    <string name="confirmDelete">Удалить выбранную задачу(-и)?</string>
+    <string name="voteTitle">Вам нравится Bionic Cow?</string>
+    <string name="voteMessage">Проголосуйте за приложение Bionic Cow в Play Маркете!</string>
+    <string name="voteOK">Да, проголосовать сейчас</string>
+    <string name="voteNOK">Нет, благодарю</string>
+    <string name="task_deleted_OK1">Задача удалена</string>
+    <string name="task_deleted_OK2">%d задач удалены</string>
+    <string name="task_deleted_NOK1">Не удалось удалить задачу</string>
+    <string name="task_deleted_NOK2">Не удалось удалить %d задач</string>
+    <string name="task_postponed_OK1">Задача отложена</string>
+    <string name="task_postponed_OK2">%d задач отложены</string>
+    <string name="task_postponed_NOK1">Не удалось отложить задачу</string>
+    <string name="task_postponed_NOK2">Не удалось отложить %d задач</string>
+    <string name="task_completed_OK1">Задача завершена</string>
+    <string name="task_completed_OK2">%d задач завершены</string>
+    <string name="task_completed_NOK1">Не удалось завершить задачу;</string>
+    <string name="task_completed_NOK2">Не удалось отложить %d задач</string>
+    <string name="task_uncompleted_OK1">Задача возвращена в работу</string>
+    <string name="task_uncompleted_OK2"> %d задач возвращены в работу</string>
+    <string name="task_uncompleted_NOK1">Не удалось вернуть задачу в работу;</string>
+    <string name="task_uncompleted_NOK2">Не удалось вернуть в работу %d задач</string>
+    <string name="task_NOK">Не удалось получить список задач -&#160;</string>
+    <string name="task_modified_OK">Изменения в задаче \"%s\" сохранены</string>
+    <string name="task_modified_NOK">Не удалось сохранить изменения в задаче \"%s\":</string>
+    <string name="note_deleted_OK">Заметка удалена</string>
+    <string name="note_deleted_NOK">Не удалось удалить заметку -&#160;</string>
+    <string name="note_added_OK">Заметка добавлена</string>
+    <string name="note_added_NOK">Не удалось добавить заметку -&#160;</string>
+    <string name="note_modified_OK">Заметка изменена</string>
+    <string name="note_modified_NOK">Не удалось отредактировать заметку -&#160;</string>
+    <string name="authentication_NOK">Аутентификация завершилась неудачно -&#160;</string>
+    <string name="authentication_aborted">Аутентификация прервана пользователем</string>
+    <string name="starting_authentication">Начинаю аутентификацию</string>
+    <string name="finishing_authentication">Завершаю аутентификацию</string>
+    <string name="internet_NOK">Отсутствует подключние к Интернету</string>
+    <string name="timeline_NOK">Impossible to get timeline - </string>
+    <string name="sync_NOK">Синхронизация завершилась неудачно - </string>
+    <string name="folder_add_NOK1">Не удалось добавить папку - неверное имя</string>
+    <string name="folder_add_NOK2">Не удалось добавить папку - неверное правило</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="loading_data">Загружаю данные</string>
+    <string name="last_synch">Последняя синхронизация:&#160;</string>
+    <string name="neverSynched">Никогда</string>
+    <string name="define_rule">Начинается с</string>
+    <string name="insert_folder_name">укажите имя папки</string>
+    <string name="folder_pattern_hint">введите первые символы названия тега, списка и/или места</string>
+    <string name="modify_folder">Настроить папку:</string>
+    <string name="coming_soon">Данная функция находится в разработке и скоро будет доступна</string>
+    <string name="synch_reset_message">В следующий раз задачи и теги будут синхронизированы заново</string>
+    <string name="first_synch">Будет произведена первая синхронизация. Это может занять длительное время.</string>
+    <string name="taskModified">Задача изменена</string>
+    <string name="folderHelp">Папки могут содержать списки, места и/или теги.\nПример:\nпапка \"Контекст\" - все теги, начинающиеся с символа \'@\'.</string>
+    <string name="howToTitle">Как пользоваться папками</string>
+    <string name="selected_single">1 выбран</string>
+    <string name="selected_multi">%d выбраны</string>
+    <string name="monthlyWrong">Должна повторяться раз в месяц, иначе результат непредсказуем</string>
+    <string name="weeklyWrong">Должна повторяться раз в неделю, иначе результат непредсказуем</string>
+    <string name="connectionWarningAdd">ОФФЛАЙН режим\nДобавленная задача НЕ будет сохранена.</string>
+    <string name="connectionWarningEdit">ОФФЛАЙН режим\nИзменённые поля НЕ будут сохранены.</string>
+    <string name="connectionWarningQuickAdd">Вы в режиме ОФФЛАЙН\nДобавленная задача НЕ будет сохранена.\nПодключитесь к сети.</string>
+    <string name="navigation_hint_title">Как пользоваться</string>
+    <string name="navigation_hint">Коснитесь надписи "Списки" для изменения режима просмотра</string>
+	
+	
+    
+    
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="addTitle">добавить</string>
+    <string name="syncTitle">синхронизировать</string>
+    <string name="resetMemory">очистить память</string>
+    <string name="forgetUser">забыть пользователя</string>
+    <string name="cancelTitle">отмена</string>
+    <string name="editTitle">редактировать</string>
+</resources>
