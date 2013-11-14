@@ -25,7 +25,7 @@ public class ContactTable {
 			//+ COLUMN_ID + " integer primary key autoincrement, "
 			+ COLUMN_FULLNAME + " text not null,"
 			+ COLUMN_USERNAME + " text not null,"
-			+ COLUMN_CONTACT_ID + " text primary key,"
+			+ COLUMN_CONTACT_ID + " text primary key"
 			+ ");";
 	
 	public static void onCreate(SQLiteDatabase database) {

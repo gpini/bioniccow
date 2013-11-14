@@ -20,8 +20,8 @@ public class TagTable {
 			+ "("
 			//+ COLUMN_ID + " integer primary key autoincrement, "
 			+ COLUMN_NAME + " text not null,"
-			+ COLUMN_TASK_ID + " text not null"
-			+ "FOREIGN KEY (" + COLUMN_TASK_ID + ") ON " + TaskTable.TABLE_TASK + "(" + COLUMN_TASK_ID + ") ON DELETE CASCADE ON UPDATE CASCADE,"
+			+ COLUMN_TASK_ID + " text not null,"
+			+ "FOREIGN KEY (" + COLUMN_TASK_ID + ") REFERENCES " + TaskTable.TABLE_TASK + "(" + COLUMN_TASK_ID + ") ON DELETE CASCADE ON UPDATE CASCADE,"
 			+ "PRIMARY KEY (" + COLUMN_TASK_ID + ", " + COLUMN_NAME + ") ON CONFLICT REPLACE"
 			+ ");";
 	

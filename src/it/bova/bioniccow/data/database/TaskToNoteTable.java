@@ -25,8 +25,8 @@ public class TaskToNoteTable {
 			//+ COLUMN_ID + " integer primary key autoincrement, "
 			+ COLUMN_NOTE_ID + " text not null,"
 			+ COLUMN_TASK_ID + " text not null,"
-			+ "FOREIGN KEY (" + COLUMN_TASK_ID + ") ON " + TaskTable.TABLE_TASK + "(" + COLUMN_TASK_ID + ") ON DELETE CASCADE ON UPDATE CASCADE,"
-			+ "FOREIGN KEY (" + COLUMN_NOTE_ID + ") ON " + NoteTable.TABLE_NOTE + "(" + COLUMN_NOTE_ID + ") ON DELETE CASCADE ON UPDATE CASCADE,"
+			+ "FOREIGN KEY (" + COLUMN_TASK_ID + ") REFERENCES " + TaskTable.TABLE_TASK + "(" + COLUMN_TASK_ID + ") ON DELETE CASCADE ON UPDATE CASCADE,"
+			+ "FOREIGN KEY (" + COLUMN_NOTE_ID + ") REFERENCES " + NoteTable.TABLE_NOTE + "(" + COLUMN_NOTE_ID + ") ON DELETE CASCADE ON UPDATE CASCADE,"
 			+ "PRIMARY KEY (" + COLUMN_TASK_ID + ", " + COLUMN_NOTE_ID + ") ON CONFLICT REPLACE"
 			+ ");";
 	

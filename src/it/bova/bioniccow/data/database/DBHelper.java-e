@@ -56,19 +56,19 @@ public class DBHelper extends SQLiteOpenHelper {
 					+ "hasDueTime, postponed, priority, taskserieId, name, listId, locationId, "
 					+ "created, modified, recurrenceIsEvery, recurrenceFrequency, recurrenceInterval, "
 					+ "recurrenceOptionType, recurrenceOptionValue, source, url, taskId";
-			database.execSQL("INSERT (" + newTaskFields + ") INTO task SELECT (" + newTaskFields + ") FROM tmpTask;");
+			database.execSQL("INSERT INTO task (" + newTaskFields + ") SELECT (" + newTaskFields + ") FROM tmpTask;");
 			database.execSQL("DROP TABLE tmpTask;");
 			//create and populate new contact tables
 			database.execSQL("ATTACH DATABASE contacts.db AS dbc;");
-			database.execSQL("INSERT (fullname, username, contactId) INTO contact SELECT (fullname, username, contactId) FROM dbc.contact;");
+			database.execSQL("INSERT INTO contact (fullname, username, contactId) SELECT (fullname, username, contactId) FROM dbc.contact;");
 			database.execSQL("INSERT INTO task_to_contact SELECT (taskId, contactId) FROM task JOIN dbc.contact ON task.taskId = dbc.contact.taskId;");
 			//create and populate new note tables
 			database.execSQL("ATTACH DATABASE note.db AS dbn;");
-			database.execSQL("INSERT (title, text, create, modified, noteId) INTO note SELECT (title, text, create, modified, noteId) FROM dbn.note;");
-			database.execSQL("INSERT INTO task_to_note SELECT (taskId, notetId) FROM task JOIN dbn.note ON task.taskId = dbn.note.taskId;");
+			database.execSQL("INSERT INTO note (title, text, create, modified, noteId) SELECT (title, text, create, modified, noteId) FROM dbn.note;");
+			database.execSQL("INSERT INTO task_to_note (taskId, notetId) SELECT (taskId, notetId) FROM task JOIN dbn.note ON task.taskId = dbn.note.taskId;");
 			//create and populate new tag table
 			database.execSQL("ATTACH DATABASE tags.db AS dbt;");
-			database.execSQL("INSERT (name, taskId) INTO tag SELECT (name, taskId) FROM dbt.tag;");
+			database.execSQL("INSERT INTO tag (name, taskId) SELECT (name, taskId) FROM dbt.tag;");
 			//clean unused db
 			database.execSQL("DROP TABLE dbc.contact;");
 			database.execSQL("DETACH DATABASE contacts.db;");
