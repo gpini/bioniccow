@@ -1,17 +1,12 @@
 package it.bova.bioniccow.asyncoperations;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-
 import it.bova.bioniccow.InterProcess;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.rtmapi.Note;
-import it.bova.rtmapi.Task;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 public class MessageSender implements InterProcess {
 	

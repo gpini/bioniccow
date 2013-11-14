@@ -14,8 +14,8 @@ import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.MessageReceiver;
 import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
 import it.bova.bioniccow.data.ApiSingleton;
-import it.bova.bioniccow.data.Folders;
 import it.bova.bioniccow.data.Folder;
+import it.bova.bioniccow.data.Folders_old2;
 import it.bova.bioniccow.data.Preferences;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
 import it.bova.bioniccow.utilities.SimpleDatePickerDialog;
@@ -284,7 +284,7 @@ public class BionicCowActivity_less_old extends SherlockFragmentActivity impleme
 								BionicCowActivity_less_old.this.startActivity(intent);
 								break;
 							case 1 :
-								Folders folders = new Folders(BionicCowActivity_less_old.this);
+								Folders_old2 folders = new Folders_old2(BionicCowActivity_less_old.this);
 								Map<String,Folder> folderMap = folders.retrieveAsMap();
 								folderMap.remove(name);
 								folders.saveAndNotifyAsList(folderMap);
@@ -341,7 +341,7 @@ public class BionicCowActivity_less_old extends SherlockFragmentActivity impleme
 						BionicCowActivity_less_old.this.startActivity(intent);
 						break;
 					case 1 :
-						Folders folders = new Folders(BionicCowActivity_less_old.this);
+						Folders_old2 folders = new Folders_old2(BionicCowActivity_less_old.this);
 						Map<String,Folder> folderMap = folders.retrieveAsMap();
 						folderMap.remove(folderName);
 						folders.saveAndNotifyAsList(folderMap);

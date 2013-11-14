@@ -2,10 +2,10 @@ package it.bova.bioniccow.asyncoperations.sync;
 
 
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Folders;
-import it.bova.bioniccow.data.Locations;
-import it.bova.bioniccow.data.Tags;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Folders_old2;
+import it.bova.bioniccow.data.Locations_old2;
+import it.bova.bioniccow.data.Tags_old2;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.rtmapi.Location;
@@ -30,16 +30,16 @@ public abstract class TasksUpdater {
 			onUpdate(deletedTasks);
 
 			//update tags
-			Tags tags = new Tags(context);
-			Set<String> tagSet = TaskDatabase.getDistingTags();
+			Tags_old2 tags = new Tags_old2(context);
+			Set<String> tagSet = TaskDatabase.getDistinctTags();
 			//Log.d("(change) tags", "" + tagSet.size());
 			tags.save(tagSet);
 
 			//update folders
-			Folders folders = new Folders(context);
+			Folders_old2 folders = new Folders_old2(context);
 			Map<String,Folder> folderMap = folders.retrieveAsMap();
-			Map<String, TaskList> listMap = new TaskLists(context).retrieveAsMap();
-			Map<String, Location> locMap = new Locations(context).retrieveAsMap();
+			Map<String, TaskList> listMap = new TaskLists_old2(context).retrieveAsMap();
+			Map<String, Location> locMap = new Locations_old2(context).retrieveAsMap();
 			Map<String,Folder> newFolderMap
 				= TasksUpdater.updateFolders(folderMap, tagSet, listMap, locMap);
 			folders.saveAsList(newFolderMap);

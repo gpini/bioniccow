@@ -8,8 +8,8 @@ import java.util.Map;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-import it.bova.bioniccow.data.Folders;
 import it.bova.bioniccow.data.Folder;
+import it.bova.bioniccow.data.Folders_old2;
 import it.bova.bioniccow.data.observers.FolderObserver;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
@@ -36,7 +36,7 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 	private ListView lv;
 	private FolderAdapter adapter;
 
-	private Folders folders;
+	private Folders_old2 folders;
 	private FolderObserver folderObserver;
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,7 +63,7 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 
 
 		//"Sveglia" le strutture
-		this.folders = new Folders(this.getSherlockActivity());	
+		this.folders = new Folders_old2(this.getSherlockActivity());	
 
 		return view;
 
@@ -175,7 +175,7 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 								EditDeleteDialogFragment.this.getActivity().startActivity(intent);
 								break;
 							case 1 :
-								Folders folders = new Folders(EditDeleteDialogFragment.this.getActivity());
+								Folders_old2 folders = new Folders_old2(EditDeleteDialogFragment.this.getActivity());
 								Map<String,Folder> folderMap = folders.retrieveAsMap();
 								folderMap.remove(name);
 								folders.saveAndNotifyAsList(folderMap);

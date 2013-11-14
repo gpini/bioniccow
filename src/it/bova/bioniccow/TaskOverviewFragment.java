@@ -10,7 +10,7 @@ import java.util.Map;
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBOverviewTaskGetter;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.observers.TaskListObserver;
 import it.bova.bioniccow.utilities.SmartClickListener;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
@@ -48,7 +48,7 @@ public class TaskOverviewFragment extends SherlockFragment
 	private TaskOverviewAdapter adapter;
 
 
-	private TaskLists tasklists;
+	private TaskLists_old2 tasklists;
 	private Map<String,TaskList> listMap;
 	private TaskListObserver listObserver;
 	private List<ParcelableTask> tasks;
@@ -74,7 +74,7 @@ public class TaskOverviewFragment extends SherlockFragment
 		this.dateFormatStrings = this.getResources().getStringArray(R.array.smart_date_format_labels);
 		this.task_NOK = this.getResources().getString(R.string.task_NOK);	
 
-		this.tasklists = new TaskLists(this.getSherlockActivity());
+		this.tasklists = new TaskLists_old2(this.getSherlockActivity());
 		
 		this.groupList = this.getResources().getStringArray(R.array.overview_categories);
 		this.adapter = new TaskOverviewAdapter(this.getSherlockActivity(), this.groupList, createChildList(null));

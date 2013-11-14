@@ -11,11 +11,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import it.bova.bioniccow.data.Folders;
+import it.bova.bioniccow.data.Folders_old2;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Locations;
-import it.bova.bioniccow.data.Tags;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Locations_old2;
+import it.bova.bioniccow.data.Tags_old2;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.observers.FolderObserver;
 import it.bova.bioniccow.data.observers.LocationObserver;
 import it.bova.bioniccow.data.observers.TagObserver;
@@ -142,15 +142,15 @@ public class TaskDetailActivity extends EditActivity {
 	protected String newRecurrenceString = "";
 	protected TimePickerDialog.OnTimeSetListener timeSetListener2;
 
-	protected TaskLists tasklists;
+	protected TaskLists_old2 tasklists;
 	protected TaskListObserver listObserver;
 	//protected Map<String,String> nameToListIdMap;
-	protected Locations locations;
+	protected Locations_old2 locations;
 	protected LocationObserver locationObserver;
 	//protected Map<String,String> nameToLocationIdMap;
-	protected Tags tags;
+	protected Tags_old2 tags;
 	protected TagObserver tagObserver;
-	protected Folders folders;
+	protected Folders_old2 folders;
 	protected FolderObserver folderObserver;
 	
 	protected NetAvailabilityTask nat;
@@ -171,10 +171,10 @@ public class TaskDetailActivity extends EditActivity {
 
 		this.loadForms();
 
-		this.folders = new Folders(this);
-		this.tags = new Tags(this);
-		this.tasklists = new TaskLists(this);
-		this.locations = new Locations(this);
+		this.folders = new Folders_old2(this);
+		this.tags = new Tags_old2(this);
+		this.tasklists = new TaskLists_old2(this);
+		this.locations = new Locations_old2(this);
 
 		this.tagLabels = new ArrayList<Label>();
 		this.folderLabels = new ArrayList<Label>();

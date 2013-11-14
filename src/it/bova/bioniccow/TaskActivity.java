@@ -27,8 +27,8 @@ import it.bova.bioniccow.asyncoperations.tasks.TaskCompleter;
 import it.bova.bioniccow.asyncoperations.tasks.TaskDeleter;
 import it.bova.bioniccow.asyncoperations.tasks.TaskPostponer;
 import it.bova.bioniccow.asyncoperations.tasks.TaskUncompleter;
-import it.bova.bioniccow.data.Locations;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Locations_old2;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.observers.LocationObserver;
 import it.bova.bioniccow.data.observers.TaskListObserver;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
@@ -82,10 +82,10 @@ public class TaskActivity extends SyncableActivity {
 	private Button completeButton;
 	private TaskAdapter adapter;
 	
-	private TaskLists tasklists;
+	private TaskLists_old2 tasklists;
 	private Map<String,TaskList> listMap;
 	private TaskListObserver listObserver;
-	private Locations locations;
+	private Locations_old2 locations;
 	private LocationObserver locationObserver;
 	private Map<String,Location> locMap;
 	private ArrayList<CheckableTask> uncompletedTasks;
@@ -176,8 +176,8 @@ public class TaskActivity extends SyncableActivity {
 		
 		this.selectedTasks = new HashMap<String,CheckableTask>();
 		
-		this.tasklists = new TaskLists(this);
-		this.locations = new Locations(this);
+		this.tasklists = new TaskLists_old2(this);
+		this.locations = new Locations_old2(this);
 		this.adapter = new TaskAdapter(this, new ArrayList<CheckableTask>());
 		this.footer = getLayoutInflater().inflate(R.layout.task_footer, null);
 		this.footerButton = (Button) this.footer.findViewById(R.id.footerText);

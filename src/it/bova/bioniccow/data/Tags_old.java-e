@@ -7,15 +7,15 @@ import java.util.TreeSet;
 
 import android.content.Context;
 
-public class Tags_old extends DataObservable<Set<String>> {
+public class Tags_old extends DataObservable_old2<Set<String>> {
 	
 	public Tags_old(Context context) {
 		super(context);
 	}
 
 	private static Set<String> tagSet;
-	private static List<DataObserver<Set<String>>> observers = 
-			new ArrayList<DataObserver<Set<String>>>();
+	private static List<DataObserver_old2<Set<String>>> observers = 
+			new ArrayList<DataObserver_old2<Set<String>>>();
 	private static final String TAG_FILENAME = "tags.dat";
 	
 	
@@ -34,7 +34,7 @@ public class Tags_old extends DataObservable<Set<String>> {
 		return new TreeSet<String>();
 	}
 
-	@Override List<DataObserver<Set<String>>> getObservers() {
+	@Override List<DataObserver_old2<Set<String>>> getObservers() {
 		return observers;
 	}
 	

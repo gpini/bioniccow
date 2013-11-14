@@ -9,15 +9,15 @@ import java.util.Map;
 
 import android.content.Context;
 
-public class TaskLists_old extends DataObservable<Map<String,TaskList>> {
+public class TaskLists_old extends DataObservable_old2<Map<String,TaskList>> {
 	
 	public TaskLists_old(Context context) {
 		super(context);
 	}
 
 	private static Map<String,TaskList> listMap;
-	private static List<DataObserver<Map<String,TaskList>>> observers = 
-			new ArrayList<DataObserver<Map<String,TaskList>>>();
+	private static List<DataObserver_old2<Map<String,TaskList>>> observers = 
+			new ArrayList<DataObserver_old2<Map<String,TaskList>>>();
 	private static final String LIST_FILENAME = "lists.dat";
 	
 	
@@ -33,7 +33,7 @@ public class TaskLists_old extends DataObservable<Map<String,TaskList>> {
 		return new HashMap<String,TaskList>();
 	}
 
-	@Override List<DataObserver<Map<String, TaskList>>> getObservers() {
+	@Override List<DataObserver_old2<Map<String, TaskList>>> getObservers() {
 		return observers;
 	}
 	

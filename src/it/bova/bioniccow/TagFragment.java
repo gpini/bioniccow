@@ -1,6 +1,6 @@
 package it.bova.bioniccow;
 
-import it.bova.bioniccow.data.Tags;
+import it.bova.bioniccow.data.Tags_old2;
 import it.bova.bioniccow.data.observers.TagObserver;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
@@ -24,7 +24,7 @@ public class TagFragment extends SherlockFragment implements InterProcess{
 	private GridView grid;
 	private TagAdapter adapter;
 
-	private Tags tags;
+	private Tags_old2 tags;
 	private TagObserver tagObserver;
 	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,7 +36,7 @@ public class TagFragment extends SherlockFragment implements InterProcess{
 		grid.setAdapter(adapter);
 		
 		//"sveglia" Tags
-		this.tags = new Tags(this.getSherlockActivity());	
+		this.tags = new Tags_old2(this.getSherlockActivity());	
 
 		return view;
 

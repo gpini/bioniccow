@@ -12,13 +12,13 @@ import java.util.Set;
 import com.actionbarsherlock.app.SherlockFragment;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskAdder;
 import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
-import it.bova.bioniccow.data.Folders;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Locations;
+import it.bova.bioniccow.data.Folders_old2;
+import it.bova.bioniccow.data.Locations_old2;
 import it.bova.bioniccow.data.Preferences;
-import it.bova.bioniccow.data.Tags;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Tags_old2;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.observers.FolderObserver;
 import it.bova.bioniccow.data.observers.LocationObserver;
 import it.bova.bioniccow.data.observers.TagObserver;
@@ -71,15 +71,15 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 	private SyncHelper syncHelper;
 	private TextView syncInfo;
 
-	private TaskLists tasklists;
+	private TaskLists_old2 tasklists;
 	private TaskListObserver listObserver;
 	private Map<String,TaskList> listMap;
-	private Locations locations;
+	private Locations_old2 locations;
 	private LocationObserver locationObserver;
 	private Map<String,Location> locMap;
-	private Tags tags;
+	private Tags_old2 tags;
 	private TagObserver tagObserver;
-	private Folders folders;
+	private Folders_old2 folders;
 	private FolderObserver folderObserver;
 	private List<Label> listLabels;
 	private List<Label> locationLabels;
@@ -173,10 +173,10 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 		});
 
 		//"Sveglia" le strutture
-		this.folders = new Folders(this.getSherlockActivity());	
-		this.tasklists = new TaskLists(this.getSherlockActivity());
-		this.locations = new Locations(this.getSherlockActivity());
-		this.tags = new Tags(this.getSherlockActivity());
+		this.folders = new Folders_old2(this.getSherlockActivity());	
+		this.tasklists = new TaskLists_old2(this.getSherlockActivity());
+		this.locations = new Locations_old2(this.getSherlockActivity());
+		this.tags = new Tags_old2(this.getSherlockActivity());
 		this.listMap = new HashMap<String,TaskList>();
 		this.locMap = new HashMap<String,Location>();
 

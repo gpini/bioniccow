@@ -2,47 +2,30 @@ package it.bova.bioniccow;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
-import it.bova.bioniccow.asyncoperations.MessageReceiver;
-import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
-import it.bova.bioniccow.asyncoperations.sync.SyncObserver;
-import it.bova.bioniccow.asyncoperations.sync.Synchronizer;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.observers.TaskListObserver;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
 import it.bova.bioniccow.utilities.rtmobjects.TaskListComparator;
-import it.bova.rtmapi.RtmObjects;
 import it.bova.rtmapi.TaskList;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class TaskListFragment extends SherlockFragment implements InterProcess {
 	
 	private GridView grid;
 	private TaskListAdapter adapter;
 	
-	private TaskLists tasklists;
+	private TaskLists_old2 tasklists;
 	private TaskListObserver listObserver;
 	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,7 +36,7 @@ public class TaskListFragment extends SherlockFragment implements InterProcess {
 		grid.setAdapter(adapter);
 		
 		//"sveglia" tasklists!!
-		this.tasklists = new TaskLists(this.getSherlockActivity());	
+		this.tasklists = new TaskLists_old2(this.getSherlockActivity());	
 		
 		return view;
 		

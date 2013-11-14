@@ -8,15 +8,15 @@ import java.util.Map;
 
 import android.content.Context;
 
-public class Folders_old extends DataObservable<Map<String,Folder>> {
+public class Folders_old extends DataObservable_old2<Map<String,Folder>> {
 	
 	public Folders_old(Context context) {
 		super(context);
 	}
 
 	private static Map<String,Folder> folderMap;
-	private static List<DataObserver<Map<String,Folder>>> observers = 
-			new ArrayList<DataObserver<Map<String,Folder>>>();
+	private static List<DataObserver_old2<Map<String,Folder>>> observers = 
+			new ArrayList<DataObserver_old2<Map<String,Folder>>>();
 	private static final String FOLDERS_FILENAME = "folders.dat";
 	
 	
@@ -36,7 +36,7 @@ public class Folders_old extends DataObservable<Map<String,Folder>> {
 
 	}
 
-	@Override List<DataObserver<Map<String,Folder>>> getObservers() {
+	@Override List<DataObserver_old2<Map<String,Folder>>> getObservers() {
 		return observers;
 	}
 	

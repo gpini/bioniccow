@@ -6,13 +6,13 @@ import it.bova.bioniccow.asyncoperations.InquiryAnswer;
 import it.bova.bioniccow.asyncoperations.rtmobjects.ListGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.LocationGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.SynchedTaskGetter;
-import it.bova.bioniccow.data.Folders;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Locations;
+import it.bova.bioniccow.data.Folders_old2;
+import it.bova.bioniccow.data.Locations_old2;
 import it.bova.bioniccow.data.Preferences;
-import it.bova.bioniccow.data.Tags;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Tags_old2;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.rtmapi.DeletedTask;
@@ -162,7 +162,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			listMap = RtmObjects.toMap(answer.getResult());
 			for(TaskList list : listMap.values())
 				if(list.isArchived()) listMap.remove(list);
-			new TaskLists(this).saveAsList(listMap);
+			new TaskLists_old2(this).saveAsList(listMap);
 			return true;
 		}
 		else {
@@ -176,7 +176,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 		InquiryAnswer<List<Location>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
 			locMap = RtmObjects.toMap(answer.getResult());
-			new Locations(this).saveAsList(locMap);
+			new Locations_old2(this).saveAsList(locMap);
 			return true;
 		}
 		else {
@@ -242,18 +242,18 @@ public class SynchService extends IntentService implements ErrorCoded{
 				p.putLong(PrefParameter.LAST_SYNCH, now.getTime());
 
 				//Log.d("ciao", "synching tags");
-				Set<String> tagSet = TaskDatabase.getDistingTags();
+				Set<String> tagSet = TaskDatabase.getDistinctTags();
 				//Log.d("(synch) tags", "" + tagSet.size());
-				new Tags(this).save(tagSet);
+				new Tags_old2(this).save(tagSet);
 
 				//Log.d("ciao", "synching folders");
-				Map<String,Folder> folders = new Folders(this).retrieveAsMap();
+				Map<String,Folder> folders = new Folders_old2(this).retrieveAsMap();
 				if(listMap == null)
-					listMap = new TaskLists(this).retrieveAsMap();
+					listMap = new TaskLists_old2(this).retrieveAsMap();
 				if(locMap == null)
-					locMap = new Locations(this).retrieveAsMap();
+					locMap = new Locations_old2(this).retrieveAsMap();
 				folderMap = TasksUpdater.updateFolders(folders, tagSet, listMap, locMap);
-				new Folders(this).saveAsList(folderMap);
+				new Folders_old2(this).saveAsList(folderMap);
 
 				return synchedTasks;
 			}

@@ -9,15 +9,15 @@ import java.util.Map;
 
 import android.content.Context;
 
-public class Locations_old extends DataObservable<Map<String,Location>> {
+public class Locations_old extends DataObservable_old2<Map<String,Location>> {
 	
 	public Locations_old(Context context) {
 		super(context);
 	}
 
 	private static Map<String,Location> locationMap;
-	private static List<DataObserver<Map<String,Location>>> observers = 
-			new ArrayList<DataObserver<Map<String,Location>>>();
+	private static List<DataObserver_old2<Map<String,Location>>> observers = 
+			new ArrayList<DataObserver_old2<Map<String,Location>>>();
 	private static final String LOC_FILENAME = "locations.dat";
 	
 	
@@ -36,7 +36,7 @@ public class Locations_old extends DataObservable<Map<String,Location>> {
 		return new HashMap<String,Location>();
 	}
 
-	@Override List<DataObserver<Map<String, Location>>> getObservers() {
+	@Override List<DataObserver_old2<Map<String, Location>>> getObservers() {
 		return observers;
 	}
 	

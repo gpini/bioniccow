@@ -1,12 +1,15 @@
 package it.bova.bioniccow.data.database;
 
+import it.bova.rtmapi.Recurrence;
+import it.bova.rtmapi.Task;
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class TaskTable {
 	// Database table
 	public static final String TABLE_TASK = "task";
-	public static final String COLUMN_ID = "_id";
+	//public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_TASK_STATUS = "status";
 	//task
 	public static final String COLUMN_TASK_ID = "taskId";
@@ -47,9 +50,9 @@ public class TaskTable {
 	private static final String DATABASE_CREATE = "create table "
 			+ TABLE_TASK
 			+ "("
-			+ COLUMN_ID + " integer primary key autoincrement, "
+			//+ COLUMN_ID + " integer primary key autoincrement, "
 			+ COLUMN_TASK_STATUS + " integer default 0,"
-			+ COLUMN_TASK_ID + " text unique not null,"
+			+ COLUMN_TASK_ID + " text primary key,"
 			+ COLUMN_ADDED + " integer not null,"
 			+ COLUMN_COMPLETED + " integer,"
 			+ COLUMN_DELETED + " integer,"
@@ -80,9 +83,49 @@ public class TaskTable {
 	public static void onUpgrade(SQLiteDatabase database, int oldVersion,
 			int newVersion) {
 		Log.w(NoteTable.class.getName(), "Upgrading database from version "
-				+ oldVersion + " to " + newVersion
-				+ ", which will destroy all old data");
-		database.execSQL("DROP TABLE IF EXISTS " + TABLE_TASK);
-		onCreate(database);
+				+ oldVersion + " to " + newVersion);
 	}
+	
+	public static ContentValues values(Task task) {
+		ContentValues values = new ContentValues();
+		values.put(TaskTable.COLUMN_TASK_ID, task.getId());
+		values.put(TaskTable.COLUMN_ADDED, task.getAdded().getTime());
+		if(task.getCompleted() != null)
+			values.put(TaskTable.COLUMN_COMPLETED, task.getCompleted().getTime());
+		if(task.getDeleted() != null)
+			values.put(TaskTable.COLUMN_DELETED, task.getDeleted().getTime());
+		if(task.getDue() != null)
+			values.put(TaskTable.COLUMN_DUE, task.getDue().getTime());
+		if(task.getEstimate() != null)
+			values.put(TaskTable.COLUMN_ESTIMATE, task.getEstimate());
+		values.put(TaskTable.COLUMN_HAS_DUE_TIME, boolToInt(task.getHasDueTime()));
+		values.put(TaskTable.COLUMN_POSTPONED, task.getPostponed());
+		values.put(TaskTable.COLUMN_PRIORITY, task.getPriority().ordinal());
+		values.put(TaskTable.COLUMN_TASKSERIE_ID, task.getTaskserieId());
+		values.put(TaskTable.COLUMN_NAME, task.getName());
+		values.put(TaskTable.COLUMN_LIST_ID, task.getListId());
+		values.put(TaskTable.COLUMN_LOCATION_ID, task.getLocationId());
+		if(task.getCreated() != null)
+			values.put(TaskTable.COLUMN_CREATED, task.getCreated().getTime());
+		if(task.getModified() != null)
+			values.put(TaskTable.COLUMN_MODIFIED, task.getModified().getTime());
+		if(task.getRecurrence() != null) {
+			Recurrence rec = task.getRecurrence();
+			values.put(TaskTable.COLUMN_RECURRENCE_IS_EVERY, boolToInt(rec.isEvery()));
+			values.put(TaskTable.COLUMN_RECURRENCE_INTERVAL, rec.getInterval());
+			values.put(TaskTable.COLUMN_RECURRENCE_FREQUENCY, rec.getFrequency().ordinal());
+			if(rec.hasOption()) {
+				values.put(TaskTable.COLUMN_RECURRENCE_OPTION_TYPE, rec.getOption().ordinal());
+				values.put(TaskTable.COLUMN_RECURRENCE_OPTION_VALUE, rec.getOptionValue());
+			}
+		}
+		values.put(TaskTable.COLUMN_SOURCE, task.getSource());
+		if(task.getUrl() != null)
+			values.put(TaskTable.COLUMN_URL, task.getUrl());
+		return values;
+	}
+	
+	private static int boolToInt(boolean bool) {
+		return bool == true ? 1 : 0;
+	}	
 }

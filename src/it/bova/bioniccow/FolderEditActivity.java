@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import it.bova.bioniccow.data.Folders;
 import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.Folder.Applicability;
-import it.bova.bioniccow.data.Locations;
+import it.bova.bioniccow.data.Folders_old2;
+import it.bova.bioniccow.data.Locations_old2;
 import it.bova.bioniccow.data.Preferences;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
-import it.bova.bioniccow.data.Tags;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Tags_old2;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.rtmapi.Location;
 import it.bova.rtmapi.TaskList;
 import android.app.AlertDialog;
@@ -39,9 +39,9 @@ public class FolderEditActivity extends EditActivity {
 	private String folderNOKAdd2;
 	
 	private Folder folderToBeEdited;
-	private Tags tags;
-	private TaskLists tasklists;
-	private Locations locations;
+	private Tags_old2 tags;
+	private TaskLists_old2 tasklists;
+	private Locations_old2 locations;
 	
 	private static final int FOLDER_HELP_DIALOG = 1;
 	
@@ -59,7 +59,7 @@ public class FolderEditActivity extends EditActivity {
 		if(this.getIntent().hasExtra("name")) {
 			 String name = this.getIntent().getStringExtra("name");
 			 folderToBeEdited = 
-					 new Folders(this).retrieveAsMap().get(name);
+					 new Folders_old2(this).retrieveAsMap().get(name);
 			 if(folderToBeEdited != null) {
 				 folderNameInput.setText(name);
 				 String rule = folderToBeEdited.getRule();
@@ -97,9 +97,9 @@ public class FolderEditActivity extends EditActivity {
 		folderNOKAdd1 = this.getResources().getString(R.string.folder_add_NOK1);
 		folderNOKAdd2 = this.getResources().getString(R.string.folder_add_NOK2);
 
-		this.tags = new Tags(this);
-		this.tasklists = new TaskLists(this);
-		this.locations = new Locations(this);
+		this.tags = new Tags_old2(this);
+		this.tasklists = new TaskLists_old2(this);
+		this.locations = new Locations_old2(this);
 		
 	}
 	
@@ -180,7 +180,7 @@ public class FolderEditActivity extends EditActivity {
 			this.finish();
 		}
 		else {
-			Folders folders = new Folders(this);
+			Folders_old2 folders = new Folders_old2(this);
 			Map<String,Folder> folderMap = folders.retrieveAsMap();
 			if(folderToBeEdited != null)
 				folderMap.remove(folderToBeEdited.getName());

@@ -1,10 +1,10 @@
 package it.bova.bioniccow;
 
-import it.bova.bioniccow.data.Folders;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Locations;
-import it.bova.bioniccow.data.Tags;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Folders_old2;
+import it.bova.bioniccow.data.Locations_old2;
+import it.bova.bioniccow.data.Tags_old2;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.observers.FolderObserver;
 import it.bova.bioniccow.data.observers.LocationObserver;
 import it.bova.bioniccow.data.observers.TagObserver;
@@ -45,16 +45,16 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 	private FolderAdapter adapter;
 
 	private String folder;
-	private Folders folders;
+	private Folders_old2 folders;
 	private FolderObserver folderObserver;
 	
-	private Tags tags;
+	private Tags_old2 tags;
 	private Set<String> tagSet;
 	private TagObserver tagObserver;
-	private TaskLists tasklists;
+	private TaskLists_old2 tasklists;
 	private Map<String,TaskList> listMap;
 	private TaskListObserver listObserver;
-	private Locations locations;
+	private Locations_old2 locations;
 	private Map<String,Location> locMap;
 	private LocationObserver locationObserver;
 	
@@ -66,10 +66,10 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 		adapter = new FolderAdapter(this.getSherlockActivity(), new ArrayList<FolderElement>());
 		grid.setAdapter(adapter);
 		
-		this.folders = new Folders(this.getSherlockActivity());
-		this.tags = new Tags(this.getSherlockActivity());
-		this.locations = new Locations(this.getSherlockActivity());
-		this.tasklists = new TaskLists(this.getSherlockActivity());
+		this.folders = new Folders_old2(this.getSherlockActivity());
+		this.tags = new Tags_old2(this.getSherlockActivity());
+		this.locations = new Locations_old2(this.getSherlockActivity());
+		this.tasklists = new TaskLists_old2(this.getSherlockActivity());
 		
 		folder = this.getArguments().getString("folder");
 		TextView folderTitle = (TextView) view.findViewById(R.id.folderTitle);

@@ -2,16 +2,12 @@ package it.bova.bioniccow.asyncoperations;
 
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.rtmapi.Note;
-import it.bova.rtmapi.Task;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 public class MessageReceiver extends BroadcastReceiver {
 	@Override public final void onReceive(Context context, Intent intent) {

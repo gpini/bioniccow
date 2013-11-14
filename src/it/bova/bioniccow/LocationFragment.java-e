@@ -1,6 +1,6 @@
 package it.bova.bioniccow;
 
-import it.bova.bioniccow.data.Locations;
+import it.bova.bioniccow.data.Locations_old2;
 import it.bova.bioniccow.data.observers.LocationObserver;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
@@ -26,7 +26,7 @@ public class LocationFragment extends SherlockFragment implements InterProcess{
 	private GridView grid;
 	private LocationAdapter adapter;
 	
-	private Locations locations;
+	private Locations_old2 locations;
 	private LocationObserver locationObserver;
 	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,7 +38,7 @@ public class LocationFragment extends SherlockFragment implements InterProcess{
 		grid.setAdapter(adapter);
 		
 		//"sveglia" locations!!
-		this.locations = new Locations(this.getSherlockActivity());	
+		this.locations = new Locations_old2(this.getSherlockActivity());	
 		
 		return view;
 		

@@ -1,10 +1,10 @@
 package it.bova.bioniccow.asyncoperations.sync;
 
 import it.bova.bioniccow.asyncoperations.MessageSender;
-import it.bova.bioniccow.data.Folders;
-import it.bova.bioniccow.data.Locations;
-import it.bova.bioniccow.data.Tags;
-import it.bova.bioniccow.data.TaskLists;
+import it.bova.bioniccow.data.Folders_old2;
+import it.bova.bioniccow.data.Locations_old2;
+import it.bova.bioniccow.data.Tags_old2;
+import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.rtmapi.Task;
 import java.util.ArrayList;
@@ -109,13 +109,13 @@ public class Synchronizer {
 		@Override public void handleMessage(Message msg) {
 			switch(msg.arg1) {
 			case SynchService.LISTS_SYNCHED : 
-				new TaskLists(context).notifyDataChanged();
+				new TaskLists_old2(context).notifyDataChanged();
 				break;
 			case SynchService.LOCATIONS_SYNCHED : 
-				new Locations(context).notifyDataChanged();
+				new Locations_old2(context).notifyDataChanged();
 				break;
 			case SynchService.TAGS_SYNCHED :
-				new Tags(context).notifyDataChanged();
+				new Tags_old2(context).notifyDataChanged();
 				break;
 			case SynchService.TASKS_SYNCHED : 
 				//Log.d("sync", "task synched");
@@ -128,7 +128,7 @@ public class Synchronizer {
 				}
 				break;
 			case SynchService.FOLDERS_SYNCHED: 
-				new Folders(context).notifyDataChanged();
+				new Folders_old2(context).notifyDataChanged();
 				break;
 			}
 		}
