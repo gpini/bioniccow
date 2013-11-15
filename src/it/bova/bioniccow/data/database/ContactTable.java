@@ -19,7 +19,7 @@ public class ContactTable {
 		};
 	
 	// Database creation SQL statement
-	private static final String DATABASE_CREATE = "create table "
+	private static final String DATABASE_CREATE = "create table if not exists "
 			+ TABLE_CONTACT
 			+ "("
 			//+ COLUMN_ID + " integer primary key autoincrement, "

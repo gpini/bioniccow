@@ -47,7 +47,7 @@ public class TaskTable {
 	};
 
 	// Database creation SQL statement
-	private static final String DATABASE_CREATE = "create table "
+	private static final String DATABASE_CREATE = "create table if not exists "
 			+ TABLE_TASK
 			+ "("
 			//+ COLUMN_ID + " integer primary key autoincrement, "
