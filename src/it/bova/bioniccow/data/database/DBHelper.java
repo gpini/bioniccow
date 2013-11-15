@@ -41,7 +41,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	// e.g. if you increase the database version
 	@Override public void onUpgrade(SQLiteDatabase database, int oldVersion,
 			int newVersion) {
-		if(newVersion == 2) {
+		if(oldVersion == 1) {
 			ContactTable.onCreate(database);
 			TaskToContactTable.onCreate(database);
 			NoteTable.onCreate(database);
@@ -56,26 +56,33 @@ public class DBHelper extends SQLiteOpenHelper {
 					+ "hasDueTime, postponed, priority, taskserieId, name, listId, locationId, "
 					+ "created, modified, recurrenceIsEvery, recurrenceFrequency, recurrenceInterval, "
 					+ "recurrenceOptionType, recurrenceOptionValue, source, url, taskId";
-			database.execSQL("INSERT INTO task (" + newTaskFields + ") SELECT (" + newTaskFields + ") FROM tmpTask;");
+			database.execSQL("INSERT INTO task (" + newTaskFields + ") SELECT " + newTaskFields + " FROM tmpTask;");
 			database.execSQL("DROP TABLE tmpTask;");
 			//create and populate new contact tables
-			database.execSQL("ATTACH DATABASE contacts.db AS dbc;");
-			database.execSQL("INSERT INTO contact (fullname, username, contactId) SELECT (fullname, username, contactId) FROM dbc.contact;");
-			database.execSQL("INSERT INTO task_to_contact SELECT (taskId, contactId) FROM task JOIN dbc.contact ON task.taskId = dbc.contact.taskId;");
+			database.endTransaction();
+			database.execSQL("ATTACH DATABASE 'contacts.db' AS dbc;");
+			database.beginTransaction();
+			database.execSQL("INSERT INTO contact (fullname, username, contactId) SELECT fullname, username, contactId FROM dbc.contact;");
+			database.execSQL("INSERT INTO task_to_contact SELECT taskId, contactId FROM task JOIN dbc.contact ON task.taskId = dbc.contact.taskId;");
 			//create and populate new note tables
-			database.execSQL("ATTACH DATABASE note.db AS dbn;");
-			database.execSQL("INSERT INTO note (title, text, create, modified, noteId) SELECT (title, text, create, modified, noteId) FROM dbn.note;");
-			database.execSQL("INSERT INTO task_to_note (taskId, notetId) SELECT (taskId, notetId) FROM task JOIN dbn.note ON task.taskId = dbn.note.taskId;");
+			database.endTransaction();
+			database.execSQL("ATTACH DATABASE 'note.db' AS dbn;");
+			database.beginTransaction();
+			database.execSQL("INSERT INTO note (title, text, create, modified, noteId) SELECT title, text, create, modified, noteId FROM dbn.note;");
+			database.execSQL("INSERT INTO task_to_note (taskId, notetId) SELECT taskId, notetId FROM task JOIN dbn.note ON task.taskId = dbn.note.taskId;");
 			//create and populate new tag table
-			database.execSQL("ATTACH DATABASE tags.db AS dbt;");
-			database.execSQL("INSERT INTO tag (name, taskId) SELECT (name, taskId) FROM dbt.tag;");
+			database.endTransaction();
+			database.execSQL("ATTACH DATABASE 'tags.db' AS dbt;");
+			database.beginTransaction();
+			database.execSQL("INSERT INTO tag (name, taskId) SELECT name, taskId FROM dbt.tag;");
 			//clean unused db
+			database.endTransaction();
 			database.execSQL("DROP TABLE dbc.contact;");
-			database.execSQL("DETACH DATABASE contacts.db;");
+			database.execSQL("DETACH DATABASE 'contacts.db';");
 			database.execSQL("DROP TABLE dbn.note;");
-			database.execSQL("DETACH DATABASE notes.db;");
+			database.execSQL("DETACH DATABASE 'notes.db';");
 			database.execSQL("DROP TABLE dbt.tag;");
-			database.execSQL("DETACH DATABASE tags.db;");
+			database.execSQL("DETACH DATABASE 'tags.db';");
 			
 			//create new tasklist, location and folder tables
 			TaskListTable.onCreate(database);
