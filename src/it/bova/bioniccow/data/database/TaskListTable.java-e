@@ -27,7 +27,7 @@ public class TaskListTable {
 		};
 	
 	// Database creation SQL statement
-	private static final String DATABASE_CREATE = "create table "
+	private static final String DATABASE_CREATE = "create table if not exists "
 			+ TABLE_TASKLIST
 			+ "("
 			//+ COLUMN_ID + " integer primary key autoincrement, "
@@ -38,7 +38,7 @@ public class TaskListTable {
 			+ COLUMN_TASKLIST_ID + " text primary key,"
 			+ COLUMN_POSITION + " integer not null,"
 			+ COLUMN_SMART + " bool not null,"
-			+ COLUMN_SORT_ORDER + " integer not null,"
+			+ COLUMN_SORT_ORDER + " integer not null"
 			+ ");";
 	
 	public static void onCreate(SQLiteDatabase database) {

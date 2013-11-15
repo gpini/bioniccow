@@ -27,7 +27,7 @@ public class LocationTable {
 		};
 	
 	// Database creation SQL statement
-	private static final String DATABASE_CREATE = "create table "
+	private static final String DATABASE_CREATE = "create table if not exists "
 			+ TABLE_LOCATION
 			+ "("
 			//+ COLUMN_ID + " integer primary key autoincrement, "
