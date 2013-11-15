@@ -53,31 +53,35 @@ public class DBHelper extends SQLiteOpenHelper {
 			database.execSQL("INSERT INTO task (" + newTaskFields + ") SELECT " + newTaskFields + " FROM tmpTask;");
 			database.execSQL("DROP TABLE tmpTask;");
 			//create and populate new contact tables
+			database.setTransactionSuccessful();
 			database.endTransaction();
 			String contactPath = context.getDatabasePath("contacts.db").getPath();
 			database.execSQL("ATTACH DATABASE '" + contactPath + "' AS dbc;");
 			//database.beginTransaction();
 			ContactTable.onCreate(database);
 			TaskToContactTable.onCreate(database);
+			database.execSQL("INSERT INTO task_to_contact (taskId, contactId) SELECT DISTINCT task.taskId, contactId FROM task JOIN dbc.contact ON task.taskId = dbc.contact.taskId;");
 			database.execSQL("INSERT INTO contact (fullname, username, contactId) SELECT DISTINCT fullname, username, contactId FROM dbc.contact;");
-			database.execSQL("INSERT INTO task_to_contact (taskId, contactId) SELECT DISTINCT taskId, contactId FROM task JOIN dbc.contact ON task.taskId = dbc.contact.taskId;");
 			//create and populate new note tables
+			database.setTransactionSuccessful();
 			database.endTransaction();
 			String notePath = context.getDatabasePath("notes.db").getPath();
 			database.execSQL("ATTACH DATABASE '" + notePath + " AS dbn;");
 			database.beginTransaction();
 			NoteTable.onCreate(database);
 			TaskToNoteTable.onCreate(database);
-			database.execSQL("INSERT INTO note (title, text, create, modified, noteId) SELECT DISTINCT title, text, create, modified, noteId FROM dbn.note;");
-			database.execSQL("INSERT INTO task_to_note (taskId, notetId) SELECT DISTINCT taskId, notetId FROM task JOIN dbn.note ON task.taskId = dbn.note.taskId;");
+			database.execSQL("INSERT INTO note (title, text, create, modified, noteId) SELECT title, text, create, modified, noteId FROM dbn.note;");
+			database.execSQL("INSERT INTO task_to_note (task.taskId, notetId) SELECT taskId, notetId FROM task JOIN dbn.note ON task.taskId = dbn.note.taskId;");
 			//create and populate new tag table
+			database.setTransactionSuccessful();
 			database.endTransaction();
 			String tagPath = context.getDatabasePath("tags.db").getPath();
 			database.execSQL("ATTACH DATABASE '" + tagPath + " AS dbt;");
 			database.beginTransaction();
 			TagTable.onCreate(database);
-			database.execSQL("INSERT INTO tag (name, taskId) SELECT DISTINCT name, taskId FROM dbt.tag;");
+			database.execSQL("INSERT INTO tag (name, taskId) SELECT name, taskId FROM dbt.tag;");
 			//clean unused db
+			database.setTransactionSuccessful();
 			database.endTransaction();
 			database.execSQL("DROP TABLE dbc.contact;");
 			database.execSQL("DETACH DATABASE '" + contactPath + ";");
