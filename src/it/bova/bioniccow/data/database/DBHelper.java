@@ -95,30 +95,36 @@ public class DBHelper extends SQLiteOpenHelper {
 			//create and populate new contact tables
 			database.setTransactionSuccessful();
 			database.endTransaction();
+			database.execSQL("DROP TABLE IF EXISTS task_to_contact;");
+			database.execSQL("DROP TABLE IF EXISTS contact;");
 			String contactPath = context.getDatabasePath("contacts.db").getPath();
 			database.execSQL("ATTACH DATABASE '" + contactPath + "' AS dbc;");
 			//database.beginTransaction();
-			database.execSQL("DROP TABLE IF EXISTS task_to_contact;");
-			database.execSQL("DROP TABLE IF EXISTS contact;");
 			ContactTable.onCreate(database);
 			TaskToContactTable.onCreate(database);
+			database.beginTransaction();
 			database.execSQL("INSERT INTO task_to_contact (taskId, contactId) SELECT DISTINCT task.taskId, contactId FROM task JOIN dbc.contact ON task.taskId = dbc.contact.taskId;");
 			database.execSQL("INSERT INTO contact (fullname, username, contactId) SELECT DISTINCT fullname, username, contactId FROM dbc.contact;");
+			database.setTransactionSuccessful();
+			database.endTransaction();
 			//create and populate new tag table
+			database.execSQL("DROP TABLE IF EXISTS tag;");
 			String tagPath = context.getDatabasePath("tags.db").getPath();
 			database.execSQL("ATTACH DATABASE '" + tagPath + "' AS dbt;");
-			database.execSQL("DROP TABLE IF EXISTS tag;");
 			TagTable.onCreate(database);
 			database.execSQL("INSERT INTO tag (name, taskId) SELECT name, taskId FROM dbt.tag;");
 			//create and populate new note tables
-			String notePath = context.getDatabasePath("notes.db").getPath();
-			database.execSQL("ATTACH DATABASE '" + notePath + "' AS dbn;");
 			database.execSQL("DROP TABLE IF EXISTS task_to_note;");
 			database.execSQL("DROP TABLE IF EXISTS note;");
+			String notePath = context.getDatabasePath("notes.db").getPath();
+			database.execSQL("ATTACH DATABASE '" + notePath + "' AS dbn;");
 			NoteTable.onCreate(database);
 			TaskToNoteTable.onCreate(database);
+			database.beginTransaction();
 			database.execSQL("INSERT INTO note (title, text, created, modified, noteId) SELECT title, text, created, modified, noteId FROM dbn.note;");
 			database.execSQL("INSERT INTO task_to_note (task.taskId, notetId) SELECT taskId, notetId FROM task JOIN dbn.note ON task.taskId = dbn.note.taskId;");
+			database.setTransactionSuccessful();
+			database.endTransaction();
 			//clean unused db
 			database.execSQL("DROP TABLE dbc.contact;");
 			database.execSQL("DETACH DATABASE '" + contactPath + "';");
@@ -126,7 +132,7 @@ public class DBHelper extends SQLiteOpenHelper {
 			database.execSQL("DETACH DATABASE '" + notePath + "';");
 			database.execSQL("DROP TABLE dbt.tag;");
 			database.execSQL("DETACH DATABASE '" + tagPath + "';");
-			
+			//database.beginTransaction();
 			
 		}
 	}
