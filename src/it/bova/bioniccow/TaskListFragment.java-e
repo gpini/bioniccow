@@ -1,11 +1,13 @@
 package it.bova.bioniccow;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
+import it.bova.bioniccow.utilities.rtmobjects.TaskListComparator;
 import it.bova.rtmapi.TaskList;
 import com.actionbarsherlock.app.SherlockFragment;
 
@@ -47,6 +49,7 @@ public class TaskListFragment extends SherlockFragment implements InterProcess {
 	public void refresh() {
 		DBTaskListsGetter tlg = new DBTaskListsGetter(this.getSherlockActivity()) {
 			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				Collections.sort(tasklists, new TaskListComparator());
 				adapter.reloadAndNotify(tasklists);
 			}
 		};

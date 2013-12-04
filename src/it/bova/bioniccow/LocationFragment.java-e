@@ -3,8 +3,10 @@ package it.bova.bioniccow;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
+import it.bova.bioniccow.utilities.rtmobjects.LocationComparator;
 import it.bova.rtmapi.Location;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -49,6 +51,7 @@ public class LocationFragment extends SherlockFragment implements InterProcess{
 	public void refresh() {
 		DBLocationsGetter lg = new DBLocationsGetter(this.getSherlockActivity()) {
 			@Override protected void onPostExecute(List<Location> locations) {
+				Collections.sort(locations, new LocationComparator());
 				adapter.reloadAndNotify(locations);
 			}
 		};

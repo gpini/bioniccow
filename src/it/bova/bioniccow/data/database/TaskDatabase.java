@@ -334,6 +334,7 @@ public class TaskDatabase {
 				insertId = dB.insertWithOnConflict(TaskListTable.TABLE_TASKLIST, null,
 						tasklistValues, SQLiteDatabase.CONFLICT_REPLACE);
 			}
+			dB.setTransactionSuccessful();
 			dB.endTransaction();
 			return insertId;
 		}
@@ -364,6 +365,7 @@ public class TaskDatabase {
 				insertId = dB.insertWithOnConflict(LocationTable.TABLE_LOCATION, null,
 						locationValues, SQLiteDatabase.CONFLICT_REPLACE);
 			}
+			dB.setTransactionSuccessful();
 			dB.endTransaction();
 			return insertId;
 		}
