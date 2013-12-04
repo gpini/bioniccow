@@ -126,9 +126,13 @@ public class DBHelper extends SQLiteOpenHelper {
 			}
 			
 			//create and populate new contact tables
-			String contactPath = context.getDatabasePath("contacts.db").getPath();
 			boolean contactAlreadyDone = prefs.getBoolean(PrefParameter.CONTACT_DB_UPGRADED, false);
 			if(!contactAlreadyDone) {
+				if(database.inTransaction()) {
+					database.setTransactionSuccessful();
+					database.endTransaction();
+				}
+				String contactPath = context.getDatabasePath("contacts.db").getPath();
 				database.execSQL("DROP TABLE IF EXISTS task_to_contact;");
 				database.execSQL("DROP TABLE IF EXISTS contact;");
 				database.execSQL("ATTACH DATABASE '" + contactPath + "' AS dbc;");
@@ -140,27 +144,43 @@ public class DBHelper extends SQLiteOpenHelper {
 				database.execSQL("INSERT INTO contact (fullname, username, contactId) SELECT DISTINCT fullname, username, contactId FROM dbc.contact;");
 				database.setTransactionSuccessful();
 				database.endTransaction();
-				this.context.deleteDatabase("contacts.db");
 				prefs.putBoolean(PrefParameter.CONTACT_DB_UPGRADED, true);
-				database.execSQL("DETACH DATABASE '" + contactPath + "';");
+				try {
+					database.execSQL("DETACH DATABASE 'dbc';");
+					this.context.deleteDatabase("contacts.db");
+				} catch(Exception e) {
+					//do nothing
+				}
 			}
 			
 			//create and populate new tag table
-			String tagPath = context.getDatabasePath("tags.db").getPath();
 			boolean tagAlreadyDone = prefs.getBoolean(PrefParameter.TAG_DB_UPGRADED, false);
 			if(!tagAlreadyDone) {
+				if(database.inTransaction()) {
+					database.setTransactionSuccessful();
+					database.endTransaction();
+				}
+				String tagPath = context.getDatabasePath("tags.db").getPath();
 				database.execSQL("DROP TABLE IF EXISTS tag;");
 				database.execSQL("ATTACH DATABASE '" + tagPath + "' AS dbt;");
 				TagTable.onCreate(database);
 				database.execSQL("INSERT INTO tag (name, taskId) SELECT name, taskId FROM dbt.tag;");
 				prefs.putBoolean(PrefParameter.TAG_DB_UPGRADED, true);
-				database.execSQL("DETACH DATABASE '" + tagPath + "';");
-				this.context.deleteDatabase("tags.db");
+				try {
+					database.execSQL("DETACH DATABASE 'dbt';");
+					this.context.deleteDatabase("tags.db");
+				} catch(Exception e) {
+					//do nothing
+				}
 			}
 			//create and populate new note tables
-			String notePath = context.getDatabasePath("notes.db").getPath();
 			boolean noteAlreadyDone = prefs.getBoolean(PrefParameter.NOTE_DB_UPGRADED, false);
 			if(!noteAlreadyDone) {
+				if(database.inTransaction()) {
+					database.setTransactionSuccessful();
+					database.endTransaction();
+				}
+				String notePath = context.getDatabasePath("notes.db").getPath();
 				database.execSQL("DROP TABLE IF EXISTS task_to_note;");
 				database.execSQL("DROP TABLE IF EXISTS note;");
 				database.execSQL("ATTACH DATABASE '" + notePath + "' AS dbn;");
@@ -172,8 +192,12 @@ public class DBHelper extends SQLiteOpenHelper {
 				database.setTransactionSuccessful();
 				database.endTransaction();
 				prefs.putBoolean(PrefParameter.NOTE_DB_UPGRADED, true);
-				database.execSQL("DETACH DATABASE '" + notePath + "';");
-				this.context.deleteDatabase("notes.db");
+				try {
+					database.execSQL("DETACH DATABASE 'dbn';");
+					this.context.deleteDatabase("notes.db");
+				} catch(Exception e) {
+					//do nothing
+				}
 			}
 			
 		}
