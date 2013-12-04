@@ -40,7 +40,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 
 	private View popup;
 
-	private MessageReceiver messageReceiver = new DefaultMessageReceiver(this);
+	private MessageReceiver messageReceiver;
 
 	private SyncHelper syncHelper;
 
@@ -60,6 +60,33 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 	/** Called when the activity is first created. */
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		this.messageReceiver = new DefaultMessageReceiver(this) {
+			@Override protected void onTasklistsUpdated(Context context) {
+				FragmentManager fm= BionicCowActivity.this.getSupportFragmentManager();
+				Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+				if(fragment != null) {
+					String tag = fragment.getTag();
+					if (tag != null) {
+						if(tag.equals(LIST_FRAGMENT)) 
+							((TaskListFragment) fragment).refresh();
+					}
+				}
+			}
+			
+			@Override protected void onLocationsUpdated(Context context) {
+				FragmentManager fm= BionicCowActivity.this.getSupportFragmentManager();
+				Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+				if(fragment != null) {
+					String tag = fragment.getTag();
+					if (tag != null) {
+						if(tag.equals(LOCATION_FRAGMENT)) 
+							((LocationFragment) fragment).refresh();
+					}
+				}
+			}
+		};
+		//Action Bar
 		setContentView(R.layout.main);
 		ActionBar ab = this.getSupportActionBar();
 		ab.setHomeButtonEnabled(true);

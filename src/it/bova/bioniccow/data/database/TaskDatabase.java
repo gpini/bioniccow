@@ -8,8 +8,10 @@ import java.util.TreeSet;
 
 import it.bova.rtmapi.Contact;
 import it.bova.rtmapi.DeletedTask;
+import it.bova.rtmapi.Location;
 import it.bova.rtmapi.Note;
 import it.bova.rtmapi.Task;
+import it.bova.rtmapi.TaskList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -317,6 +319,66 @@ public class TaskDatabase {
 		return tasks;
 
 
+	}
+	
+	public static synchronized long putTasklists(List<TaskList> tasklists) {
+		checkOrThrow();
+		if(tasklists != null) {
+			//erase previous tasklists
+			dB.delete(TaskListTable.TABLE_TASKLIST, null, null);
+			//insert tasklists
+			dB.beginTransaction();
+			long insertId = -1;
+			for(TaskList tasklist : tasklists) {
+				ContentValues tasklistValues = TaskListTable.values(tasklist);
+				insertId = dB.insertWithOnConflict(TaskListTable.TABLE_TASKLIST, null,
+						tasklistValues, SQLiteDatabase.CONFLICT_REPLACE);
+			}
+			dB.endTransaction();
+			return insertId;
+		}
+		else return -1;
+	}
+	
+	public static synchronized List<TaskList> getTasklists() {
+		Cursor tasklistCursor = dB.query(TaskListTable.TABLE_TASKLIST, null,
+				"archived = 0", null, null, null, null);
+		List<TaskList> tasklists = new ArrayList<TaskList>();
+		while(tasklistCursor.moveToNext()) {
+			TaskList tasklist = CursorHelper.cursorToTaskList(tasklistCursor);
+			tasklists.add(tasklist);
+		}
+		return tasklists;
+	}
+	
+	public static synchronized long putLocations(List<Location> locations) {
+		checkOrThrow();
+		if(locations != null) {
+			//erase previous locations
+			dB.delete(LocationTable.TABLE_LOCATION, null, null);
+			//insert locations
+			dB.beginTransaction();
+			long insertId = -1;
+			for(Location location : locations) {
+				ContentValues locationValues = LocationTable.values(location);
+				insertId = dB.insertWithOnConflict(LocationTable.TABLE_LOCATION, null,
+						locationValues, SQLiteDatabase.CONFLICT_REPLACE);
+			}
+			dB.endTransaction();
+			return insertId;
+		}
+		else return -1;
+	}
+	
+	public static synchronized List<Location> getLocations() {
+		Cursor locationCursor = dB.query(LocationTable.TABLE_LOCATION, null, null,
+				null, null, null, null);
+		List<Location> locations = new ArrayList<Location>();
+		while(locationCursor.moveToNext()) {
+			Location location = CursorHelper.cursorToLocation(locationCursor);
+			locations.add(location);
+		}
+		return locations;
 	}
 	
 	private static String columnsToString(String[]...  stringArrays) {

@@ -1,13 +1,11 @@
 package it.bova.bioniccow;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import it.bova.bioniccow.data.TaskLists_old2;
-import it.bova.bioniccow.data.observers.TaskListObserver;
+
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
-import it.bova.bioniccow.utilities.rtmobjects.TaskListComparator;
 import it.bova.rtmapi.TaskList;
 import com.actionbarsherlock.app.SherlockFragment;
 
@@ -25,18 +23,12 @@ public class TaskListFragment extends SherlockFragment implements InterProcess {
 	private GridView grid;
 	private TaskListAdapter adapter;
 	
-	private TaskLists_old2 tasklists;
-	private TaskListObserver listObserver;
-	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		      Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.grid, container, false);
 		grid = (GridView) view.findViewById(R.id.gridView);
 		adapter = new TaskListAdapter(this.getSherlockActivity(), new ArrayList<TaskList>());
-		grid.setAdapter(adapter);
-		
-		//"sveglia" tasklists!!
-		this.tasklists = new TaskLists_old2(this.getSherlockActivity());	
+		grid.setAdapter(adapter);	
 		
 		return view;
 		
@@ -44,30 +36,21 @@ public class TaskListFragment extends SherlockFragment implements InterProcess {
 	
 	public void onResume() {
 		super.onResume();			
-						
-		this.listObserver = new TaskListObserver() {
-			@Override public void onDataChanged(List<TaskList> lists) {
-				//Toast.makeText(TaskListActivity.this, "size: " + taskMap.size() , Toast.LENGTH_SHORT).show();
-				List<TaskList> tmpLists = new ArrayList<TaskList>();
-				tmpLists.addAll(lists);
-				for(TaskList list : tmpLists)
-					if(list.isArchived()) lists.remove(list);
-				Collections.sort(tmpLists, new TaskListComparator());
-				TaskListFragment.this.adapter.reloadAndNotify(tmpLists);
-			}
-		};
-		this.tasklists.addObserver(listObserver);
-
-		
-		tasklists.retrieve();
-		tasklists.notifyObservers();	
-
+		this.refresh();
 	}
 	
 	public void onPause() {
 		super.onPause();	
-		this.tasklists.removeObserver(this.listObserver);
 	
+	}
+	
+	public void refresh() {
+		DBTaskListsGetter tlg = new DBTaskListsGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				adapter.reloadAndNotify(tasklists);
+			}
+		};
+		tlg.execute();
 	}
 	
 	private class TaskListAdapter extends ImprovedArrayAdapter<TaskList> {

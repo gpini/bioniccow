@@ -55,13 +55,17 @@ public class TaskListTable {
 		ContentValues values = new ContentValues();
 		values.put(TaskListTable.COLUMN_TASKLIST_ID, tasklist.getId());
 		values.put(TaskListTable.COLUMN_NAME, tasklist.getName());
-		values.put(TaskListTable.COLUMN_ARCHIVED, tasklist.isArchived());
-		values.put(TaskListTable.COLUMN_DELETED, tasklist.isDeleted());
-		values.put(TaskListTable.COLUMN_LOCKED, tasklist.isLocked());
+		values.put(TaskListTable.COLUMN_ARCHIVED, boolToInt(tasklist.isArchived()));
+		values.put(TaskListTable.COLUMN_DELETED, boolToInt(tasklist.isDeleted()));
+		values.put(TaskListTable.COLUMN_LOCKED, boolToInt(tasklist.isLocked()));
 		values.put(TaskListTable.COLUMN_POSITION, tasklist.getPosition());
-		values.put(TaskListTable.COLUMN_SMART, tasklist.isSmart());
+		values.put(TaskListTable.COLUMN_SMART, boolToInt(tasklist.isSmart()));
 		values.put(TaskListTable.COLUMN_SORT_ORDER, tasklist.getSortOrder());
 		return values;
 	}
+	
+	private static int boolToInt(boolean bool) {
+		return bool == true ? 1 : 0;
+	}	
 		
 }

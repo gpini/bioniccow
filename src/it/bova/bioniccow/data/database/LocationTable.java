@@ -55,11 +55,15 @@ public class LocationTable {
 		values.put(LocationTable.COLUMN_LOCATION_ID, location.getId());
 		values.put(LocationTable.COLUMN_NAME, location.getName());
 		values.put(LocationTable.COLUMN_ADDRESS, location.getAddress());
-		values.put(LocationTable.COLUMN_VIEWABLE, location.isViewable());
+		values.put(LocationTable.COLUMN_VIEWABLE, boolToInt(location.isViewable()));
 		values.put(LocationTable.COLUMN_LATITUDE, location.getLatitude());
 		values.put(LocationTable.COLUMN_LONGITUDE, location.getLongitude());
 		values.put(LocationTable.COLUMN_ZOOM, location.getZoom());
 		return values;
 	}
+	
+	private static int boolToInt(boolean bool) {
+		return bool == true ? 1 : 0;
+	}	
 	
 }

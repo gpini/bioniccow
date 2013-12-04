@@ -47,10 +47,6 @@ public class SynchService extends IntentService implements ErrorCoded{
 	private static boolean synching = false;
 	private boolean synchSuccess;
 	
-	private static Map<String,TaskList> listMap;
-	private static Map<String,Location> locMap;
-	private static Map<String,Folder> folderMap;
-	
 	private List<Task> newTasks = new ArrayList<Task>();
 	private List<Task> changedTasks = new ArrayList<Task>();
 	
@@ -139,8 +135,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 						synchedTasks.getDeletedTasks(), SynchService.TASKS_SYNCHED);
 				this.newTasks.clear();
 				this.changedTasks.clear();
-				this.sendMessage(messenger, SynchService.TAGS_SYNCHED);
-				this.sendMessage(messenger, SynchService.FOLDERS_SYNCHED);
+				//this.sendMessage(messenger, SynchService.TAGS_SYNCHED);
+				//this.sendMessage(messenger, SynchService.FOLDERS_SYNCHED);
 			}
 		}
 		
@@ -159,10 +155,9 @@ public class SynchService extends IntentService implements ErrorCoded{
 		ListGetter lg = new ListGetter(NOK_sync_phrase, SynchService.this);
 		InquiryAnswer<List<TaskList>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
-			listMap = RtmObjects.toMap(answer.getResult());
-			for(TaskList list : listMap.values())
-				if(list.isArchived()) listMap.remove(list);
-			new TaskLists_old2(this).saveAsList(listMap);
+			TaskDatabase.open(this);
+			TaskDatabase.putTasklists(answer.getResult());
+			TaskDatabase.close();
 			return true;
 		}
 		else {
@@ -175,8 +170,9 @@ public class SynchService extends IntentService implements ErrorCoded{
 		LocationGetter lg = new LocationGetter(NOK_sync_phrase, SynchService.this);
 		InquiryAnswer<List<Location>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
-			locMap = RtmObjects.toMap(answer.getResult());
-			new Locations_old2(this).saveAsList(locMap);
+			TaskDatabase.open(this);
+			TaskDatabase.putLocations(answer.getResult());
+			TaskDatabase.close();
 			return true;
 		}
 		else {
@@ -241,7 +237,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 				TaskDatabase.removeUsingTransactions(synchedTasks.getDeletedTasks());
 				p.putLong(PrefParameter.LAST_SYNCH, now.getTime());
 
-				//Log.d("ciao", "synching tags");
+				/*//Log.d("ciao", "synching tags");
 				Set<String> tagSet = TaskDatabase.getDistinctTags();
 				//Log.d("(synch) tags", "" + tagSet.size());
 				new Tags_old2(this).save(tagSet);
@@ -253,7 +249,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 				if(locMap == null)
 					locMap = new Locations_old2(this).retrieveAsMap();
 				folderMap = TasksUpdater.updateFolders(folders, tagSet, listMap, locMap);
-				new Folders_old2(this).saveAsList(folderMap);
+				new Folders_old2(this).saveAsList(folderMap);*/
 
 				return synchedTasks;
 			}

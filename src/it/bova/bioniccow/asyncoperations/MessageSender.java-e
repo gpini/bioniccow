@@ -17,6 +17,9 @@ public class MessageSender implements InterProcess {
 	public static final int NOTE_ADDED = 5;
 	public static final int NOTE_DELETED = 6;
 	public static final int NOTE_EDITED = 7;
+	public static final int TASKLISTS_UPDATED = 8;
+	public static final int FOLDERS_UPDATED = 9;
+	public static final int LOCATIONS_UPDATED = 10;
 	
 	public static void sendMessage(Context context, String text) {
 		Intent intent = new Intent(ERROR_MESSENGER);
@@ -76,6 +79,24 @@ public class MessageSender implements InterProcess {
 		intent.putExtra("code", NOTE_EDITED);
 		if(editedNote != null)
 			intent.putExtra("editedNote", editedNote);
+		context.sendBroadcast(intent);		
+	}
+	
+	public static void notifyTasklistsUpdated(Context context) {
+		Intent intent = new Intent(ERROR_MESSENGER);
+		intent.putExtra("code", TASKLISTS_UPDATED);
+		context.sendBroadcast(intent);		
+	}
+	
+	public static void notifyLocationsUpdated(Context context) {
+		Intent intent = new Intent(ERROR_MESSENGER);
+		intent.putExtra("code", LOCATIONS_UPDATED);
+		context.sendBroadcast(intent);		
+	}
+	
+	public static void notifyFoldersUpdated(Context context) {
+		Intent intent = new Intent(ERROR_MESSENGER);
+		intent.putExtra("code", FOLDERS_UPDATED);
 		context.sendBroadcast(intent);		
 	}
 }

@@ -9,11 +9,13 @@ import java.util.Map;
 import android.database.Cursor;
 import it.bova.rtmapi.Contact;
 import it.bova.rtmapi.Frequency;
+import it.bova.rtmapi.Location;
 import it.bova.rtmapi.Note;
 import it.bova.rtmapi.Priority;
 import it.bova.rtmapi.Recurrence;
 import it.bova.rtmapi.Recurrence.RecurrenceOption;
 import it.bova.rtmapi.Task;
+import it.bova.rtmapi.TaskList;
 
 public class CursorHelper {
 
@@ -197,6 +199,44 @@ public class CursorHelper {
 		}
 		noteCursor.close();
 		return noteMap;
+	}
+	
+	public static TaskList cursorToTaskList(Cursor tasklistCursor) {
+		int tasklistIdIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_TASKLIST_ID);
+		int nameIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_NAME);
+		int lockedIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_LOCKED);
+		int archivedIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_ARCHIVED);
+		int deletedIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_DELETED);
+		int positionIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_POSITION);
+		int smartIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_SMART);
+		int sortOrderIndex = tasklistCursor.getColumnIndex(TaskListTable.COLUMN_SORT_ORDER);
+		String tasklistId = tasklistCursor.getString(tasklistIdIndex);
+		String name = tasklistCursor.getString(nameIndex);
+		boolean locked = intToBool(tasklistCursor.getInt(lockedIndex));
+		boolean archived = intToBool(tasklistCursor.getInt(archivedIndex));
+		boolean deleted = intToBool(tasklistCursor.getInt(deletedIndex));
+		int position = tasklistCursor.getInt(positionIndex);
+		boolean smart = intToBool(tasklistCursor.getInt(smartIndex));
+		int sortOrder = tasklistCursor.getInt(sortOrderIndex);
+		return new TaskList(tasklistId, name, archived, deleted, locked, position, smart, sortOrder);
+	}
+	
+	public static Location cursorToLocation(Cursor locationCursor) {
+		int locationIdIndex = locationCursor.getColumnIndex(LocationTable.COLUMN_LOCATION_ID);
+		int nameIndex = locationCursor.getColumnIndex(LocationTable.COLUMN_NAME);
+		int addressIndex = locationCursor.getColumnIndex(LocationTable.COLUMN_ADDRESS);
+		int viewableIndex = locationCursor.getColumnIndex(LocationTable.COLUMN_VIEWABLE);
+		int latitudeIndex = locationCursor.getColumnIndex(LocationTable.COLUMN_LATITUDE);
+		int longitudeIndex = locationCursor.getColumnIndex(LocationTable.COLUMN_LONGITUDE);
+		int zoomIndex = locationCursor.getColumnIndex(LocationTable.COLUMN_ZOOM);
+		String locationId = locationCursor.getString(locationIdIndex);
+		String name = locationCursor.getString(nameIndex);
+		String address = locationCursor.getString(addressIndex);
+		boolean viewable = intToBool(locationCursor.getInt(viewableIndex));
+		double lat = locationCursor.getDouble(latitudeIndex);
+		double lon = locationCursor.getDouble(longitudeIndex);
+		int zoom = locationCursor.getInt(zoomIndex);
+		return new Location(address, locationId, lat, lon, name, viewable, zoom);
 	}
 	
 	private static boolean intToBool(int i) {

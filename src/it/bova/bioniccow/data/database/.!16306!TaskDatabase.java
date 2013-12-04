@@ -8,8 +8,10 @@ import java.util.TreeSet;
 
 import it.bova.rtmapi.Contact;
 import it.bova.rtmapi.DeletedTask;
+import it.bova.rtmapi.Location;
 import it.bova.rtmapi.Note;
 import it.bova.rtmapi.Task;
+import it.bova.rtmapi.TaskList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

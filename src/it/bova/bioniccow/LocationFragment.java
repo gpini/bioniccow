@@ -1,13 +1,10 @@
 package it.bova.bioniccow;
 
-import it.bova.bioniccow.data.Locations_old2;
-import it.bova.bioniccow.data.observers.LocationObserver;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
-import it.bova.bioniccow.utilities.rtmobjects.LocationComparator;
 import it.bova.rtmapi.Location;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -26,19 +23,13 @@ public class LocationFragment extends SherlockFragment implements InterProcess{
 	private GridView grid;
 	private LocationAdapter adapter;
 	
-	private Locations_old2 locations;
-	private LocationObserver locationObserver;
-	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		      Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.grid,
 		        container, false);
 		grid = (GridView) view.findViewById(R.id.gridView);
 		adapter = new LocationAdapter(this.getSherlockActivity(), new ArrayList<Location>());
-		grid.setAdapter(adapter);
-		
-		//"sveglia" locations!!
-		this.locations = new Locations_old2(this.getSherlockActivity());	
+		grid.setAdapter(adapter);	
 		
 		return view;
 		
@@ -46,26 +37,22 @@ public class LocationFragment extends SherlockFragment implements InterProcess{
 	
 	public void onResume() {
 		super.onResume();
-		
-		this.locationObserver = new LocationObserver() {
-			public void onDataChanged(List<Location> locations) {
-				List<Location> tmpLocs = new ArrayList<Location>();
-				tmpLocs.addAll(locations);
-				Collections.sort(tmpLocs, new LocationComparator());
-				LocationFragment.this.adapter.reloadAndNotify(tmpLocs);
-			}
-		};
-		this.locations.addObserver(locationObserver);
-
-		locations.retrieve();
-		locations.notifyObservers();	
+		this.refresh();	
 
 	}
 	
 	public void onPause() {
 		super.onPause();	
-		this.locations.removeObserver(this.locationObserver);
 	
+	}
+	
+	public void refresh() {
+		DBLocationsGetter lg = new DBLocationsGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<Location> locations) {
+				adapter.reloadAndNotify(locations);
+			}
+		};
+		lg.execute();
 	}
 	
 	private class LocationAdapter extends ImprovedArrayAdapter<Location> {

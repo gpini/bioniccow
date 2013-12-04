@@ -109,13 +109,10 @@ public class Synchronizer {
 		@Override public void handleMessage(Message msg) {
 			switch(msg.arg1) {
 			case SynchService.LISTS_SYNCHED : 
-				new TaskLists_old2(context).notifyDataChanged();
+				MessageSender.notifyTasklistsUpdated(context);
 				break;
 			case SynchService.LOCATIONS_SYNCHED : 
-				new Locations_old2(context).notifyDataChanged();
-				break;
-			case SynchService.TAGS_SYNCHED :
-				new Tags_old2(context).notifyDataChanged();
+				MessageSender.notifyLocationsUpdated(context);
 				break;
 			case SynchService.TASKS_SYNCHED : 
 				//Log.d("sync", "task synched");
@@ -126,9 +123,6 @@ public class Synchronizer {
 				if(addedTasks != null) {
 					MessageSender.notifyTaskAdded(context, addedTasks);
 				}
-				break;
-			case SynchService.FOLDERS_SYNCHED: 
-				new Folders_old2(context).notifyDataChanged();
 				break;
 			}
 		}

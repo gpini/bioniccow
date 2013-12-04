@@ -48,6 +48,15 @@ public class MessageReceiver extends BroadcastReceiver {
 			if(editedNote != null)
 				onNoteEdited(context, editedNote);
 			break;
+		case MessageSender.TASKLISTS_UPDATED :
+			onTasklistsUpdated(context);
+			break;
+		case MessageSender.LOCATIONS_UPDATED :
+			onLocationsUpdated(context);
+			break;
+		case MessageSender.FOLDERS_UPDATED :
+			onFoldersUpdated(context);
+			break;
 		case MessageSender.ERROR :
 			String errorMsg = intent.getStringExtra("msg");
 			onError(context, errorMsg);
@@ -62,4 +71,7 @@ public class MessageReceiver extends BroadcastReceiver {
 	protected void onNoteAdded(Context context, Note addedNote, String taskId) {}
 	protected void onNoteDeleted(Context context, String deletedNoteId) {}
 	protected void onNoteEdited(Context context, Note editedNote) {}
+	protected void onTasklistsUpdated(Context context) {}
+	protected void onLocationsUpdated(Context context) {}
+	protected void onFoldersUpdated(Context context) {}
 }
