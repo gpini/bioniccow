@@ -20,6 +20,13 @@ public class Preferences  {
 		FOLDER_HELP_SHOWN("help_folder"),
 		TIMELINE("timeline"),
 		HIDE_FOLDERS("hide_folders"),
+		TASKLIST_DB_UPGRADED("tasklist_db_upgraded"),
+		FOLDER_DB_UPGRADED("folder_db_upgraded"),
+		LOCATION_DB_UPGRADED("location_db_upgraded"),
+		CONTACT_DB_UPGRADED("contact_db_upgraded"),
+		NOTE_DB_UPGRADED("note_db_upgraded"),
+		TASK_DB_UPGRADED("task_db_upgraded"),
+		TAG_DB_UPGRADED("tag_db_upgraded"),
 		VOTE_REQUESTED("voted");
 		private String name;
 		private PrefParameter(String name) {this.name = name;}
