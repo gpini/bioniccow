@@ -186,6 +186,9 @@ public class TaskDatabase {
 		dB.delete(NoteTable.TABLE_NOTE, null, null);
 		dB.delete(TaskToContactTable.TABLE_TASK_TO_CONTACT, null, null);
 		dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE, null, null);
+		dB.delete(TaskListTable.TABLE_TASKLIST, null, null);
+		dB.delete(LocationTable.TABLE_LOCATION, null, null);
+		dB.delete(FolderTable.TABLE_FOLDER, null, null);
 		return deleteId;
 	}
 	
@@ -232,8 +235,9 @@ public class TaskDatabase {
 			String tag = "";
 			if(parameters.length > 0) {
 				tag = parameters[0];
-				nestedSelect = "SELECT DISTINCT (" + columnsToString(TaskTable.allColumns) + ") FROM " 
-						+ TaskTable.TABLE_TASK + " JOIN " +  TagTable.TABLE_TAG
+				String stringCol = columnsToString("T.", TaskTable.allColumns);
+				nestedSelect = "SELECT DISTINCT " + stringCol + " FROM " 
+						+ TaskTable.TABLE_TASK + "AS T JOIN " +  TagTable.TABLE_TAG
 						+ "AS T WHERE T." + TagTable.COLUMN_NAME + " = " + tag;
 				taskCursor = dB.rawQuery(nestedSelect, null);
 			}
@@ -255,8 +259,9 @@ public class TaskDatabase {
 			taskCursor = dB.rawQuery(nestedSelect, null);
 			break;
 		case NOT_TAGGED :
-			nestedSelect = "SELECT DISTINCT (" + columnsToString(TaskTable.allColumns) + ") FROM " 
-					+ TaskTable.TABLE_TASK + " LEFT JOIN " +  TagTable.TABLE_TAG
+			String stringCol = columnsToString("T.", TaskTable.allColumns);
+			nestedSelect = "SELECT DISTINCT " + stringCol + " FROM " 
+					+ TaskTable.TABLE_TASK + " AS T LEFT JOIN " +  TagTable.TABLE_TAG
 					+ "AS T WHERE T." + TagTable.COLUMN_NAME + " IS NULL";
 			taskCursor = dB.rawQuery(nestedSelect, null);
 			break;	
@@ -277,13 +282,16 @@ public class TaskDatabase {
 		if(nestedSelect == null)
 			return new ArrayList<Task>();
 
-		String tagQuery = "SELECT (" + columnsToString(TagTable.allColumns) + ")"
+		String tagStringCol = columnsToString("T.", TagTable.allColumns);
+		String tagQuery = "SELECT " + tagStringCol
 				+ " FROM " + TagTable.TABLE_TAG + " AS T"
 				+ " JOIN (" + nestedSelect + ") AS N"
 				+ " ON T." + TagTable.COLUMN_TASK_ID + " = N." + TaskTable.COLUMN_TASK_ID;
 		tagCursor = dB.rawQuery(tagQuery, null);
 
-		String contactQuery = "SELECT (" + columnsToString(TaskToContactTable.allColumns, ContactTable.allColumns) + ")"
+		String contactStringCol = columnsToString("T2C.", TaskToContactTable.allColumns)
+				+ ", " + columnsToString("C.", ContactTable.allColumns);
+		String contactQuery = "SELECT " + contactStringCol + ""
 				+ " FROM " + ContactTable.TABLE_CONTACT + " AS C"
 				+ " JOIN " + TaskToContactTable.TABLE_TASK_TO_CONTACT  + " AS T2C"
 				+ " ON T2C." + TaskToContactTable.COLUMN_CONTACT_ID + " = C." + ContactTable.COLUMN_CONTACT_ID
@@ -291,17 +299,19 @@ public class TaskDatabase {
 				+ " ON T2C." + TaskToContactTable.COLUMN_TASK_ID + " = N." + TaskTable.COLUMN_TASK_ID;
 		contactCursor = dB.rawQuery(contactQuery, null);
 		
-		String noteQuery = "SELECT (" + columnsToString(TaskToNoteTable.allColumns, NoteTable.allColumns) + ")"
+		String noteStringCol = columnsToString("T2N.", TaskToNoteTable.allColumns)
+				+ ", " + columnsToString("NT.", NoteTable.allColumns);
+		String noteQuery = "SELECT " + noteStringCol + ""
 				+ " FROM " + NoteTable.TABLE_NOTE + " AS NT"
-				+ " JOIN " + TaskToNoteTable.TABLE_TASK_TO_NOTE  + " AS N2C"
-				+ " ON N2C." + TaskToNoteTable.COLUMN_NOTE_ID + " = NT." + NoteTable.COLUMN_NOTE_ID
+				+ " JOIN " + TaskToNoteTable.TABLE_TASK_TO_NOTE  + " AS T2N"
+				+ " ON T2N." + TaskToNoteTable.COLUMN_NOTE_ID + " = NT." + NoteTable.COLUMN_NOTE_ID
 				+ " JOIN (" + nestedSelect +  ") AS N"
-				+ " ON N2C." + TaskToNoteTable.COLUMN_TASK_ID + " = N." + TaskTable.COLUMN_TASK_ID;
+				+ " ON T2N." + TaskToNoteTable.COLUMN_TASK_ID + " = N." + TaskTable.COLUMN_TASK_ID;
 		noteCursor = dB.rawQuery(noteQuery, null);
 		
-		Map<String,List<String>> tagMap = CursorHelper.cursorToTagMap(tagCursor);
-		Map<String,List<Contact>> contactMap = CursorHelper.cursorToContactMap(contactCursor);
-		Map<String,List<Note>> noteMap = CursorHelper.cursorToNoteMap(noteCursor);
+		Map<String,List<String>> tagMap = CursorHelper.cursorToTagMap("T.", tagCursor);
+		Map<String,List<Contact>> contactMap = CursorHelper.cursorToContactMap("C.", "T2C.", contactCursor);
+		Map<String,List<Note>> noteMap = CursorHelper.cursorToNoteMap("NT.", "T2N.", noteCursor);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		//Log.d("cursor", "" + taskCursor.getPosition());
@@ -383,18 +393,15 @@ public class TaskDatabase {
 		return locations;
 	}
 	
-	private static String columnsToString(String[]...  stringArrays) {
+	private static String columnsToString(String asString, String[] stringArray) {
 		StringBuilder sb = new StringBuilder();
-		int length1 = stringArrays.length;
-		for(int i = 0; i < length1; i++) {
-			String[] stringArray = stringArrays[i];
-			int length2 = stringArrays.length;
-			for(int j = 0; j < length2; j++) {
-				String str = stringArray[j];
-				sb.append(str);
-				if(i != (length1 - 1) && j != (length2 - 1))
-					sb.append(", ");
-			}
+		int length = stringArray.length;
+		for(int i = 0; i < length; i++) {
+			String str = stringArray[i];
+			sb.append(asString);
+			sb.append(str);
+			if(i != (length - 1))
+				sb.append(", ");
 		}
 		return sb.toString();
 		

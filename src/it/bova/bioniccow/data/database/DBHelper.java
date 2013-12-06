@@ -167,6 +167,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				database.execSQL("INSERT INTO tag (name, taskId) SELECT name, taskId FROM dbt.tag;");
 				prefs.putBoolean(PrefParameter.TAG_DB_UPGRADED, true);
 				try {
+					this.context.deleteFile("lists2.dat");
 					database.execSQL("DETACH DATABASE 'dbt';");
 					this.context.deleteDatabase("tags.db");
 				} catch(Exception e) {

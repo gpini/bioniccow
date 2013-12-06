@@ -18,8 +18,8 @@ public class NoteTable {
 	
 	public static final String[] allColumns = { 
 		COLUMN_TITLE, COLUMN_TEXT, COLUMN_NOTE_ID,
-		COLUMN_NOTE_ID, COLUMN_CREATED, COLUMN_MODIFIED
-		};
+		COLUMN_CREATED, COLUMN_MODIFIED
+	};
 	
 	// Database creation SQL statement
 	private static final String DATABASE_CREATE = "create table if not exists "

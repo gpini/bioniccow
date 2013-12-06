@@ -39,7 +39,7 @@
     <string name="authentication_aborted">Autenticazione interrotta dall\'utente</string>
     <string name="starting_authentication">Inizio l\'autenticazione</string>
     <string name="finishing_authentication">Termino l\'autenticazione</string>
-    <string name="internet_NOK">Connesione ad internet mancante</string>
+    <string name="internet_NOK">Connessione ad internet mancante </string>
     <string name="timeline_NOK">Impossibile acquisire una timeline - </string>
     <string name="sync_NOK">Impossibile sincronizzare - </string>
     <string name="folder_add_NOK1">Impossibile aggiungere la cartella - nome non valido</string>

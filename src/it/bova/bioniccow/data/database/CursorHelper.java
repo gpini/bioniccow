@@ -138,12 +138,12 @@ public class CursorHelper {
 	}
 
 
-	public static Map<String,List<Contact>> cursorToContactMap(Cursor contactCursor) {
+	public static Map<String,List<Contact>> cursorToContactMap(String asContactString, String asT2CString, Cursor contactCursor) {
 		Map<String,List<Contact>> contactMap = new HashMap<String,List<Contact>>(); 
-		int contactIdIndex = contactCursor.getColumnIndex(ContactTable.COLUMN_CONTACT_ID);
-		int fullnameIndex = contactCursor.getColumnIndex(ContactTable.COLUMN_FULLNAME);
-		int usernameIndex = contactCursor.getColumnIndex(ContactTable.COLUMN_USERNAME);
-		int taskIdIndex = contactCursor.getColumnIndex(TaskToContactTable.COLUMN_TASK_ID);
+		int contactIdIndex = contactCursor.getColumnIndex(asContactString + ContactTable.COLUMN_CONTACT_ID);
+		int fullnameIndex = contactCursor.getColumnIndex(asContactString + ContactTable.COLUMN_FULLNAME);
+		int usernameIndex = contactCursor.getColumnIndex(asContactString + ContactTable.COLUMN_USERNAME);
+		int taskIdIndex = contactCursor.getColumnIndex(asT2CString + TaskToContactTable.COLUMN_TASK_ID);
 		while(contactCursor.moveToNext()) {
 			String taskId = contactCursor.getString(taskIdIndex);
 			String contactId = contactCursor.getString(contactIdIndex);
@@ -158,10 +158,10 @@ public class CursorHelper {
 		return contactMap;
 	}
 	
-	public static Map<String,List<String>> cursorToTagMap(Cursor tagCursor) {
+	public static Map<String,List<String>> cursorToTagMap(String asTagString, Cursor tagCursor) {
 		Map<String,List<String>> tagMap = new HashMap<String,List<String>>(); 
-		int nameIndex = tagCursor.getColumnIndex(TagTable.COLUMN_NAME);
-		int taskIdIndex = tagCursor.getColumnIndex(TagTable.COLUMN_TASK_ID);
+		int nameIndex = tagCursor.getColumnIndex(asTagString + TagTable.COLUMN_NAME);
+		int taskIdIndex = tagCursor.getColumnIndex(asTagString + TagTable.COLUMN_TASK_ID);
 		while(tagCursor.moveToNext()) {
 			String taskId = tagCursor.getString(taskIdIndex);
 			String tag = tagCursor.getString(nameIndex);
@@ -173,14 +173,14 @@ public class CursorHelper {
 		return tagMap;
 	}
 
-	public static Map<String,List<Note>> cursorToNoteMap(Cursor noteCursor) {
+	public static Map<String,List<Note>> cursorToNoteMap(String asNoteString, String asT2NString, Cursor noteCursor) {
 		Map<String,List<Note>> noteMap = new HashMap<String,List<Note>>(); 
-		int titleIndex = noteCursor.getColumnIndex(NoteTable.COLUMN_TITLE);
-		int textIndex = noteCursor.getColumnIndex(NoteTable.COLUMN_TEXT);
-		int createdIndex = noteCursor.getColumnIndex(NoteTable.COLUMN_CREATED);
-		int modifiedIndex = noteCursor.getColumnIndex(NoteTable.COLUMN_MODIFIED);
-		int noteIdIndex = noteCursor.getColumnIndex(NoteTable.COLUMN_NOTE_ID);
-		int taskIdIndex = noteCursor.getColumnIndex(TaskToNoteTable.COLUMN_TASK_ID);
+		int titleIndex = noteCursor.getColumnIndex(asNoteString + NoteTable.COLUMN_TITLE);
+		int textIndex = noteCursor.getColumnIndex(asNoteString + NoteTable.COLUMN_TEXT);
+		int createdIndex = noteCursor.getColumnIndex(asNoteString + NoteTable.COLUMN_CREATED);
+		int modifiedIndex = noteCursor.getColumnIndex(asNoteString + NoteTable.COLUMN_MODIFIED);
+		int noteIdIndex = noteCursor.getColumnIndex(asNoteString + NoteTable.COLUMN_NOTE_ID);
+		int taskIdIndex = noteCursor.getColumnIndex(asT2NString + TaskToNoteTable.COLUMN_TASK_ID);
 		while(noteCursor.moveToNext()) {
 			String taskId = noteCursor.getString(taskIdIndex);
 			String noteId = noteCursor.getString(noteIdIndex);

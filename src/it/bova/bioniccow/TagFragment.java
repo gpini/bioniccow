@@ -1,7 +1,6 @@
 package it.bova.bioniccow;
 
-import it.bova.bioniccow.data.Tags_old2;
-import it.bova.bioniccow.data.observers.TagObserver;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTagGetter;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
 import java.util.ArrayList;
@@ -23,9 +22,6 @@ public class TagFragment extends SherlockFragment implements InterProcess{
 	
 	private GridView grid;
 	private TagAdapter adapter;
-
-	private Tags_old2 tags;
-	private TagObserver tagObserver;
 	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		      Bundle savedInstanceState) {
@@ -34,9 +30,6 @@ public class TagFragment extends SherlockFragment implements InterProcess{
 		grid = (GridView) view.findViewById(R.id.gridView);
 		adapter = new TagAdapter(this.getSherlockActivity(), new ArrayList<String>());
 		grid.setAdapter(adapter);
-		
-		//"sveglia" Tags
-		this.tags = new Tags_old2(this.getSherlockActivity());	
 
 		return view;
 
@@ -44,24 +37,23 @@ public class TagFragment extends SherlockFragment implements InterProcess{
 	
 	public void onResume() {
 		super.onResume();
-				
-		this.tagObserver = new TagObserver() {
-			public void onDataChanged(Set<String> tagSet) {
-				TagFragment.this.adapter.reloadAndNotify(tagSet);
-			}
-		};
-		this.tags.addObserver(tagObserver);
-
-		tags.retrieve();
-		tags.notifyObservers();	
-
+		this.refresh();
 
 	}
 	
 	public void onPause() {
 		super.onPause();	
-		this.tags.removeObserver(this.tagObserver);
 	
+	}
+	
+	public void refresh() {
+		DBTagGetter tg = new DBTagGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(Set<String> tags) {
+				//Collections.sort(tags, new TaskListComparator());
+				adapter.reloadAndNotify(tags);
+			}
+		};
+		tg.execute();
 	}
 	
 	private class TagAdapter extends ImprovedArrayAdapter<String> {

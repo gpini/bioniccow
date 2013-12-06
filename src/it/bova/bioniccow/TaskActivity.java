@@ -12,12 +12,14 @@ import java.util.Map;
 import com.actionbarsherlock.app.SherlockActivity;
 
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBNotLocatedTaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBNotTaggedTaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBPrioritizedTaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBRecentTaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskGetterByLocation;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskGetterByTag;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskGetterByList;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskGetterByListId;
@@ -81,12 +83,8 @@ public class TaskActivity extends SyncableActivity {
 	private boolean areCompletedShown = false;
 	private Button completeButton;
 	private TaskAdapter adapter;
-	
-	private TaskLists_old2 tasklists;
+
 	private Map<String,TaskList> listMap;
-	private TaskListObserver listObserver;
-	private Locations_old2 locations;
-	private LocationObserver locationObserver;
 	private Map<String,Location> locMap;
 	private ArrayList<CheckableTask> uncompletedTasks;
 	private ArrayList<CheckableTask> completedTasks;
@@ -176,8 +174,6 @@ public class TaskActivity extends SyncableActivity {
 		
 		this.selectedTasks = new HashMap<String,CheckableTask>();
 		
-		this.tasklists = new TaskLists_old2(this);
-		this.locations = new Locations_old2(this);
 		this.adapter = new TaskAdapter(this, new ArrayList<CheckableTask>());
 		this.footer = getLayoutInflater().inflate(R.layout.task_footer, null);
 		this.footerButton = (Button) this.footer.findViewById(R.id.footerText);
@@ -224,49 +220,18 @@ public class TaskActivity extends SyncableActivity {
 	
 
 	public void onResume() {
-		super.onResume();
+		super.onResume();	
 		
 		if(this.uncompletedTasks == null)
 			this.retrieveTasks(type);
 		if(this.taskGetter != null && this.taskGetter.isDoing())
 			this.loadingBar.setVisibility(View.VISIBLE);
-		else this.loadingBar.setVisibility(View.GONE);
-		
-		
-		//provo a recuperare liste e location, se ci sono	
-		this.locMap = this.locations.retrieveAsMap();
-		this.listMap = this.tasklists.retrieveAsMap();
-		this.adapter.notifyDataSetChanged();
-			
-		//se si modificano da ora in poi aggiorno
-		this.listObserver = new TaskListObserver() {
-			@Override public void onDataChanged(List<TaskList> lists) {
-				TaskActivity.this.listMap = new HashMap<String,TaskList>();
-				for(TaskList list : lists)
-					TaskActivity.this.listMap.put(list.getId(), list);
-				TaskActivity.this.adapter.notifyDataSetChanged();
-			}
-		};
-		this.tasklists.addObserver(this.listObserver);
-		
-		this.locationObserver = new LocationObserver() {
-			@Override public void onDataChanged(List<Location> locations) {
-				TaskActivity.this.locMap = new HashMap<String,Location>();
-				for(Location loc : locations)
-					TaskActivity.this.locMap.put(loc.getId(), loc);
-				TaskActivity.this.adapter.notifyDataSetChanged();
-			}
-		};
-		this.locations.addObserver(this.locationObserver);
-		
-		
+		else this.loadingBar.setVisibility(View.GONE);			
 		
 	}
 	
 	public void onPause() {
 		super.onPause();	
-		this.locations.removeObserver(this.locationObserver);
-		this.tasklists.removeObserver(this.listObserver);
 	
 	}
 	
@@ -415,6 +380,29 @@ public class TaskActivity extends SyncableActivity {
 	}
 	
 	private void retrieveTasks(int type) {
+		//recupero liste e location, poi aggiorno i task
+		final int t = type;
+		final DBTaskListsGetter tlg = new DBTaskListsGetter(TaskActivity.this) {
+			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				TaskActivity.this.listMap = new HashMap<String,TaskList>();
+				for(TaskList list : tasklists)
+					TaskActivity.this.listMap.put(list.getId(), list);
+				TaskActivity.this.getTasks(t);
+			}
+		};
+		DBLocationsGetter lg = new DBLocationsGetter(TaskActivity.this) {
+			@Override protected void onPostExecute(List<Location> locations) {
+				TaskActivity.this.locMap = new HashMap<String,Location>();
+				for(Location loc : locations)
+					TaskActivity.this.locMap.put(loc.getId(), loc);
+				tlg.execute();
+			}
+		};
+		lg.execute();
+		
+	}
+	
+	private void getTasks(int type) {
 		switch(type) {
 		case LIST :
 			String listId = this.getIntent().getStringExtra(IDENTIFIER);
@@ -540,8 +528,6 @@ public class TaskActivity extends SyncableActivity {
 	}
 	
 	private void onTasksObtained(List<? extends Task> tasks) {
-		this.listMap = this.tasklists.retrieveAsMap();
-		this.locMap = this.locations.retrieveAsMap();
 		if(this.type == RECENTLY_COMPLETED)
 			Collections.sort(tasks, new TaskComparatorByCompletionDate());
 		else
@@ -871,6 +857,15 @@ public class TaskActivity extends SyncableActivity {
 		public TaskActivityMessageReceiver(SherlockActivity activity) {
 			super(activity);
 		}
+		
+		@Override protected void onTasklistsUpdated(Context context) {
+			TaskActivity.this.retrieveTasks(type);
+		}
+		
+		@Override protected void onLocationsUpdated(Context context) {
+			TaskActivity.this.retrieveTasks(type);
+		}
+				
 		@Override public void onTaskChanged(Context context, List<String> changedIds) {
 			boolean areTheseTasksAffected = false;
 			if(type == LIST) {

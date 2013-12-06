@@ -1,6 +1,8 @@
 package it.bova.bioniccow;
 
 import java.util.Date;
+import java.util.List;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
@@ -13,6 +15,7 @@ import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
 import it.bova.bioniccow.data.ApiSingleton;
 import it.bova.bioniccow.data.Preferences;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
+import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -61,31 +64,8 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		this.messageReceiver = new DefaultMessageReceiver(this) {
-			@Override protected void onTasklistsUpdated(Context context) {
-				FragmentManager fm= BionicCowActivity.this.getSupportFragmentManager();
-				Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
-				if(fragment != null) {
-					String tag = fragment.getTag();
-					if (tag != null) {
-						if(tag.equals(LIST_FRAGMENT)) 
-							((TaskListFragment) fragment).refresh();
-					}
-				}
-			}
-			
-			@Override protected void onLocationsUpdated(Context context) {
-				FragmentManager fm= BionicCowActivity.this.getSupportFragmentManager();
-				Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
-				if(fragment != null) {
-					String tag = fragment.getTag();
-					if (tag != null) {
-						if(tag.equals(LOCATION_FRAGMENT)) 
-							((LocationFragment) fragment).refresh();
-					}
-				}
-			}
-		};
+		this.messageReceiver = new MainMessageReceiver(this);
+		
 		//Action Bar
 		setContentView(R.layout.main);
 		ActionBar ab = this.getSupportActionBar();
@@ -463,6 +443,50 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			return convertView;
 		}
 
+	}
+	
+	private class MainMessageReceiver extends DefaultMessageReceiver {
+	
+		public MainMessageReceiver(SherlockActivity activity) {
+			super(activity);
+		}
+		
+		@Override protected void onTasklistsUpdated(Context context) {
+			FragmentManager fm = BionicCowActivity.this.fm;
+			Fragment headFragment = fm.findFragmentById(R.id.headerFragment);
+			((HeaderFragment) headFragment).refresh();
+			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(LIST_FRAGMENT)) 
+				((TaskListFragment) fragment).refresh();
+		}
+			
+		@Override protected void onLocationsUpdated(Context context) {
+			FragmentManager fm = BionicCowActivity.this.fm;
+			Fragment headFragment = fm.findFragmentById(R.id.headerFragment);
+			((HeaderFragment) headFragment).refresh();
+			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(LOCATION_FRAGMENT)) 
+				((LocationFragment) fragment).refresh();
+		}
+			
+		@Override protected void onTaskChanged(Context context, List<String> changedId) {
+			FragmentManager fm = BionicCowActivity.this.fm;
+			Fragment headFragment = fm.findFragmentById(R.id.headerFragment);
+			((HeaderFragment) headFragment).refresh();
+			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(TAG_FRAGMENT)) 
+				((TagFragment) fragment).refresh();
+		}
+			
+		@Override protected void onTaskAdded(Context context, List<ParcelableTask> addedTasks) {
+			FragmentManager fm = BionicCowActivity.this.fm;
+			Fragment headFragment = fm.findFragmentById(R.id.headerFragment);
+			((HeaderFragment) headFragment).refresh();
+			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(TAG_FRAGMENT)) 
+				((TagFragment) fragment).refresh();
+		}
+			
 	}
 
 

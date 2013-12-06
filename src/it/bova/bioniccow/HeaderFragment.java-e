@@ -10,6 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.actionbarsherlock.app.SherlockFragment;
+
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTagGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskAdder;
 import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
 import it.bova.bioniccow.data.Folder;
@@ -174,11 +178,6 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 
 		//"Sveglia" le strutture
 		this.folders = new Folders_old2(this.getSherlockActivity());	
-		this.tasklists = new TaskLists_old2(this.getSherlockActivity());
-		this.locations = new Locations_old2(this.getSherlockActivity());
-		this.tags = new Tags_old2(this.getSherlockActivity());
-		this.listMap = new HashMap<String,TaskList>();
-		this.locMap = new HashMap<String,Location>();
 
 		this.listLabels = new ArrayList<Label>();
 		this.locationLabels = new ArrayList<Label>();
@@ -225,44 +224,8 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 		else
 			syncInfo.setText(lastSynchPhrase + df.format(lastSynch));
 
-		this.listObserver = new TaskListObserver() {
-			@Override public void onDataChanged(List<TaskList> lists) {
-				HeaderFragment.this.listMap = new HashMap<String,TaskList>();
-				for(TaskList list : lists)
-					HeaderFragment.this.listMap.put(list.getId(), list);
-				HeaderFragment.this.listLabels = new ArrayList<Label>();
-				for(TaskList list : lists)
-					if(!list.isSmart())
-						HeaderFragment.this.listLabels.add(new Label("#", list.getName()));
-				HeaderFragment.this.reloadLabels();
-			}	
-		};
-		this.tasklists.addObserver(listObserver);
-
-
-		this.locationObserver = new LocationObserver() {
-			public void onDataChanged(List<Location> locations) {
-				HeaderFragment.this.locMap = new HashMap<String,Location>();
-				for(Location loc : locations)
-					HeaderFragment.this.locMap.put(loc.getId(), loc);
-				HeaderFragment.this.locationLabels = new ArrayList<Label>();
-				for(Location loc : locMap.values())
-					HeaderFragment.this.locationLabels.add(new Label("@", loc.getName()));
-				HeaderFragment.this.reloadLabels();
-			}	
-		};
-		this.locations.addObserver(locationObserver);
-
-		this.tagObserver = new TagObserver() {
-			public void onDataChanged(Set<String> tagSet) {
-				HeaderFragment.this.tagLabels = new ArrayList<Label>();
-				for(String tag : tagSet)
-					HeaderFragment.this.tagLabels.add(new Label("#", tag));
-				HeaderFragment.this.reloadLabels();
-			}	
-		};
-		this.tags.addObserver(tagObserver);
-
+		this.refresh();
+			
 		this.folderObserver = new FolderObserver() {
 			@Override public void onDataChanged(List<Folder> folderList) {
 				List<String> folderNameList = new ArrayList<String>();
@@ -299,14 +262,10 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 		};
 		this.folders.addObserver(folderObserver);
 
-		this.tasklists.retrieve();
-		this.tasklists.notifyObservers();
-		this.locations.retrieve();
-		this.locations.notifyObservers();
-		this.tags.retrieve();
-		this.tags.notifyObservers();
 		this.folders.retrieve();
 		this.folders.notifyObservers();
+		
+		
 
 
 	}
@@ -315,9 +274,6 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 		super.onPause();
 		this.syncHelper.detach();
 
-		this.tasklists.removeObserver(listObserver);
-		this.locations.removeObserver(locationObserver);
-		this.tags.removeObserver(tagObserver);
 		this.folders.removeObserver(folderObserver);
 	}
 
@@ -352,6 +308,36 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 		labels.addAll(folderLabels);
 		this.labelAdapter.reloadAndNotify(labels);
 
+	}
+	
+	public void refresh() {
+		//TODO Folder Update
+		final DBTagGetter tg = new DBTagGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(Set<String> tags) {
+				HeaderFragment.this.tagLabels = new ArrayList<Label>();
+				for(String tag : tags)
+					HeaderFragment.this.tagLabels.add(new Label("#", tag));
+				HeaderFragment.this.reloadLabels();
+			}
+		};
+		final DBLocationsGetter lg = new DBLocationsGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<Location> locations) {
+				HeaderFragment.this.locationLabels = new ArrayList<Label>();
+				for(Location loc : locations)
+					HeaderFragment.this.locationLabels.add(new Label("@", loc.getName()));
+				tg.execute();
+			}
+		};
+		DBTaskListsGetter tlg = new DBTaskListsGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				HeaderFragment.this.listLabels = new ArrayList<Label>();
+				for(TaskList list : tasklists)
+					if(!list.isSmart())
+						HeaderFragment.this.listLabels.add(new Label("#", list.getName()));
+				lg.execute();
+			}
+		};	
+		tlg.execute();
 	}
 
 	public void setText(String text) {
