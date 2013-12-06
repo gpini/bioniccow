@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -447,7 +449,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 	
 	private class MainMessageReceiver extends DefaultMessageReceiver {
 	
-		public MainMessageReceiver(SherlockActivity activity) {
+		public MainMessageReceiver(SherlockFragmentActivity activity) {
 			super(activity);
 		}
 		
