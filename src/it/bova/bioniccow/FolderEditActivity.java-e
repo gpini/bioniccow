@@ -43,6 +43,8 @@ public class FolderEditActivity extends EditActivity {
 	private TaskLists_old2 tasklists;
 	private Locations_old2 locations;
 	
+	private boolean isEditMode = true;
+	
 	private static final int FOLDER_HELP_DIALOG = 1;
 	
 	@Override
@@ -92,6 +94,7 @@ public class FolderEditActivity extends EditActivity {
 		}
 		else { //ADD mode
 			this.setTitle(R.string.add_folder);
+			this.isEditMode = false;
 		}
 		
 		folderNOKAdd1 = this.getResources().getString(R.string.folder_add_NOK1);

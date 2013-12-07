@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import it.bova.bioniccow.data.Folder;
 import it.bova.rtmapi.Contact;
 import it.bova.rtmapi.DeletedTask;
 import it.bova.rtmapi.Location;

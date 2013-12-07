@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import it.bova.bioniccow.data.Folder;
 import it.bova.rtmapi.Contact;
 import it.bova.rtmapi.DeletedTask;
 import it.bova.rtmapi.Location;
@@ -407,6 +408,43 @@ public class TaskDatabase {
 			locations.add(location);
 		}
 		return locations;
+	}
+	
+	public static synchronized long putFolder(Folder folder) {
+		checkOrThrow();
+		if(folder != null) {
+			long insertId = -1;
+			ContentValues folderValues = FolderTable.values(folder);
+			insertId = dB.insertWithOnConflict(FolderTable.TABLE_FOLDER, null,
+					folderValues, SQLiteDatabase.CONFLICT_REPLACE);
+			return insertId;
+		}
+		else return -1;
+	}
+	
+	public static synchronized long removeFolder(Folder folder) {
+		checkOrThrow();
+		if(folder != null) {
+			long deletedId = -1;
+			deletedId = dB.delete(FolderTable.TABLE_FOLDER,
+					FolderTable.COLUMN_NAME + " = ? AND"
+							+ FolderTable.COLUMN_RULE + " = ? AND"
+							+ FolderTable.COLUMN_APPLICABILITY + " = ?",
+					new String [] {folder.getName(), folder.getRule(), "" + folder.getApplicability().ordinal()});
+			return deletedId;
+		}
+		else return -1;
+	}
+	
+	public static synchronized List<Folder> getFolders() {
+		Cursor folderCursor = dB.query(FolderTable.TABLE_FOLDER, null, null,
+				null, null, null, null);
+		List<Folder> folders = new ArrayList<Folder>();
+		while(folderCursor.moveToNext()) {
+			Folder folder = CursorHelper.cursorToFolder(folderCursor);
+			folders.add(folder);
+		}
+		return folders;
 	}
 	
 	private static String columnsToString(String asString, String[] stringArray) {

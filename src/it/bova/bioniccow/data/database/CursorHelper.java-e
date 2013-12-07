@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.database.Cursor;
+import it.bova.bioniccow.data.Folder;
 import it.bova.rtmapi.Contact;
 import it.bova.rtmapi.Frequency;
 import it.bova.rtmapi.Location;
@@ -237,6 +238,17 @@ public class CursorHelper {
 		double lon = locationCursor.getDouble(longitudeIndex);
 		int zoom = locationCursor.getInt(zoomIndex);
 		return new Location(address, locationId, lat, lon, name, viewable, zoom);
+	}
+	
+	public static Folder cursorToFolder(Cursor folderCursor) {
+		int nameIndex = folderCursor.getColumnIndex(FolderTable.COLUMN_NAME);
+		int ruleIndex = folderCursor.getColumnIndex(FolderTable.COLUMN_RULE);
+		int applicabilityIndex = folderCursor.getColumnIndex(FolderTable.COLUMN_APPLICABILITY);
+		String name = folderCursor.getString(nameIndex);
+		String rule = folderCursor.getString(ruleIndex);
+		int applicabilityOrdinal = folderCursor.getInt(applicabilityIndex);
+		Folder.Applicability applicability = Folder.Applicability.values()[applicabilityOrdinal];
+		return new Folder(name, rule, applicability);
 	}
 	
 	private static boolean intToBool(int i) {

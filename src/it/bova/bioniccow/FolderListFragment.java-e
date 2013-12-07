@@ -8,9 +8,9 @@ import java.util.Map;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderGetter;
 import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.Folders_old2;
-import it.bova.bioniccow.data.observers.FolderObserver;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
 import it.bova.bioniccow.utilities.SmartDialogInterfaceClickListener;
@@ -36,9 +36,6 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 	private ListView lv;
 	private FolderAdapter adapter;
 
-	private Folders_old2 folders;
-	private FolderObserver folderObserver;
-
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.specials,
@@ -61,10 +58,6 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 		this.lv.setAdapter(this.adapter);
 		this.registerForContextMenu(lv);
 
-
-		//"Sveglia" le strutture
-		this.folders = new Folders_old2(this.getSherlockActivity());	
-
 		return view;
 
 	}
@@ -72,30 +65,19 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 
 	@Override public void onResume() {
 		super.onResume();  
+		this.refresh();
+	}
 
-		this.folderObserver = new FolderObserver() {
-			@Override public void onDataChanged(List<Folder> folderList) {
-				List<Folder> tmpFolders = new ArrayList<Folder>();
-				tmpFolders.addAll(folderList);
-				Collections.sort(tmpFolders, new FolderComparator());
-				FolderListFragment.this.adapter.reloadAndNotify(tmpFolders);				
+	
+	public void refresh() {
+		DBFolderGetter fg = new DBFolderGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<Folder> folders) {
+				Collections.sort(folders, new FolderComparator());
+				FolderListFragment.this.adapter.reloadAndNotify(folders);	
 			}
 		};
-		this.folders.addObserver(folderObserver);
-
-		this.folders.retrieve();
-		this.folders.notifyObservers();
-
+		fg.execute();
 	}
-
-	public void onPause() {
-		super.onPause();
-		this.folders.removeObserver(folderObserver);
-	}
-
-
-
-
 
 	private class FolderAdapter extends ImprovedArrayAdapter<Folder> {
 

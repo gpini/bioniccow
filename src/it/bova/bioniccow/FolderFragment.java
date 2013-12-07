@@ -1,14 +1,10 @@
 package it.bova.bioniccow;
 
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTagGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Folders_old2;
-import it.bova.bioniccow.data.Locations_old2;
-import it.bova.bioniccow.data.Tags_old2;
-import it.bova.bioniccow.data.TaskLists_old2;
-import it.bova.bioniccow.data.observers.FolderObserver;
-import it.bova.bioniccow.data.observers.LocationObserver;
-import it.bova.bioniccow.data.observers.TagObserver;
-import it.bova.bioniccow.data.observers.TaskListObserver;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
 import it.bova.bioniccow.utilities.rtmobjects.LocationComparator;
@@ -45,19 +41,9 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 	private FolderAdapter adapter;
 
 	private String folder;
-	private Folders_old2 folders;
-	private FolderObserver folderObserver;
-	
-	private Tags_old2 tags;
 	private Set<String> tagSet;
-	private TagObserver tagObserver;
-	private TaskLists_old2 tasklists;
 	private Map<String,TaskList> listMap;
-	private TaskListObserver listObserver;
-	private Locations_old2 locations;
 	private Map<String,Location> locMap;
-	private LocationObserver locationObserver;
-	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		      Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.folder_grid,
@@ -65,11 +51,6 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 		grid = (GridView) view.findViewById(R.id.gridView);
 		adapter = new FolderAdapter(this.getSherlockActivity(), new ArrayList<FolderElement>());
 		grid.setAdapter(adapter);
-		
-		this.folders = new Folders_old2(this.getSherlockActivity());
-		this.tags = new Tags_old2(this.getSherlockActivity());
-		this.locations = new Locations_old2(this.getSherlockActivity());
-		this.tasklists = new TaskLists_old2(this.getSherlockActivity());
 		
 		folder = this.getArguments().getString("folder");
 		TextView folderTitle = (TextView) view.findViewById(R.id.folderTitle);
@@ -85,12 +66,18 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 	
 	public void onResume() {
 		super.onResume();
-							
-		this.folderObserver = new FolderObserver() {
-			@Override public void onDataChanged(List<Folder> folderList) {
+		
+		this.refresh();		
+
+	}
+
+	
+	public void refresh() {
+		final DBFolderGetter fg = new DBFolderGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<Folder> folders) {
 				if(!folder.equals("")) {
 					Folder tmpFolder = null;
-					for(Folder fold : folderList) {
+					for(Folder fold : folders) {
 						if(fold.getName().equals(folder))
 							tmpFolder = fold;
 					}
@@ -112,7 +99,7 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 				}
 				else {
 					//CALCOLA GLI ELEMENTI
-					Collection<Folder> folderColl = folderList;
+					Collection<Folder> folderColl = folders;
 					Map<String,Location> tmpLocMap = new HashMap<String,Location>();
 					tmpLocMap.putAll(locMap);
 					Map<String,TaskList> tmpListMap = new HashMap<String,TaskList>();
@@ -160,53 +147,33 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 				    for(Location location : tmpLocMap.values())
 				    	elementsNotInFolders.add(new FolderElement(location.getId(),FolderElement.Type.LOCATION));
 				    Collections.sort(elementsNotInFolders, new FolderElementComparator());
-				    FolderFragment.this.adapter.reloadAndNotify(elementsNotInFolders);
 				}
+				FolderFragment.this.adapter.notifyDataSetChanged();
 			}
 		};
-		this.folders.retrieve();
-		this.folders.addObserver(folderObserver);
-		
-		this.locMap = this.locations.retrieveAsMap();
-		this.listMap = this.tasklists.retrieveAsMap();
-		this.tagSet = this.tags.retrieve();
-		this.adapter.notifyDataSetChanged();
-	
-		//se si modificano da ora in poi aggiorno
-		this.locationObserver = new LocationObserver() {
-			@Override public void onDataChanged(List<Location> locations) {
+		final DBTaskListsGetter tlg = new DBTaskListsGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				FolderFragment.this.listMap = new HashMap<String,TaskList>();
+				for(TaskList list : tasklists)
+					FolderFragment.this.listMap.put(list.getId(), list);
+				fg.execute();
+			}
+		};
+		final DBLocationsGetter lg = new DBLocationsGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<Location> locations) {
 				FolderFragment.this.locMap = new HashMap<String,Location>();
 				for(Location loc : locations)
 					FolderFragment.this.locMap.put(loc.getId(), loc);
-				FolderFragment.this.adapter.notifyDataSetChanged();
+				tlg.execute();
 			}
 		};
-		this.locations.addObserver(locationObserver);
-		this.listObserver = new TaskListObserver() {
-			@Override public void onDataChanged(List<TaskList> lists) {
-				FolderFragment.this.listMap = new HashMap<String,TaskList>();
-				for(TaskList list : lists)
-					FolderFragment.this.listMap.put(list.getId(), list);
-				FolderFragment.this.adapter.notifyDataSetChanged();
+		final DBTagGetter tg = new DBTagGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(Set<String> tags) {
+				FolderFragment.this.tagSet = tags;
+				lg.execute();
 			}
 		};
-		this.tasklists.addObserver(this.listObserver);
-		this.tagObserver = new TagObserver() {
-			public void onDataChanged(Set<String> tagSet) {
-				FolderFragment.this.tagSet = tagSet;
-				FolderFragment.this.adapter.notifyDataSetChanged();
-			}
-		};
-		this.tags.addObserver(tagObserver);
-		
-		folders.notifyObservers();	
-		
-
-	}
-	
-	public void onPause() {
-		super.onPause();	
-		this.folders.removeObserver(this.folderObserver);
+		tg.execute();
 	}
 	
 	private static class FolderElement {
