@@ -160,8 +160,8 @@ public class CursorHelper {
 	
 	public static Map<String,List<String>> cursorToTagMap(String asTagString, Cursor tagCursor) {
 		Map<String,List<String>> tagMap = new HashMap<String,List<String>>(); 
-		int nameIndex = tagCursor.getColumnIndex(asTagString + TagTable.COLUMN_NAME);
-		int taskIdIndex = tagCursor.getColumnIndex(asTagString + TagTable.COLUMN_TASK_ID);
+		int nameIndex = tagCursor.getColumnIndex(TagTable.COLUMN_NAME);
+		int taskIdIndex = tagCursor.getColumnIndex(TagTable.COLUMN_TASK_ID);
 		while(tagCursor.moveToNext()) {
 			String taskId = tagCursor.getString(taskIdIndex);
 			String tag = tagCursor.getString(nameIndex);

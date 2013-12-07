@@ -15,7 +15,7 @@ public class ContactTable {
 	
 	public static final String[] allColumns = { 
 		COLUMN_FULLNAME, COLUMN_USERNAME, 
-		COLUMN_CONTACT_ID, COLUMN_CONTACT_ID
+		COLUMN_CONTACT_ID
 		};
 	
 	// Database creation SQL statement

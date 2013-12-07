@@ -282,15 +282,24 @@ public class TaskDatabase {
 		if(nestedSelect == null)
 			return new ArrayList<Task>();
 
-		String tagStringCol = columnsToString("T.", TagTable.allColumns);
+		String[] tagColumns = { 
+			TagTable.COLUMN_NAME + " AS " + TagTable.COLUMN_NAME,
+			TagTable.COLUMN_TASK_ID + " AS " + TagTable.COLUMN_TASK_ID,
+		};
+		String tagStringCol = columnsToString("T.", tagColumns);
 		String tagQuery = "SELECT " + tagStringCol
 				+ " FROM " + TagTable.TABLE_TAG + " AS T"
 				+ " JOIN (" + nestedSelect + ") AS N"
 				+ " ON T." + TagTable.COLUMN_TASK_ID + " = N." + TaskTable.COLUMN_TASK_ID;
 		tagCursor = dB.rawQuery(tagQuery, null);
 
-		String contactStringCol = columnsToString("T2C.", TaskToContactTable.allColumns)
-				+ ", " + columnsToString("C.", ContactTable.allColumns);
+		String[] contactColumns = { 
+			ContactTable.COLUMN_FULLNAME + " AS " + ContactTable.COLUMN_FULLNAME,
+			ContactTable.COLUMN_USERNAME + " AS " + ContactTable.COLUMN_USERNAME, 
+			ContactTable.COLUMN_CONTACT_ID + " AS " + ContactTable.COLUMN_CONTACT_ID
+		};
+		String contactStringCol = columnsToString("C.", contactColumns)
+				+ ", T2C." + TaskToContactTable.COLUMN_TASK_ID + " AS " + TaskToContactTable.COLUMN_TASK_ID;
 		String contactQuery = "SELECT " + contactStringCol + ""
 				+ " FROM " + ContactTable.TABLE_CONTACT + " AS C"
 				+ " JOIN " + TaskToContactTable.TABLE_TASK_TO_CONTACT  + " AS T2C"
@@ -299,8 +308,15 @@ public class TaskDatabase {
 				+ " ON T2C." + TaskToContactTable.COLUMN_TASK_ID + " = N." + TaskTable.COLUMN_TASK_ID;
 		contactCursor = dB.rawQuery(contactQuery, null);
 		
-		String noteStringCol = columnsToString("T2N.", TaskToNoteTable.allColumns)
-				+ ", " + columnsToString("NT.", NoteTable.allColumns);
+		String[] noteColumns = { 
+			NoteTable.COLUMN_TITLE + " AS " + NoteTable.COLUMN_TITLE,
+			NoteTable.COLUMN_TEXT + " AS " + NoteTable.COLUMN_TEXT,
+			NoteTable.COLUMN_NOTE_ID + " AS " + NoteTable.COLUMN_NOTE_ID,
+			NoteTable.COLUMN_CREATED +  " AS " + NoteTable.COLUMN_CREATED,
+			NoteTable.COLUMN_MODIFIED +  " AS " + NoteTable.COLUMN_MODIFIED
+		};
+		String noteStringCol = columnsToString("NT.", noteColumns)
+				+ ", T2N." + TaskToNoteTable.COLUMN_TASK_ID + " AS " + TaskToNoteTable.COLUMN_TASK_ID;
 		String noteQuery = "SELECT " + noteStringCol + ""
 				+ " FROM " + NoteTable.TABLE_NOTE + " AS NT"
 				+ " JOIN " + TaskToNoteTable.TABLE_TASK_TO_NOTE  + " AS T2N"
@@ -309,9 +325,9 @@ public class TaskDatabase {
 				+ " ON T2N." + TaskToNoteTable.COLUMN_TASK_ID + " = N." + TaskTable.COLUMN_TASK_ID;
 		noteCursor = dB.rawQuery(noteQuery, null);
 		
-		Map<String,List<String>> tagMap = CursorHelper.cursorToTagMap("T.", tagCursor);
-		Map<String,List<Contact>> contactMap = CursorHelper.cursorToContactMap("C.", "T2C.", contactCursor);
-		Map<String,List<Note>> noteMap = CursorHelper.cursorToNoteMap("NT.", "T2N.", noteCursor);
+		Map<String,List<String>> tagMap = CursorHelper.cursorToTagMap("", tagCursor);
+		Map<String,List<Contact>> contactMap = CursorHelper.cursorToContactMap("", "", contactCursor);
+		Map<String,List<Note>> noteMap = CursorHelper.cursorToNoteMap("", "", noteCursor);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		//Log.d("cursor", "" + taskCursor.getPosition());
