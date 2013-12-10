@@ -5,21 +5,20 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import it.bova.bioniccow.data.Folders_old2;
+import com.actionbarsherlock.app.SherlockActivity;
+import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTagGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Locations_old2;
-import it.bova.bioniccow.data.Tags_old2;
-import it.bova.bioniccow.data.TaskLists_old2;
-import it.bova.bioniccow.data.observers.FolderObserver;
-import it.bova.bioniccow.data.observers.LocationObserver;
-import it.bova.bioniccow.data.observers.TagObserver;
-import it.bova.bioniccow.data.observers.TaskListObserver;
 import it.bova.bioniccow.utilities.ImprovedSpinnerAdapter;
 import it.bova.bioniccow.utilities.NetAvailabilityTask;
 import it.bova.bioniccow.utilities.ImprovedDatePickerDialog;
@@ -29,8 +28,11 @@ import it.bova.bioniccow.utilities.LabelAdapter;
 import it.bova.bioniccow.utilities.SimpleDatePickerDialog;
 import it.bova.bioniccow.utilities.SpaceTokenizer;
 import it.bova.bioniccow.utilities.rtmobjects.CheckableTask;
+import it.bova.bioniccow.utilities.rtmobjects.LocationComparator;
+import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.bioniccow.utilities.rtmobjects.SmartDateFormat;
 import it.bova.bioniccow.utilities.rtmobjects.TaskFormat;
+import it.bova.bioniccow.utilities.rtmobjects.TaskListComparator;
 import it.bova.rtmapi.Location;
 import it.bova.rtmapi.Recurrence;
 import it.bova.rtmapi.Recurrence.RecurrenceOption;
@@ -141,17 +143,6 @@ public class TaskDetailActivity extends EditActivity {
 	protected RecurrenceOption newRecurrenceOption = null;
 	protected String newRecurrenceString = "";
 	protected TimePickerDialog.OnTimeSetListener timeSetListener2;
-
-	protected TaskLists_old2 tasklists;
-	protected TaskListObserver listObserver;
-	//protected Map<String,String> nameToListIdMap;
-	protected Locations_old2 locations;
-	protected LocationObserver locationObserver;
-	//protected Map<String,String> nameToLocationIdMap;
-	protected Tags_old2 tags;
-	protected TagObserver tagObserver;
-	protected Folders_old2 folders;
-	protected FolderObserver folderObserver;
 	
 	protected NetAvailabilityTask nat;
 	protected View connectionWarning;
@@ -171,19 +162,14 @@ public class TaskDetailActivity extends EditActivity {
 
 		this.loadForms();
 
-		this.folders = new Folders_old2(this);
-		this.tags = new Tags_old2(this);
-		this.tasklists = new TaskLists_old2(this);
-		this.locations = new Locations_old2(this);
-
-		this.tagLabels = new ArrayList<Label>();
-		this.folderLabels = new ArrayList<Label>();
-
 	}
 
 
 	public void onResume() {
 		super.onResume();
+		
+		this.reloadTagLabels();
+		this.reloadFolderLabels();
 
 		this.updateDateButton();
 		this.updateTimeButton();
@@ -203,44 +189,6 @@ public class TaskDetailActivity extends EditActivity {
 		};
 		new Thread(this.nat).start();
 
-		this.tagObserver = new TagObserver() {
-			public void onDataChanged(Set<String> tagSet) {
-				//TaskActivity.this.tagSet = tagSet;
-				TaskDetailActivity.this.tagLabels.clear();
-				for(String tag : tagSet)
-					TaskDetailActivity.this.tagLabels.add(new Label("",tag));
-				TaskDetailActivity.this.labelAdapter.clear();
-				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.tagLabels);
-				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.folderLabels);
-				TaskDetailActivity.this.labelAdapter.notifyDataSetChanged();
-			}
-		};
-		this.tags.addObserver(this.tagObserver);
-
-		this.folderObserver = new FolderObserver() {
-			@Override public void onDataChanged(List<Folder> folderList) {
-				//TaskActivity.this.folderMap = folderMap;
-				TaskDetailActivity.this.folderLabels.clear();
-				for(Folder folder : folderList) {
-					List<String> tagElements = folder.getTagElements();
-					String rule = folder.getRule();
-					for(String tag : tagElements) {
-						String unruledTag = tag.substring(rule.length());
-						TaskDetailActivity.this.folderLabels.add(new Label(rule,unruledTag));
-					}
-				}
-				TaskDetailActivity.this.labelAdapter.clear();
-				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.tagLabels);
-				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.folderLabels);
-				TaskDetailActivity.this.labelAdapter.notifyDataSetChanged();
-			}
-		};
-		this.folders.addObserver(this.folderObserver);
-
-		tags.retrieve();
-		tags.notifyObservers();
-		folders.retrieve();
-		folders.notifyObservers();
 
 	}
 
@@ -248,11 +196,6 @@ public class TaskDetailActivity extends EditActivity {
 		super.onPause();	
 		
 		this.nat.cancel();
-		
-		this.locations.removeObserver(this.locationObserver);
-		this.tasklists.removeObserver(this.listObserver);
-		this.tags.removeObserver(this.tagObserver);
-		this.folders.removeObserver(this.folderObserver);
 
 	}
 
@@ -323,8 +266,6 @@ public class TaskDetailActivity extends EditActivity {
 	@Override public void onBackPressed() {	
 		this.finish();
 	}
-
-
 
 	@Override protected Dialog onCreateDialog(int id) {
 		switch (id) {
@@ -1031,6 +972,82 @@ public class TaskDetailActivity extends EditActivity {
 		}
 		
 		
+	}
+	
+	protected class DetailMessageReceiver extends DefaultMessageReceiver {
+	
+		public DetailMessageReceiver(SherlockActivity activity) {
+			super(activity);
+		}
+		
+		@Override protected void onTasklistsUpdated(Context context) {
+			DBTaskListsGetter tlg = new DBTaskListsGetter(TaskDetailActivity.this) {
+				@Override protected void onPostExecute(List<TaskList> tasklists) {
+					Collections.sort(tasklists, new TaskListComparator());
+					TaskDetailActivity.this.tasklistAdapter.reloadAndNotify(tasklists);
+				}
+			};
+			tlg.execute();
+		}
+			
+		@Override protected void onLocationsUpdated(Context context) {
+			DBLocationsGetter lg = new DBLocationsGetter(TaskDetailActivity.this) {
+				@Override protected void onPostExecute(List<Location> locations) {
+					Collections.sort(locations, new LocationComparator());
+					TaskDetailActivity.this.locationAdapter.reloadAndNotify(locations);
+				}
+			};
+			lg.execute();
+		}
+		
+		@Override protected void onFoldersUpdated(Context context) {
+			TaskDetailActivity.this.reloadFolderLabels();
+		}
+			
+		@Override protected void onTaskChanged(Context context, List<String> changedId) {
+			TaskDetailActivity.this.reloadTagLabels();
+		}
+			
+		@Override protected void onTaskAdded(Context context, List<ParcelableTask> addedTasks) {
+			TaskDetailActivity.this.reloadTagLabels();
+		}
+			
+	}
+	
+	private void reloadFolderLabels() {
+		DBFolderGetter fg = new DBFolderGetter(TaskDetailActivity.this) {
+			@Override protected void onPostExecute(List<Folder> folders) {
+				TaskDetailActivity.this.folderLabels.clear();
+				for(Folder folder : folders) {
+					String rule = folder.getRule();
+					for(Label tagLabel : TaskDetailActivity.this.tagLabels) {
+						String tag = tagLabel.getUnruledTag();
+						String unruledTag = tag.substring(rule.length());
+						TaskDetailActivity.this.folderLabels.add(new Label(rule,unruledTag));
+					}
+				}
+				TaskDetailActivity.this.labelAdapter.clear();
+				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.tagLabels);
+				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.folderLabels);
+				TaskDetailActivity.this.labelAdapter.notifyDataSetChanged();
+			}
+		};
+		fg.execute();
+	}
+	
+	private void reloadTagLabels() {
+		DBTagGetter tg = new DBTagGetter(TaskDetailActivity.this) {
+			@Override protected void onPostExecute(Set<String> tags) {
+				TaskDetailActivity.this.tagLabels.clear();
+				for(String tag : tags)
+					TaskDetailActivity.this.tagLabels.add(new Label("",tag));
+				TaskDetailActivity.this.labelAdapter.clear();
+				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.tagLabels);
+				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.folderLabels);
+				TaskDetailActivity.this.labelAdapter.notifyDataSetChanged();
+			}
+		};
+		tg.execute();
 	}
 	
 	

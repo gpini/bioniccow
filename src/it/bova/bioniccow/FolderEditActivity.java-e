@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import it.bova.bioniccow.asyncoperations.MessageSender;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderAdder;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderEditor;
 import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.Folder.Applicability;
 import it.bova.bioniccow.data.Folders_old2;
@@ -39,11 +42,6 @@ public class FolderEditActivity extends EditActivity {
 	private String folderNOKAdd2;
 	
 	private Folder folderToBeEdited;
-	private Tags_old2 tags;
-	private TaskLists_old2 tasklists;
-	private Locations_old2 locations;
-	
-	private boolean isEditMode = true;
 	
 	private static final int FOLDER_HELP_DIALOG = 1;
 	
@@ -59,9 +57,9 @@ public class FolderEditActivity extends EditActivity {
 		
 		//load forms if action is EDIT
 		if(this.getIntent().hasExtra("name")) {
-			 String name = this.getIntent().getStringExtra("name");
-			 folderToBeEdited = 
-					 new Folders_old2(this).retrieveAsMap().get(name);
+			Folder folder = (Folder) this.getIntent().getSerializableExtra("folder");
+			 String name = folder.getName();
+			 folderToBeEdited = folder;
 			 if(folderToBeEdited != null) {
 				 folderNameInput.setText(name);
 				 String rule = folderToBeEdited.getRule();
@@ -94,15 +92,10 @@ public class FolderEditActivity extends EditActivity {
 		}
 		else { //ADD mode
 			this.setTitle(R.string.add_folder);
-			this.isEditMode = false;
 		}
 		
 		folderNOKAdd1 = this.getResources().getString(R.string.folder_add_NOK1);
 		folderNOKAdd2 = this.getResources().getString(R.string.folder_add_NOK2);
-
-		this.tags = new Tags_old2(this);
-		this.tasklists = new TaskLists_old2(this);
-		this.locations = new Locations_old2(this);
 		
 	}
 	
@@ -175,6 +168,10 @@ public class FolderEditActivity extends EditActivity {
 		//save
 		String name = this.folderNameInput.getText().toString();
 		String rule = this.ruleInput.getText().toString();
+		int folderId = -1;
+		if(folderToBeEdited != null) //EDIT MODE
+			folderId = folderToBeEdited.getId();
+		Folder newFolder = new Folder(folderId, name, rule, selectedApplicability);
 		if(name.equals("") || rule.equals("")) {
 			if(name.equals(""))
 				Toast.makeText(this, this.folderNOKAdd1, Toast.LENGTH_SHORT).show();
@@ -183,42 +180,28 @@ public class FolderEditActivity extends EditActivity {
 			this.finish();
 		}
 		else {
-			Folders_old2 folders = new Folders_old2(this);
-			Map<String,Folder> folderMap = folders.retrieveAsMap();
-			if(folderToBeEdited != null)
-				folderMap.remove(folderToBeEdited.getName());
-			Folder newFolder = new Folder(name, rule, selectedApplicability);
-			List<String> tagElements = new ArrayList<String>();
-			List<String> listElements = new ArrayList<String>();
-			List<String> locationElements = new ArrayList<String>();
-			switch(selectedApplicability) {
-				case TAGS :
-					Set<String> tagSet1 = this.tags.retrieve();
-					tagElements = newFolder.loadTagElements(tagSet1);
-					break;
-				case LISTS :
-					Map<String,TaskList> listMap1 = this.tasklists.retrieveAsMap();
-					listElements = newFolder.loadListElements(listMap1);
-					break;
-				case LOCATIONS :
-					Map<String,Location> locMap1 = this.locations.retrieveAsMap();
-					locationElements = newFolder.loadLocationElements(locMap1);
-					break;
-				case EVERYTHING :
-					Set<String> tagSet2 = this.tags.retrieve();
-					tagElements = newFolder.loadTagElements(tagSet2);
-					Map<String,TaskList> listMap2 = this.tasklists.retrieveAsMap();
-					listElements = newFolder.loadListElements(listMap2);
-					Map<String,Location> locMap2 = this.locations.retrieveAsMap();
-					locationElements = newFolder.loadLocationElements(locMap2);
-					break;
+			if(folderToBeEdited != null) {
+				//EDIT MODE
+				DBFolderEditor fe = new DBFolderEditor(FolderEditActivity.this) {
+					@Override public void onPostExecute(Boolean result) {
+						if(result)
+							MessageSender.notifyFoldersUpdated(FolderEditActivity.this);
+						FolderEditActivity.this.finish();
+					}
+				};
+				fe.execute(newFolder);
 			}
-			newFolder.setTagElements(tagElements);
-			newFolder.setListElements(listElements);
-			newFolder.setLocationElements(locationElements);
-			folderMap.put(newFolder.getName(),newFolder);
-			folders.saveAndNotifyAsList(folderMap);
-			this.finish();
+			else {
+				//ADD MODE
+				DBFolderAdder fa = new DBFolderAdder(FolderEditActivity.this) {
+					@Override public void onPostExecute(Boolean result) {
+						if(result)
+							MessageSender.notifyFoldersUpdated(FolderEditActivity.this);
+						FolderEditActivity.this.finish();
+					}
+				};
+				fa.execute(newFolder);
+			}
 		}
 	}
 	

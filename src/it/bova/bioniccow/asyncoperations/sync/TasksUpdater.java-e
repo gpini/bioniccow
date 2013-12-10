@@ -1,21 +1,12 @@
 package it.bova.bioniccow.asyncoperations.sync;
 
 
-import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Folders_old2;
-import it.bova.bioniccow.data.Locations_old2;
-import it.bova.bioniccow.data.Tags_old2;
-import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
-import it.bova.rtmapi.Location;
-import it.bova.rtmapi.TaskList;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import android.content.Context;
+import android.util.Log;
 
 public abstract class TasksUpdater {
 	
@@ -29,23 +20,23 @@ public abstract class TasksUpdater {
 			//update tasks with changed tasks (they will be overriden by next synch action)
 			onUpdate(deletedTasks);
 
-			//update tags
+			/*//update tags
 			Tags_old2 tags = new Tags_old2(context);
 			Set<String> tagSet = TaskDatabase.getDistinctTags();
 			//Log.d("(change) tags", "" + tagSet.size());
-			tags.save(tagSet);
+			tags.save(tagSet);*/
 
-			//update folders
+			/*//update folders
 			Folders_old2 folders = new Folders_old2(context);
 			Map<String,Folder> folderMap = folders.retrieveAsMap();
 			Map<String, TaskList> listMap = new TaskLists_old2(context).retrieveAsMap();
 			Map<String, Location> locMap = new Locations_old2(context).retrieveAsMap();
 			Map<String,Folder> newFolderMap
 				= TasksUpdater.updateFolders(folderMap, tagSet, listMap, locMap);
-			folders.saveAsList(newFolderMap);
+			folders.saveAsList(newFolderMap);*/
 			return deletedTasks;
 		}catch(Exception e) {
-			//Log.d("DB error", e.getMessage());
+			Log.d("DB error", e.getMessage());
 			return null;
 		}
 		finally {
@@ -55,7 +46,7 @@ public abstract class TasksUpdater {
 
 	protected abstract void onUpdate(List<ParcelableTask> updatedTasks);
 	
-	public static Map<String, Folder> updateFolders(Map<String,Folder> folders,
+	/*public static Map<String, Folder> updateFolders(Map<String,Folder> folders,
 	Set<String> tagSet, Map<String,TaskList> listMap, Map<String,Location> locMap) {
 		for(Folder folder : folders.values()) {
 			switch(folder.getApplicability()) {
@@ -77,5 +68,5 @@ public abstract class TasksUpdater {
 			}
 		}
 		return folders;
-	}
+	}*/
 }

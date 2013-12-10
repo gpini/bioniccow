@@ -5,35 +5,35 @@ import it.bova.rtmapi.TaskList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class Folder implements Serializable{
 	
+	private int folderId;
 	private String rule = "";
 	private String name = "";
-	private Applicability applicability = Applicability.EVERYTHING;
-	private List<String> tagElements;
-	private List<String> listElements;
-	private List<String> locationElements;
-	
+	private Applicability applicability = Applicability.EVERYTHING;	
 	
 	public enum Applicability {
 		LISTS,TAGS,LOCATIONS,EVERYTHING;
 	}
 		
-	public Folder(String name, String rule,
+	public Folder(int folderId, String name, String rule,
 			Applicability applicability) {
 		this.setRule(rule);
 		this.name = name;
 		this.applicability = applicability;
-		this.tagElements = new ArrayList<String>();
-		this.listElements = new ArrayList<String>();
-		this.locationElements = new ArrayList<String>();
 	}
 	
+	public int getId() {
+		return folderId;
+	}
+
+	public void setId(int id) {
+		this.folderId = id;
+	}
 	
 	public String getRule() {
 		return rule;
@@ -57,33 +57,6 @@ public class Folder implements Serializable{
 
 	public void setApplicability(Applicability applicability) {
 		this.applicability = applicability;
-	}
-
-	public List<String> getTagElements() {
-		return tagElements;
-	}
-
-	public void setTagElements(List<String> tagElements) {
-		//Collections.sort(tagElements);
-		this.tagElements = tagElements;
-	}
-	
-	public List<String> getListElements() {
-		return listElements;
-	}
-
-	public void setListElements(List<String> listElements) {
-		//Collections.sort(listElements);
-		this.listElements = listElements;
-	}
-	
-	public List<String> getLocationElements() {
-		return locationElements;
-	}
-
-	public void setLocationElements(List<String> locationElements) {
-		//Collections.sort(locationElements);
-		this.locationElements = locationElements;
 	}
 	
 	public List<String> loadTagElements(Set<String> tagSet) {

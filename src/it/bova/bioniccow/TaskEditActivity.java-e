@@ -8,9 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import it.bova.bioniccow.data.observers.LocationObserver;
-import it.bova.bioniccow.data.observers.TaskListObserver;
-import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.NoteAdder;
 import it.bova.bioniccow.asyncoperations.rtmobjects.NoteDeleter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.NoteModifier;
@@ -92,7 +91,7 @@ public class TaskEditActivity extends TaskDetailActivity {
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		this.messageReceiver = new TaskDetailActivityMessageReceiver(this);
+		this.messageReceiver = new TaskEditActivityMessageReceiver(this);
 		
 		Intent intent = this.getIntent();
 		this.taskToBeEdited = (CheckableTask) intent.getParcelableExtra("task");
@@ -134,54 +133,8 @@ public class TaskEditActivity extends TaskDetailActivity {
 	public void onResume() {
 		super.onResume();
 		
-		//se si modificano da ora in poi aggiorno
-		this.listObserver = new TaskListObserver() {
-			@Override public void onDataChanged(List<TaskList> lists) {
-				List<TaskList> tmpLists = new ArrayList<TaskList>();
-				for(TaskList list : lists) {
-					if(!list.isSmart()) tmpLists.add(list);
-				}
-				Collections.sort(tmpLists, new TaskListComparator());
-				TaskEditActivity.this.tasklistAdapter.reload(tmpLists);
-				int selectedListPosition = 0;
-				if(TaskEditActivity.this.selectedListId != null)
-					selectedListPosition =
-						TaskEditActivity.this.tasklistAdapter.findPositionByRtmObjectId(selectedListId);
-				else 
-					selectedListPosition = 
-						TaskEditActivity.this.tasklistAdapter.findPositionByRtmObjectId(taskToBeEdited.getListId());
-				TaskEditActivity.this.tasklistAdapter.notifyDataSetChanged();
-				if(selectedListPosition >= 0)
-					TaskEditActivity.this.listSpinner.setSelection(selectedListPosition);
-			}
-		};
-		this.tasklists.addObserver(this.listObserver);
-		
-		this.locationObserver = new LocationObserver() {
-			@Override public void onDataChanged(List<Location> locations) {
-				List<Location> tmpLocs = new ArrayList<Location>();
-				tmpLocs.addAll(locations);
-				Collections.sort(tmpLocs, new LocationComparator());
-				tmpLocs.add(0, new Location("", "-", 0, 0, "-", false, 0));
-				TaskEditActivity.this.locationAdapter.reload(tmpLocs);
-				int selectedLocPosition = 0;
-				if(TaskEditActivity.this.selectedLocationId != null)
-					selectedLocPosition =
-						TaskEditActivity.this.locationAdapter.findPositionByRtmObjectId(selectedLocationId);
-				else 
-					selectedLocPosition =
-						TaskEditActivity.this.locationAdapter.findPositionByRtmObjectId(taskToBeEdited.getLocationId());
-				TaskEditActivity.this.locationAdapter.notifyDataSetChanged();
-				if(selectedLocPosition >= 0)
-					TaskEditActivity.this.locationSpinner.setSelection(selectedLocPosition);
-			}
-		};
-		this.locations.addObserver(this.locationObserver);
-		
-		tasklists.retrieve();
-		tasklists.notifyObservers();
-		locations.retrieve();
-		locations.notifyObservers();
+		this.refreshTaskLists();
+		this.refreshLocations();
 		
 	}
 	
@@ -807,13 +760,14 @@ public class TaskEditActivity extends TaskDetailActivity {
 		multipleEditor.execute();
 	}
 	
-	private class TaskDetailActivityMessageReceiver extends DefaultMessageReceiver{
+	private class TaskEditActivityMessageReceiver extends DetailMessageReceiver{
 	
-		public TaskDetailActivityMessageReceiver(SherlockActivity activity) {
+		public TaskEditActivityMessageReceiver(SherlockActivity activity) {
 			super(activity);
 		}
 		
 		@Override public void onTaskChanged(Context context, List<String> changedIds) {
+			super.onTaskChanged(context, changedIds);
 			if(TaskEditActivity.this.taskToBeEdited != null) {
 				for(String id : changedIds) {
 					if(id.equals(TaskEditActivity.this.taskToBeEdited.getId())) {
@@ -888,7 +842,64 @@ public class TaskEditActivity extends TaskDetailActivity {
 				taskToBeEdited.setNotes(newNotes);
 			}	
 		}
+		
+		@Override public void onTasklistsUpdated(Context context) {
+			super.onTasklistsUpdated(context);
+			TaskEditActivity.this.refreshTaskLists();
+		}
+		
+		@Override public void onLocationsUpdated(Context context) {
+			super.onLocationsUpdated(context);
+			TaskEditActivity.this.refreshLocations();
+		}
 
+	}
+	
+	private void refreshTaskLists() {
+		DBTaskListsGetter tlg = new DBTaskListsGetter(TaskEditActivity.this) {
+			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				List<TaskList> tmpLists = new ArrayList<TaskList>();
+				for(TaskList list : tasklists) {
+					if(!list.isSmart()) tmpLists.add(list);
+				}
+				Collections.sort(tmpLists, new TaskListComparator());
+				TaskEditActivity.this.tasklistAdapter.reload(tmpLists);
+				int selectedListPosition = 0;
+				if(TaskEditActivity.this.selectedListId != null)
+					selectedListPosition =
+						TaskEditActivity.this.tasklistAdapter.findPositionByRtmObjectId(selectedListId);
+				else 
+					selectedListPosition = 
+						TaskEditActivity.this.tasklistAdapter.findPositionByRtmObjectId(taskToBeEdited.getListId());
+				TaskEditActivity.this.tasklistAdapter.notifyDataSetChanged();
+				if(selectedListPosition >= 0)
+					TaskEditActivity.this.listSpinner.setSelection(selectedListPosition);
+			}
+		};
+		tlg.execute();
+	}
+	
+	private void refreshLocations() {
+		DBLocationsGetter lg = new DBLocationsGetter(TaskEditActivity.this) {
+			@Override protected void onPostExecute(List<Location> locations) {
+				List<Location> tmpLocs = new ArrayList<Location>();
+				tmpLocs.addAll(locations);
+				Collections.sort(tmpLocs, new LocationComparator());
+				tmpLocs.add(0, new Location("", "-", 0, 0, "-", false, 0));
+				TaskEditActivity.this.locationAdapter.reload(tmpLocs);
+				int selectedLocPosition = 0;
+				if(TaskEditActivity.this.selectedLocationId != null)
+					selectedLocPosition =
+						TaskEditActivity.this.locationAdapter.findPositionByRtmObjectId(selectedLocationId);
+				else 
+					selectedLocPosition =
+						TaskEditActivity.this.locationAdapter.findPositionByRtmObjectId(taskToBeEdited.getLocationId());
+				TaskEditActivity.this.locationAdapter.notifyDataSetChanged();
+				if(selectedLocPosition >= 0)
+					TaskEditActivity.this.locationSpinner.setSelection(selectedLocPosition);
+			}
+		};
+		lg.execute();
 	}
 	
 }

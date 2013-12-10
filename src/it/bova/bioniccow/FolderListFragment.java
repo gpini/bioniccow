@@ -8,6 +8,8 @@ import java.util.Map;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+import it.bova.bioniccow.asyncoperations.MessageSender;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderDeleter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderGetter;
 import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.Folders_old2;
@@ -102,10 +104,10 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 			Folder folder = this.getItem(position);
 			if(folder != null) holder.tv.setText(folder.getName());
 			else holder.tv.setText("-----");
-			convertView.setOnClickListener(new SmartClickListener<String>(folder.getName()) {
+			convertView.setOnClickListener(new SmartClickListener<Folder>(folder) {
 				@Override public void onClick(View v) {
 					Bundle bundle = new Bundle();
-					bundle.putString("folder", this.get());
+					bundle.putSerializable("folder", this.get());
 					FolderFragment fragment = new FolderFragment();
 					fragment.setArguments(bundle);
 					FolderListFragment.this.getActivity().getSupportFragmentManager()
@@ -115,10 +117,10 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 						.commit();
 				}
 			});
-			convertView.setOnLongClickListener(new SmartLongClickListener<String>(folder.getName()) {
+			convertView.setOnLongClickListener(new SmartLongClickListener<Folder>(folder) {
 				@Override public boolean onLongClick(View v) {
-					String folderName = this.get()[0];
-					FolderListFragment.this.showEditDeleteDialog(folderName);
+					Folder folder = this.get()[0];
+					FolderListFragment.this.showEditDeleteDialog(folder);
 					return true;
 				}
 			});
@@ -127,10 +129,10 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 
 	}
 	
-	void showEditDeleteDialog(String folderName) {
+	void showEditDeleteDialog(Folder folder) {
 	    DialogFragment newFragment = EditDeleteDialogFragment.newInstance();
 	    Bundle bundle = new Bundle();
-		bundle.putString("folder", folderName);
+		bundle.putSerializable("folder", folder);
 		newFragment.setArguments(bundle);
 	    newFragment.show(this.getFragmentManager(), "edit_delete");
 	}
@@ -144,23 +146,27 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 	    
 	    @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
 	    	String modifyFolder = this.getResources().getString(R.string.modify_folder);
-			String folderName = this.getArguments().getString("folder");
+			Folder folder = (Folder) this.getArguments().getSerializable("folder");
 			final Dialog dialog = new AlertDialog.Builder(this.getActivity()).setTitle(modifyFolder).setCancelable(true)
-					.setItems(R.array.edit_del_options, new SmartDialogInterfaceClickListener<String>(folderName) {
+					.setItems(R.array.edit_del_options, new SmartDialogInterfaceClickListener<Folder>(folder) {
 						@Override public void onClick(DialogInterface dialoginterface, int i) {
-							String name = this.get();
+							Folder folder = this.get();
+							//String name = folder.getName();
 							switch(i) {
 							case 0 :
 								Intent intent = new Intent(EditDeleteDialogFragment.this.getActivity(),FolderEditActivity.class);
-								intent.putExtra("name", name);
+								intent.putExtra("folder", folder);
 								EditDeleteDialogFragment.this.dismiss();
 								EditDeleteDialogFragment.this.getActivity().startActivity(intent);
 								break;
 							case 1 :
-								Folders_old2 folders = new Folders_old2(EditDeleteDialogFragment.this.getActivity());
-								Map<String,Folder> folderMap = folders.retrieveAsMap();
-								folderMap.remove(name);
-								folders.saveAndNotifyAsList(folderMap);
+								DBFolderDeleter fd = new DBFolderDeleter(EditDeleteDialogFragment.this.getActivity()) {
+									@Override public void onPostExecute(Boolean result) {
+										if(result)
+											MessageSender.notifyFoldersUpdated(EditDeleteDialogFragment.this.getActivity());
+									}
+								};
+								fd.execute(folder.getId());
 								EditDeleteDialogFragment.this.dismiss();
 								break;
 							default :

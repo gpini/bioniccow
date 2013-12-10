@@ -3,8 +3,11 @@ package it.bova.bioniccow;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import it.bova.bioniccow.data.observers.LocationObserver;
-import it.bova.bioniccow.data.observers.TaskListObserver;
+
+import com.actionbarsherlock.app.SherlockActivity;
+
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskAdder;
 import it.bova.bioniccow.utilities.rtmobjects.CheckableTask;
 import it.bova.bioniccow.utilities.rtmobjects.LocationComparator;
@@ -17,6 +20,7 @@ import it.bova.rtmapi.Priority;
 import it.bova.rtmapi.Recurrence;
 import it.bova.rtmapi.TaskList;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -28,6 +32,8 @@ public class TaskAddActivity extends TaskDetailActivity{
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		this.messageReceiver = new TaskAddActivityMessageReceiver(this);
 
 		Intent intent = this.getIntent();
 		this.taskToBeEdited = (CheckableTask) intent.getParcelableExtra("task");
@@ -47,59 +53,8 @@ public class TaskAddActivity extends TaskDetailActivity{
 	public void onResume() {
 		super.onResume();	
 
-		//se si modificano da ora in poi aggiorno
-		this.listObserver = new TaskListObserver() {
-			@Override public void onDataChanged(List<TaskList> lists) {
-				List<TaskList> tmpLists = new ArrayList<TaskList>();
-				for(TaskList list : lists) {
-					if(!list.isSmart()) tmpLists.add(list);
-				}
-				Collections.sort(tmpLists, new TaskListComparator());
-				tmpLists.add(0, new TaskList("-", DEFAULT_LIST, false, false, false, 0, false, 0));
-				TaskAddActivity.this.tasklistAdapter.reload(tmpLists);
-				int selectedListPosition = 0;
-				if(TaskAddActivity.this.selectedListId != null) {
-					selectedListPosition =
-							TaskAddActivity.this.tasklistAdapter.findPositionByRtmObjectId(selectedListId);
-				}
-				else {
-					int type = TaskAddActivity.this.getIntent().getIntExtra(TYPE,0);
-					String id = null;
-					if(type == LIST)
-						id = TaskAddActivity.this.getIntent().getStringExtra(IDENTIFIER);
-					if(id != null)
-						selectedListPosition =
-							TaskAddActivity.this.tasklistAdapter.findPositionByRtmObjectId(id);
-				}
-				TaskAddActivity.this.tasklistAdapter.notifyDataSetChanged();
-				if(selectedListPosition >= 0)
-					TaskAddActivity.this.listSpinner.setSelection(selectedListPosition);
-			}
-		};
-		this.tasklists.addObserver(this.listObserver);
-
-		this.locationObserver = new LocationObserver() {
-			@Override public void onDataChanged(List<Location> locations) {
-				List<Location> tmpLocs = new ArrayList<Location>();
-				tmpLocs.addAll(locations);
-				Collections.sort(tmpLocs, new LocationComparator());
-				tmpLocs.add(0, new Location("", "-", 0, 0, "-", false, 0));
-				TaskAddActivity.this.locationAdapter.reload(tmpLocs);
-				int selectedLocPosition = 0;
-				if(TaskAddActivity.this.selectedLocationId != null)
-					selectedLocPosition = 
-						TaskAddActivity.this.locationAdapter.findPositionByRtmObjectId(selectedLocationId);
-				TaskAddActivity.this.locationAdapter.notifyDataSetChanged();
-				if(selectedLocPosition >= 0)
-					TaskAddActivity.this.locationSpinner.setSelection(selectedLocPosition);
-			}
-		};
-		this.locations.addObserver(this.locationObserver);
-
-		tasklists.retrieve();
-		tasklists.notifyObservers();
-		locations.retrieve();
-		locations.notifyObservers();
+		this.refreshTaskLists();
+		this.refreshLocations();
 
 	}
 
@@ -211,6 +166,77 @@ public class TaskAddActivity extends TaskDetailActivity{
 			sb.append(SmartAddFormat.formatUrl(this.urlInput.getText().toString()));
 		}
 		return sb.toString();
+	}
+	
+	private class TaskAddActivityMessageReceiver extends DetailMessageReceiver{
+		
+		public TaskAddActivityMessageReceiver(SherlockActivity activity) {
+			super(activity);
+		}
+		
+		@Override protected void onTasklistsUpdated(Context context) {
+			super.onTasklistsUpdated(context);
+			TaskAddActivity.this.refreshTaskLists();
+			
+		}
+		
+		@Override protected void onLocationsUpdated(Context context) {
+			super.onLocationsUpdated(context);
+			TaskAddActivity.this.refreshLocations();
+		}
+		
+	}
+	
+	private void refreshLocations() {
+		DBLocationsGetter lg = new DBLocationsGetter(TaskAddActivity.this) {
+			@Override protected void onPostExecute(List<Location> locations) {
+				List<Location> tmpLocs = new ArrayList<Location>();
+				tmpLocs.addAll(locations);
+				Collections.sort(tmpLocs, new LocationComparator());
+				tmpLocs.add(0, new Location("", "-", 0, 0, "-", false, 0));
+				TaskAddActivity.this.locationAdapter.reload(tmpLocs);
+				int selectedLocPosition = 0;
+				if(TaskAddActivity.this.selectedLocationId != null)
+					selectedLocPosition = 
+						TaskAddActivity.this.locationAdapter.findPositionByRtmObjectId(selectedLocationId);
+				TaskAddActivity.this.locationAdapter.notifyDataSetChanged();
+				if(selectedLocPosition >= 0)
+					TaskAddActivity.this.locationSpinner.setSelection(selectedLocPosition);
+			}
+		};
+		lg.execute();		
+	}
+	
+	private void refreshTaskLists() {
+		DBTaskListsGetter tlg = new DBTaskListsGetter(TaskAddActivity.this) {
+			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				List<TaskList> tmpLists = new ArrayList<TaskList>();
+				for(TaskList list : tasklists) {
+					if(!list.isSmart()) tmpLists.add(list);
+				}
+				Collections.sort(tmpLists, new TaskListComparator());
+				tmpLists.add(0, new TaskList("-", DEFAULT_LIST, false, false, false, 0, false, 0));
+				TaskAddActivity.this.tasklistAdapter.reload(tmpLists);
+				int selectedListPosition = 0;
+				if(TaskAddActivity.this.selectedListId != null) {
+					selectedListPosition =
+							TaskAddActivity.this.tasklistAdapter.findPositionByRtmObjectId(selectedListId);
+				}
+				else {
+					int type = TaskAddActivity.this.getIntent().getIntExtra(TYPE,0);
+					String id = null;
+					if(type == LIST)
+						id = TaskAddActivity.this.getIntent().getStringExtra(IDENTIFIER);
+					if(id != null)
+						selectedListPosition =
+							TaskAddActivity.this.tasklistAdapter.findPositionByRtmObjectId(id);
+				}
+				TaskAddActivity.this.tasklistAdapter.notifyDataSetChanged();
+				if(selectedListPosition >= 0)
+					TaskAddActivity.this.listSpinner.setSelection(selectedListPosition);
+			}
+		};
+		tlg.execute();
 	}
 
 

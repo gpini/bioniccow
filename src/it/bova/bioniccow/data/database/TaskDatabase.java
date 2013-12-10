@@ -413,27 +413,30 @@ public class TaskDatabase {
 	public static synchronized long putFolder(Folder folder) {
 		checkOrThrow();
 		if(folder != null) {
-			long insertId = -1;
 			ContentValues folderValues = FolderTable.values(folder);
-			insertId = dB.insertWithOnConflict(FolderTable.TABLE_FOLDER, null,
-					folderValues, SQLiteDatabase.CONFLICT_REPLACE);
+			long insertId = -1;
+			insertId = dB.insert(FolderTable.TABLE_FOLDER, null, folderValues);
 			return insertId;
 		}
 		else return -1;
 	}
 	
-	public static synchronized long removeFolder(Folder folder) {
+	public static synchronized int updateFolder(Folder folder) {
+		ContentValues folderValues = FolderTable.values(folder);
+		int updatedRows = dB.update(FolderTable.TABLE_FOLDER,
+				folderValues, FolderTable.COLUMN_FOLDER_ID + "= ?",
+				new String[]{"" + folder.getId()});
+		return updatedRows;
+	}
+	
+	
+	public static synchronized long removeFolder(int folderId) {
 		checkOrThrow();
-		if(folder != null) {
-			long deletedId = -1;
-			deletedId = dB.delete(FolderTable.TABLE_FOLDER,
-					FolderTable.COLUMN_NAME + " = ? AND"
-							+ FolderTable.COLUMN_RULE + " = ? AND"
-							+ FolderTable.COLUMN_APPLICABILITY + " = ?",
-					new String [] {folder.getName(), folder.getRule(), "" + folder.getApplicability().ordinal()});
-			return deletedId;
-		}
-		else return -1;
+		long deletedId = -1;
+		deletedId = dB.delete(FolderTable.TABLE_FOLDER,
+				FolderTable.COLUMN_FOLDER_ID + " = ?",
+				new String [] {Integer.toString(folderId)});
+		return deletedId;
 	}
 	
 	public static synchronized List<Folder> getFolders() {
@@ -447,21 +450,6 @@ public class TaskDatabase {
 		return folders;
 	}
 	
-	private static String columnsToString(String asString, String[] stringArray) {
-		StringBuilder sb = new StringBuilder();
-		int length = stringArray.length;
-		for(int i = 0; i < length; i++) {
-			String str = stringArray[i];
-			sb.append(asString);
-			sb.append(str);
-			if(i != (length - 1))
-				sb.append(", ");
-		}
-		return sb.toString();
-		
-	}
-
-
 	public static synchronized Set<String> getDistinctTags() {
 		checkOrThrow();
 		Set<String> tags = new TreeSet<String>();
@@ -476,6 +464,20 @@ public class TaskDatabase {
 		}
 		c.close();
 		return tags;
+	}
+	
+	private static String columnsToString(String asString, String[] stringArray) {
+		StringBuilder sb = new StringBuilder();
+		int length = stringArray.length;
+		for(int i = 0; i < length; i++) {
+			String str = stringArray[i];
+			sb.append(asString);
+			sb.append(str);
+			if(i != (length - 1))
+				sb.append(", ");
+		}
+		return sb.toString();
+		
 	}
 
 	private static void checkOrThrow() {

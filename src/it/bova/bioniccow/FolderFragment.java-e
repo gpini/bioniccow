@@ -44,6 +44,7 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 	private Set<String> tagSet;
 	private Map<String,TaskList> listMap;
 	private Map<String,Location> locMap;
+	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		      Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.folder_grid,
@@ -97,8 +98,7 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 						FolderFragment.this.adapter.reloadAndNotify(new ArrayList<FolderElement>());
 					}
 				}
-				else {
-					//CALCOLA GLI ELEMENTI
+				else { //NO FOLDER (Specials)
 					Collection<Folder> folderColl = folders;
 					Map<String,Location> tmpLocMap = new HashMap<String,Location>();
 					tmpLocMap.putAll(locMap);

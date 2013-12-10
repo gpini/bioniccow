@@ -241,14 +241,16 @@ public class CursorHelper {
 	}
 	
 	public static Folder cursorToFolder(Cursor folderCursor) {
+		int folderIdIndex = folderCursor.getColumnIndex(FolderTable.COLUMN_FOLDER_ID);
 		int nameIndex = folderCursor.getColumnIndex(FolderTable.COLUMN_NAME);
 		int ruleIndex = folderCursor.getColumnIndex(FolderTable.COLUMN_RULE);
 		int applicabilityIndex = folderCursor.getColumnIndex(FolderTable.COLUMN_APPLICABILITY);
+		int id = folderCursor.getInt(folderIdIndex);
 		String name = folderCursor.getString(nameIndex);
 		String rule = folderCursor.getString(ruleIndex);
 		int applicabilityOrdinal = folderCursor.getInt(applicabilityIndex);
 		Folder.Applicability applicability = Folder.Applicability.values()[applicabilityOrdinal];
-		return new Folder(name, rule, applicability);
+		return new Folder(id, name, rule, applicability);
 	}
 	
 	private static boolean intToBool(int i) {
