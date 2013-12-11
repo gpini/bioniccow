@@ -55,37 +55,36 @@ public class FolderEditActivity extends EditActivity {
 		((RadioButton) this.findViewById(R.id.radio_tags)).setChecked(true);
 		this.selectedApplicability = Applicability.TAGS;
 		
-		//load forms if action is EDIT
-		if(this.getIntent().hasExtra("name")) {
+		if(this.getIntent().hasExtra("folder")) { //load forms if action is EDIT
 			Folder folder = (Folder) this.getIntent().getSerializableExtra("folder");
-			 String name = folder.getName();
-			 folderToBeEdited = folder;
-			 if(folderToBeEdited != null) {
-				 folderNameInput.setText(name);
-				 String rule = folderToBeEdited.getRule();
-				 ruleInput.setText(rule);
-				 Applicability appl = folderToBeEdited.getApplicability();
-				 switch(appl) {
-				 case TAGS : 
-					 ((RadioButton) this.findViewById(R.id.radio_tags)).setChecked(true);
-					 this.selectedApplicability = Applicability.TAGS;
-					 break;
-				 case LISTS : 
-					 ((RadioButton) this.findViewById(R.id.radio_lists)).setChecked(true);
-					 this.selectedApplicability = Applicability.LISTS;
-					 break;
-				 case LOCATIONS : 
-					 ((RadioButton) this.findViewById(R.id.radio_locations)).setChecked(true);
-					 this.selectedApplicability = Applicability.LOCATIONS;
-					 break;
-				 case EVERYTHING : 
-					 ((RadioButton) this.findViewById(R.id.radio_everything)).setChecked(true);
-					 this.selectedApplicability = Applicability.EVERYTHING;
-					 break;
-				 }
-			 }
-			 else
-				 Toast.makeText(this, "folder not found", Toast.LENGTH_SHORT).show();
+			String name = folder.getName();
+			folderToBeEdited = folder;
+			if(folderToBeEdited != null) {
+				folderNameInput.setText(name);
+				String rule = folderToBeEdited.getRule();
+				ruleInput.setText(rule);
+				Applicability appl = folderToBeEdited.getApplicability();
+				switch(appl) {
+				case TAGS : 
+					((RadioButton) this.findViewById(R.id.radio_tags)).setChecked(true);
+					this.selectedApplicability = Applicability.TAGS;
+					break;
+				case LISTS : 
+					((RadioButton) this.findViewById(R.id.radio_lists)).setChecked(true);
+					this.selectedApplicability = Applicability.LISTS;
+					break;
+				case LOCATIONS : 
+					((RadioButton) this.findViewById(R.id.radio_locations)).setChecked(true);
+					this.selectedApplicability = Applicability.LOCATIONS;
+					break;
+				case EVERYTHING : 
+					((RadioButton) this.findViewById(R.id.radio_everything)).setChecked(true);
+					this.selectedApplicability = Applicability.EVERYTHING;
+					break;
+				}
+			}
+			else
+				Toast.makeText(this, "folder not found", Toast.LENGTH_SHORT).show();
 			//"Where am I" TextViews
 			this.ab.setTitle(name);
 			this.ab.setSubtitle(R.string.edit_folder);

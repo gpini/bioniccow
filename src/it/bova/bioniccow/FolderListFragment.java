@@ -163,7 +163,7 @@ public class FolderListFragment extends SherlockFragment implements InterProcess
 								DBFolderDeleter fd = new DBFolderDeleter(EditDeleteDialogFragment.this.getActivity()) {
 									@Override public void onPostExecute(Boolean result) {
 										if(result)
-											MessageSender.notifyFoldersUpdated(EditDeleteDialogFragment.this.getActivity());
+											MessageSender.notifyFoldersUpdated(this.getContext());
 									}
 								};
 								fd.execute(folder.getId());

@@ -83,18 +83,25 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 							tmpFolder = fold;
 					}
 					if(tmpFolder != null) {
-					      List<FolderElement> tmpElementList = new ArrayList<FolderElement>();
-					      List<String> tagElements = tmpFolder.loadTagElements(tagSet);
-					      for(String tag : tagElements)
-					    	  tmpElementList.add(new FolderElement(tag,FolderElement.Type.TAG));
-					      List<String> listElements = tmpFolder.loadListElements(listMap);
-					      for(String listId : listElements)
-					    	  tmpElementList.add(new FolderElement(listId,FolderElement.Type.LIST));
-					      List<String> locElements = tmpFolder.loadLocationElements(locMap);
-					      for(String locId : locElements)
-					    	  tmpElementList.add(new FolderElement(locId,FolderElement.Type.LOCATION));
-					      Collections.sort(tmpElementList, new FolderElementComparator());
-					      FolderFragment.this.adapter.reloadAndNotify(tmpElementList);
+						List<FolderElement> tmpElementList = new ArrayList<FolderElement>();
+						Folder.Applicability applicability = tmpFolder.getApplicability();
+						if(applicability == Folder.Applicability.TAGS || applicability == Folder.Applicability.EVERYTHING) {
+							List<String> tagElements = tmpFolder.loadTagElements(tagSet);
+							for(String tag : tagElements)
+								tmpElementList.add(new FolderElement(tag,FolderElement.Type.TAG));
+						}
+						if(applicability == Folder.Applicability.LISTS || applicability == Folder.Applicability.EVERYTHING) {
+							List<String> listElements = tmpFolder.loadListElements(listMap);
+							for(String listId : listElements)
+								tmpElementList.add(new FolderElement(listId,FolderElement.Type.LIST));
+						}
+						if(applicability == Folder.Applicability.LOCATIONS || applicability == Folder.Applicability.EVERYTHING) {
+							List<String> locElements = tmpFolder.loadLocationElements(locMap);
+							for(String locId : locElements)
+								tmpElementList.add(new FolderElement(locId,FolderElement.Type.LOCATION));
+						}
+					    Collections.sort(tmpElementList, new FolderElementComparator());
+					    FolderFragment.this.adapter.reloadAndNotify(tmpElementList);
 					}
 					else {
 						Toast.makeText(FolderFragment.this.getSherlockActivity(), "Folder not available", Toast.LENGTH_SHORT).show();
@@ -150,8 +157,8 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 				    for(Location location : tmpLocMap.values())
 				    	elementsNotInFolders.add(new FolderElement(location.getId(),FolderElement.Type.LOCATION));
 				    Collections.sort(elementsNotInFolders, new FolderElementComparator());
+					FolderFragment.this.adapter.reloadAndNotify(elementsNotInFolders);
 				}
-				FolderFragment.this.adapter.notifyDataSetChanged();
 			}
 		};
 		final DBTaskListsGetter tlg = new DBTaskListsGetter(this.getSherlockActivity()) {

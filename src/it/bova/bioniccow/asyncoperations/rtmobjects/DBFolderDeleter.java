@@ -12,6 +12,10 @@ public class DBFolderDeleter extends AsyncTask<Integer, Void, Boolean>{
 	public DBFolderDeleter(Context context) {
 		this.context = context;
 	}
+	
+	public Context getContext() {
+		return this.context;
+	}
 
 	@Override
 	protected Boolean doInBackground(Integer... params) {

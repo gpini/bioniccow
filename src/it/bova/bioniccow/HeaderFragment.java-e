@@ -266,26 +266,33 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 				HeaderFragment.this.folderLabels = new ArrayList<Label>();
 				for(Folder folder : folders) {
 					String rule = folder.getRule();
-					List<String> tagElements = folder.loadTagElements(tagSet);
-					for(String tag : tagElements) {
-						String unruledTag = tag.substring(rule.length());
-						HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledTag));
+					Folder.Applicability applicability = folder.getApplicability();
+					if(applicability == Folder.Applicability.TAGS || applicability == Folder.Applicability.EVERYTHING) {
+						List<String> tagElements = folder.loadTagElements(tagSet);
+						for(String tag : tagElements) {
+							String unruledTag = tag.substring(rule.length());
+							HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledTag));
+						}
 					}
+					if(applicability == Folder.Applicability.LISTS || applicability == Folder.Applicability.EVERYTHING) {
 					List<String> listElements = folder.loadListElements(listMap);
-					for(String listId : listElements) {
-						TaskList tasklist = listMap.get(listId);
-						if(tasklist == null || tasklist.isSmart()) continue;
-						String list = tasklist.getName();
-						String unruledList = list.substring(rule.length());
-						HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledList));
+						for(String listId : listElements) {
+							TaskList tasklist = listMap.get(listId);
+							if(tasklist == null || tasklist.isSmart()) continue;
+							String list = tasklist.getName();
+							String unruledList = list.substring(rule.length());
+							HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledList));
+						}
 					}
+					if(applicability == Folder.Applicability.LOCATIONS || applicability == Folder.Applicability.EVERYTHING) {
 					List<String> locElements = folder.loadLocationElements(locMap);
-					for(String locId : locElements) {
-						Location location = locMap.get(locId);
-						if(location == null) continue;
-						String loc = location.getName();
-						String unruledLoc = loc.substring(rule.length());
-						HeaderFragment.this.folderLabels.add(new Label("@" + rule, unruledLoc));
+						for(String locId : locElements) {
+							Location location = locMap.get(locId);
+							if(location == null) continue;
+							String loc = location.getName();
+							String unruledLoc = loc.substring(rule.length());
+							HeaderFragment.this.folderLabels.add(new Label("@" + rule, unruledLoc));
+						}
 					}
 				}
 				HeaderFragment.this.reloadLabels();
