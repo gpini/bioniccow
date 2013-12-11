@@ -40,7 +40,7 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 	private GridView grid;
 	private FolderAdapter adapter;
 
-	private String folder;
+	private Folder folder;
 	private Set<String> tagSet;
 	private Map<String,TaskList> listMap;
 	private Map<String,Location> locMap;
@@ -53,10 +53,10 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 		adapter = new FolderAdapter(this.getSherlockActivity(), new ArrayList<FolderElement>());
 		grid.setAdapter(adapter);
 		
-		folder = this.getArguments().getString("folder");
+		folder = (Folder) this.getArguments().getSerializable("folder");
 		TextView folderTitle = (TextView) view.findViewById(R.id.folderTitle);
-		if(folder != null && !folder.equals(""))
-			folderTitle.setText(folder);
+		if(folder != null)
+			folderTitle.setText(folder.getName());
 		else
 			folderTitle.setText(R.string.noFolder);
 		
@@ -76,19 +76,22 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 	public void refresh() {
 		final DBFolderGetter fg = new DBFolderGetter(this.getSherlockActivity()) {
 			@Override protected void onPostExecute(List<Folder> folders) {
-				if(!folder.equals("")) {
+				if(folder != null) {
 					Folder tmpFolder = null;
 					for(Folder fold : folders) {
-						if(fold.getName().equals(folder))
+						if(fold.getName().equals(folder.getName()))
 							tmpFolder = fold;
 					}
 					if(tmpFolder != null) {
 					      List<FolderElement> tmpElementList = new ArrayList<FolderElement>();
-					      for(String tag : tmpFolder.getTagElements())
+					      List<String> tagElements = tmpFolder.loadTagElements(tagSet);
+					      for(String tag : tagElements)
 					    	  tmpElementList.add(new FolderElement(tag,FolderElement.Type.TAG));
-					      for(String listId : tmpFolder.getListElements())
+					      List<String> listElements = tmpFolder.loadListElements(listMap);
+					      for(String listId : listElements)
 					    	  tmpElementList.add(new FolderElement(listId,FolderElement.Type.LIST));
-					      for(String locId : tmpFolder.getLocationElements())
+					      List<String> locElements = tmpFolder.loadLocationElements(locMap);
+					      for(String locId : locElements)
 					    	  tmpElementList.add(new FolderElement(locId,FolderElement.Type.LOCATION));
 					      Collections.sort(tmpElementList, new FolderElementComparator());
 					      FolderFragment.this.adapter.reloadAndNotify(tmpElementList);
@@ -112,28 +115,28 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 					for(Folder folder : folderColl) {
 						switch(folder.getApplicability()) {
 						case TAGS :
-							folderTags = folder.getTagElements();
+							folderTags = folder.loadTagElements(tagSet);
 							for(String tag : folderTags)
 								tmpTagSet.remove(tag);
 							break;
 						case LISTS :
-							folderLists = folder.getListElements();
+							folderLists = folder.loadListElements(listMap);
 							for(String tag : folderLists)
 								tmpListMap.remove(tag);
 							break;
 						case LOCATIONS :
-							folderLocations = folder.getLocationElements();
+							folderLocations = folder.loadLocationElements(locMap);
 							for(String tag : folderLocations)
 								tmpLocMap.remove(tag);
 							break;
 						case EVERYTHING :
-							folderTags = folder.getTagElements();
+							folderTags = folder.loadTagElements(tagSet);
 							for(String tag : folderTags)
 								tmpTagSet.remove(tag);
-							folderLists = folder.getListElements();
+							folderLists = folder.loadListElements(listMap);
 							for(String tag : folderLists)
 								tmpListMap.remove(tag);
-							folderLocations = folder.getLocationElements();
+							folderLocations = folder.loadLocationElements(locMap);
 							for(String tag : folderLocations)
 								tmpLocMap.remove(tag);
 							break;

@@ -64,7 +64,7 @@ public class SpecialsFragment extends SherlockFragment implements InterProcess, 
 		case 4 :
 			FolderFragment fragment = new FolderFragment();
 			Bundle bundle = new Bundle();
-			bundle.putString("folder", "");
+			bundle.putSerializable("folder", null);
 			fragment.setArguments(bundle);
 			this.getActivity().getSupportFragmentManager()
 				.beginTransaction()

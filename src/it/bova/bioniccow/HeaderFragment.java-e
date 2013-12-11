@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTagGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
@@ -18,15 +19,9 @@ import it.bova.bioniccow.asyncoperations.rtmobjects.TaskAdder;
 import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
 import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.Folders_old2;
-import it.bova.bioniccow.data.Locations_old2;
 import it.bova.bioniccow.data.Preferences;
-import it.bova.bioniccow.data.Tags_old2;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
-import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.data.observers.FolderObserver;
-import it.bova.bioniccow.data.observers.LocationObserver;
-import it.bova.bioniccow.data.observers.TagObserver;
-import it.bova.bioniccow.data.observers.TaskListObserver;
 import it.bova.bioniccow.utilities.Label;
 import it.bova.bioniccow.utilities.LabelAdapter;
 import it.bova.bioniccow.utilities.LabelAutoCompleteTextView;
@@ -42,17 +37,14 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -75,14 +67,9 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 	private SyncHelper syncHelper;
 	private TextView syncInfo;
 
-	private TaskLists_old2 tasklists;
-	private TaskListObserver listObserver;
 	private Map<String,TaskList> listMap;
-	private Locations_old2 locations;
-	private LocationObserver locationObserver;
 	private Map<String,Location> locMap;
-	private Tags_old2 tags;
-	private TagObserver tagObserver;
+	private Set<String> tagSet;
 	private Folders_old2 folders;
 	private FolderObserver folderObserver;
 	private List<Label> listLabels;
@@ -225,47 +212,6 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 			syncInfo.setText(lastSynchPhrase + df.format(lastSynch));
 
 		this.refresh();
-			
-		this.folderObserver = new FolderObserver() {
-			@Override public void onDataChanged(List<Folder> folderList) {
-				List<String> folderNameList = new ArrayList<String>();
-				for(Folder folder : folderList)
-					folderNameList.add(folder.getName());
-				//Update AutocompleteTextView
-				HeaderFragment.this.folderLabels = new ArrayList<Label>();
-				for(Folder folder : folderList) {
-					String rule = folder.getRule();
-					List<String> tagElements = folder.getTagElements();
-					for(String tag : tagElements) {
-						String unruledTag = tag.substring(rule.length());
-						HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledTag));
-					}
-					List<String> listElements = folder.getListElements();
-					for(String listId : listElements) {
-						TaskList tasklist = listMap.get(listId);
-						if(tasklist == null || tasklist.isSmart()) continue;
-						String list = tasklist.getName();
-						String unruledList = list.substring(rule.length());
-						HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledList));
-					}
-					List<String> locElements = folder.getLocationElements();
-					for(String locId : locElements) {
-						Location location = locMap.get(locId);
-						if(location == null) continue;
-						String loc = location.getName();
-						String unruledLoc = loc.substring(rule.length());
-						HeaderFragment.this.folderLabels.add(new Label("@" + rule, unruledLoc));
-					}
-				}
-				HeaderFragment.this.reloadLabels();
-			}
-		};
-		this.folders.addObserver(folderObserver);
-
-		this.folders.retrieve();
-		this.folders.notifyObservers();
-		
-		
 
 
 	}
@@ -311,29 +257,69 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 	}
 	
 	public void refresh() {
-		//TODO Folder Update
+		final DBFolderGetter fg = new DBFolderGetter(this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<Folder> folders) {
+				List<String> folderNameList = new ArrayList<String>();
+				for(Folder folder : folders)
+					folderNameList.add(folder.getName());
+				//Update AutocompleteTextView
+				HeaderFragment.this.folderLabels = new ArrayList<Label>();
+				for(Folder folder : folders) {
+					String rule = folder.getRule();
+					List<String> tagElements = folder.loadTagElements(tagSet);
+					for(String tag : tagElements) {
+						String unruledTag = tag.substring(rule.length());
+						HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledTag));
+					}
+					List<String> listElements = folder.loadListElements(listMap);
+					for(String listId : listElements) {
+						TaskList tasklist = listMap.get(listId);
+						if(tasklist == null || tasklist.isSmart()) continue;
+						String list = tasklist.getName();
+						String unruledList = list.substring(rule.length());
+						HeaderFragment.this.folderLabels.add(new Label("#" + rule, unruledList));
+					}
+					List<String> locElements = folder.loadLocationElements(locMap);
+					for(String locId : locElements) {
+						Location location = locMap.get(locId);
+						if(location == null) continue;
+						String loc = location.getName();
+						String unruledLoc = loc.substring(rule.length());
+						HeaderFragment.this.folderLabels.add(new Label("@" + rule, unruledLoc));
+					}
+				}
+				HeaderFragment.this.reloadLabels();
+			}
+		};
 		final DBTagGetter tg = new DBTagGetter(this.getSherlockActivity()) {
 			@Override protected void onPostExecute(Set<String> tags) {
+				HeaderFragment.this.tagSet = tags;
 				HeaderFragment.this.tagLabels = new ArrayList<Label>();
 				for(String tag : tags)
 					HeaderFragment.this.tagLabels.add(new Label("#", tag));
-				HeaderFragment.this.reloadLabels();
+				fg.execute();
 			}
 		};
 		final DBLocationsGetter lg = new DBLocationsGetter(this.getSherlockActivity()) {
 			@Override protected void onPostExecute(List<Location> locations) {
 				HeaderFragment.this.locationLabels = new ArrayList<Label>();
-				for(Location loc : locations)
+				HeaderFragment.this.locMap = new HashMap<String,Location>();
+				for(Location loc : locations) {
+					HeaderFragment.this.locMap.put(loc.getId(), loc);
 					HeaderFragment.this.locationLabels.add(new Label("@", loc.getName()));
+				}
 				tg.execute();
 			}
 		};
 		DBTaskListsGetter tlg = new DBTaskListsGetter(this.getSherlockActivity()) {
 			@Override protected void onPostExecute(List<TaskList> tasklists) {
 				HeaderFragment.this.listLabels = new ArrayList<Label>();
-				for(TaskList list : tasklists)
+				HeaderFragment.this.listMap = new HashMap<String,TaskList>();
+				for(TaskList list : tasklists) {
+					HeaderFragment.this.listMap.put(list.getId(), list);
 					if(!list.isSmart())
 						HeaderFragment.this.listLabels.add(new Label("#", list.getName()));
+				}
 				lg.execute();
 			}
 		};	
