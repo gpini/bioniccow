@@ -238,8 +238,10 @@ public class TaskDatabase {
 				tag = parameters[0];
 				String stringCol = columnsToString("T.", TaskTable.allColumns);
 				nestedSelect = "SELECT DISTINCT " + stringCol + " FROM " 
-						+ TaskTable.TABLE_TASK + "AS T JOIN " +  TagTable.TABLE_TAG
-						+ "AS T WHERE T." + TagTable.COLUMN_NAME + " = " + tag;
+						+ TaskTable.TABLE_TASK + " AS T JOIN " +  TagTable.TABLE_TAG
+						+ " AS TG ON T." + TaskTable.COLUMN_TASK_ID + " = "
+						+ "TG." + TagTable.COLUMN_TASK_ID + " WHERE TG." + TagTable.COLUMN_NAME
+						+ " = '" + tag + "'";
 				taskCursor = dB.rawQuery(nestedSelect, null);
 			}
 			break;
@@ -424,8 +426,7 @@ public class TaskDatabase {
 	public static synchronized int updateFolder(Folder folder) {
 		ContentValues folderValues = FolderTable.values(folder);
 		int updatedRows = dB.update(FolderTable.TABLE_FOLDER,
-				folderValues, FolderTable.COLUMN_FOLDER_ID + "= ?",
-				new String[]{"" + folder.getId()});
+				folderValues, FolderTable.COLUMN_FOLDER_ID + " = " + folder.getId(), null);
 		return updatedRows;
 	}
 	
@@ -434,8 +435,7 @@ public class TaskDatabase {
 		checkOrThrow();
 		long deletedId = -1;
 		deletedId = dB.delete(FolderTable.TABLE_FOLDER,
-				FolderTable.COLUMN_FOLDER_ID + " = ?",
-				new String [] {Integer.toString(folderId)});
+				FolderTable.COLUMN_FOLDER_ID + folderId, null);
 		return deletedId;
 	}
 	

@@ -160,6 +160,8 @@ public class TaskDetailActivity extends EditActivity {
 		this.repeatStrings1 = this.getResources().getStringArray(R.array.repeat_labels1);
 		this.repeatStrings2 = this.getResources().getStringArray(R.array.repeat_labels2);
 
+		TaskDetailActivity.this.tagLabels = new ArrayList<Label>();
+		TaskDetailActivity.this.folderLabels = new ArrayList<Label>();
 		this.loadForms();
 
 	}
@@ -168,8 +170,7 @@ public class TaskDetailActivity extends EditActivity {
 	public void onResume() {
 		super.onResume();
 		
-		this.reloadTagLabels();
-		this.reloadFolderLabels();
+		this.refreshLabels();
 
 		this.updateDateButton();
 		this.updateTimeButton();
@@ -1001,21 +1002,21 @@ public class TaskDetailActivity extends EditActivity {
 		}
 		
 		@Override protected void onFoldersUpdated(Context context) {
-			TaskDetailActivity.this.reloadFolderLabels();
+			TaskDetailActivity.this.refreshLabels();
 		}
 			
 		@Override protected void onTaskChanged(Context context, List<String> changedId) {
-			TaskDetailActivity.this.reloadTagLabels();
+			TaskDetailActivity.this.refreshLabels();
 		}
 			
 		@Override protected void onTaskAdded(Context context, List<ParcelableTask> addedTasks) {
-			TaskDetailActivity.this.reloadTagLabels();
+			TaskDetailActivity.this.refreshLabels();
 		}
 			
 	}
 	
-	private void reloadFolderLabels() {
-		DBFolderGetter fg = new DBFolderGetter(TaskDetailActivity.this) {
+	private void refreshLabels() {
+		final DBFolderGetter fg = new DBFolderGetter(TaskDetailActivity.this) {
 			@Override protected void onPostExecute(List<Folder> folders) {
 				TaskDetailActivity.this.folderLabels.clear();
 				for(Folder folder : folders) {
@@ -1032,10 +1033,6 @@ public class TaskDetailActivity extends EditActivity {
 				TaskDetailActivity.this.labelAdapter.notifyDataSetChanged();
 			}
 		};
-		fg.execute();
-	}
-	
-	private void reloadTagLabels() {
 		DBTagGetter tg = new DBTagGetter(TaskDetailActivity.this) {
 			@Override protected void onPostExecute(Set<String> tags) {
 				TaskDetailActivity.this.tagLabels.clear();
@@ -1044,14 +1041,10 @@ public class TaskDetailActivity extends EditActivity {
 				TaskDetailActivity.this.labelAdapter.clear();
 				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.tagLabels);
 				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.folderLabels);
-				TaskDetailActivity.this.labelAdapter.notifyDataSetChanged();
+				fg.execute();
 			}
 		};
 		tg.execute();
 	}
 	
-	
-
-
-
 }
