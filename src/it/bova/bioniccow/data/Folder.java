@@ -22,6 +22,7 @@ public class Folder implements Serializable{
 		
 	public Folder(int folderId, String name, String rule,
 			Applicability applicability) {
+		this.folderId = folderId;
 		this.setRule(rule);
 		this.name = name;
 		this.applicability = applicability;

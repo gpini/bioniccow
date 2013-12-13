@@ -435,7 +435,7 @@ public class TaskDatabase {
 		checkOrThrow();
 		long deletedId = -1;
 		deletedId = dB.delete(FolderTable.TABLE_FOLDER,
-				FolderTable.COLUMN_FOLDER_ID + folderId, null);
+				FolderTable.COLUMN_FOLDER_ID + " = " + folderId, null);
 		return deletedId;
 	}
 	

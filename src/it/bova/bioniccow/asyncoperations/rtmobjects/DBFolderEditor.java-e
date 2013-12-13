@@ -20,8 +20,8 @@ public class DBFolderEditor extends AsyncTask<Folder, Void, Boolean>{
 			Folder folder = folders[0];
 			try {
 				TaskDatabase.open(this.context);
-				long id = TaskDatabase.updateFolder(folder);
-				if(id >= 0)
+				long updatedRows = TaskDatabase.updateFolder(folder);
+				if(updatedRows >= 0)
 					return true;
 				else
 					return false;
