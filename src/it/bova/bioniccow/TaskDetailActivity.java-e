@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -1019,16 +1020,19 @@ public class TaskDetailActivity extends EditActivity {
 		final DBFolderGetter fg = new DBFolderGetter(TaskDetailActivity.this) {
 			@Override protected void onPostExecute(List<Folder> folders) {
 				TaskDetailActivity.this.folderLabels.clear();
+				
+				Set<String> tagSet = new HashSet<String>();
+				for(Label tagLabel : TaskDetailActivity.this.tagLabels)
+					tagSet.add(tagLabel.getUnruledTag());
+				
 				for(Folder folder : folders) {
 					String rule = folder.getRule();
-					for(Label tagLabel : TaskDetailActivity.this.tagLabels) {
-						String tag = tagLabel.getUnruledTag();
+					List<String> tagElements = folder.loadTagElements(tagSet);
+					for(String tag : tagElements) {
 						String unruledTag = tag.substring(rule.length());
-						TaskDetailActivity.this.folderLabels.add(new Label(rule,unruledTag));
+						TaskDetailActivity.this.folderLabels.add(new Label("#" + rule, unruledTag));
 					}
 				}
-				TaskDetailActivity.this.labelAdapter.clear();
-				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.tagLabels);
 				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.folderLabels);
 				TaskDetailActivity.this.labelAdapter.notifyDataSetChanged();
 			}
@@ -1040,7 +1044,6 @@ public class TaskDetailActivity extends EditActivity {
 					TaskDetailActivity.this.tagLabels.add(new Label("",tag));
 				TaskDetailActivity.this.labelAdapter.clear();
 				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.tagLabels);
-				TaskDetailActivity.this.labelAdapter.addAll(TaskDetailActivity.this.folderLabels);
 				fg.execute();
 			}
 		};
