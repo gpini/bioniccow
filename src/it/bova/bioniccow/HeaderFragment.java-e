@@ -18,10 +18,8 @@ import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskAdder;
 import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Folders_old2;
 import it.bova.bioniccow.data.Preferences;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
-import it.bova.bioniccow.data.observers.FolderObserver;
 import it.bova.bioniccow.utilities.Label;
 import it.bova.bioniccow.utilities.LabelAdapter;
 import it.bova.bioniccow.utilities.LabelAutoCompleteTextView;
@@ -70,8 +68,6 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 	private Map<String,TaskList> listMap;
 	private Map<String,Location> locMap;
 	private Set<String> tagSet;
-	private Folders_old2 folders;
-	private FolderObserver folderObserver;
 	private List<Label> listLabels;
 	private List<Label> locationLabels;
 	private List<Label> tagLabels;
@@ -161,10 +157,7 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 			@Override public void onClick(View v) {
 				HeaderFragment.this.append(" !");
 			}
-		});
-
-		//"Sveglia" le strutture
-		this.folders = new Folders_old2(this.getSherlockActivity());	
+		});	
 
 		this.listLabels = new ArrayList<Label>();
 		this.locationLabels = new ArrayList<Label>();
@@ -219,8 +212,6 @@ public class HeaderFragment extends SherlockFragment implements InterProcess {
 	@Override public void onPause() {
 		super.onPause();
 		this.syncHelper.detach();
-
-		this.folders.removeObserver(folderObserver);
 	}
 
 

@@ -1,10 +1,6 @@
 package it.bova.bioniccow.asyncoperations.sync;
 
 import it.bova.bioniccow.asyncoperations.MessageSender;
-import it.bova.bioniccow.data.Folders_old2;
-import it.bova.bioniccow.data.Locations_old2;
-import it.bova.bioniccow.data.Tags_old2;
-import it.bova.bioniccow.data.TaskLists_old2;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.rtmapi.Task;
 import java.util.ArrayList;

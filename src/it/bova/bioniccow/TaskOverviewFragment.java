@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
+import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBOverviewTaskGetter;
-import it.bova.bioniccow.data.TaskLists_old2;
-import it.bova.bioniccow.data.observers.TaskListObserver;
 import it.bova.bioniccow.utilities.SmartClickListener;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.bioniccow.utilities.rtmobjects.SmartDateComparator;
@@ -20,7 +19,6 @@ import it.bova.bioniccow.utilities.rtmobjects.TaskFormat;
 import it.bova.rtmapi.Priority;
 import it.bova.rtmapi.Task;
 import it.bova.rtmapi.TaskList;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -48,9 +46,7 @@ public class TaskOverviewFragment extends SherlockFragment
 	private TaskOverviewAdapter adapter;
 
 
-	private TaskLists_old2 tasklists;
 	private Map<String,TaskList> listMap;
-	private TaskListObserver listObserver;
 	private List<ParcelableTask> tasks;
 	
 	private String[] groupList;
@@ -73,8 +69,6 @@ public class TaskOverviewFragment extends SherlockFragment
 
 		this.dateFormatStrings = this.getResources().getStringArray(R.array.smart_date_format_labels);
 		this.task_NOK = this.getResources().getString(R.string.task_NOK);	
-
-		this.tasklists = new TaskLists_old2(this.getSherlockActivity());
 		
 		this.groupList = this.getResources().getStringArray(R.array.overview_categories);
 		this.adapter = new TaskOverviewAdapter(this.getSherlockActivity(), this.groupList, createChildList(null));
@@ -99,35 +93,14 @@ public class TaskOverviewFragment extends SherlockFragment
 		super.onResume();
 		this.getSherlockActivity().registerReceiver(messageReceiver, new IntentFilter(ERROR_MESSENGER));
 
-		if(this.tasks == null)
-			this.retrieveTasks(/*filter*/);
-
-		//if(this.taskGetter != null && this.taskGetter.isDoing())
-		//	this.loadingBar.setVisibility(View.VISIBLE);
-		//else this.loadingBar.setVisibility(View.GONE);
-
-
-		//provo a recuperare liste e location, se ci sono	
-		this.listMap = this.tasklists.retrieveAsMap();
-		this.adapter.notifyDataSetChanged();
-
-		//se si modificano da ora in poi aggiorno
-		this.listObserver = new TaskListObserver() {
-			@Override public void onDataChanged(List<TaskList> lists) {
-				TaskOverviewFragment.this.listMap = new HashMap<String,TaskList>();
-				for(TaskList list : lists)
-					TaskOverviewFragment.this.listMap.put(list.getId(), list);
-				TaskOverviewFragment.this.adapter.notifyDataSetChanged();
-			}
-		};
-		this.tasklists.addObserver(this.listObserver);
-
+		//if(this.tasks == null)
+			this.refresh();
+		
 	}
 
 	@Override public void onPause() {
 		super.onPause();	
 		this.getSherlockActivity().unregisterReceiver(messageReceiver);
-		this.tasklists.removeObserver(this.listObserver);
 
 	}
 
@@ -143,8 +116,17 @@ public class TaskOverviewFragment extends SherlockFragment
 	}
 
 	public void refresh() {
-		this.retrieveTasks();
+		DBTaskListsGetter tlg = new DBTaskListsGetter(TaskOverviewFragment.this.getSherlockActivity()) {
+			@Override protected void onPostExecute(List<TaskList> tasklists) {
+				TaskOverviewFragment.this.listMap = new HashMap<String,TaskList>();
+				for(TaskList list : tasklists)
+					TaskOverviewFragment.this.listMap.put(list.getId(), list);
+				TaskOverviewFragment.this.retrieveTasks();
+			}
+		};
+		tlg.execute();
 	}
+	
 	
 	private void retrieveTasks(/*String filter*/) {
 		this.taskGetter = new DBOverviewTaskGetter(this.task_NOK,this.getSherlockActivity()) {
@@ -165,7 +147,6 @@ public class TaskOverviewFragment extends SherlockFragment
 	}
 
 	private void onTasksObtained(List<ParcelableTask> tasks2) {
-		this.listMap = this.tasklists.retrieveAsMap();
 		this.tasks = tasks2;
 		this.adapter.reloadList(createChildList(tasks2));
 		this.adapter.notifyDataSetChanged();
@@ -389,6 +370,7 @@ public class TaskOverviewFragment extends SherlockFragment
 		public TaskActivityMessageReceiver(SherlockFragmentActivity activity) {
 			super(activity);
 		}
+		
 		@Override public void onTaskChanged(Context context, List<String> changedIds) {
 			if(TaskOverviewFragment.this.tasks != null) {
 				boolean areTheseTasksAffected = false;
@@ -400,13 +382,13 @@ public class TaskOverviewFragment extends SherlockFragment
 					}
 				}
 				if(areTheseTasksAffected)
-					TaskOverviewFragment.this.retrieveTasks(/*filter*/);
+					TaskOverviewFragment.this.refresh();
 			}
 		}
 		@Override public void onTaskAdded(Context context, List<ParcelableTask> tasks){
 			for(Task task : tasks) {
 				if(task.getDue() != null) {
-					TaskOverviewFragment.this.retrieveTasks(/*filter*/);
+					TaskOverviewFragment.this.refresh();
 					break;
 				}
 			}

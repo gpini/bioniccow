@@ -12,7 +12,6 @@ import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderDeleter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderGetter;
 import it.bova.bioniccow.data.Folder;
-import it.bova.bioniccow.data.Folders_old2;
 import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
 import it.bova.bioniccow.utilities.SmartClickListener;
 import it.bova.bioniccow.utilities.SmartDialogInterfaceClickListener;
