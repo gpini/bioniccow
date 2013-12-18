@@ -55,15 +55,12 @@ public class TaskOverviewFragment extends SherlockFragment
 	//phrases
 	private String[] dateFormatStrings;
 	private String task_NOK;
-	private TaskActivityMessageReceiver messageReceiver;
 
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		      Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.task_overview,
 		        container, false);
-		
-		this.messageReceiver = new TaskActivityMessageReceiver(this.getSherlockActivity());
 
 		//this.loadingBar = (RelativeLayout) view.findViewById(R.id.loadingBar);
 
@@ -91,18 +88,11 @@ public class TaskOverviewFragment extends SherlockFragment
 
 	public void onResume() {		
 		super.onResume();
-		this.getSherlockActivity().registerReceiver(messageReceiver, new IntentFilter(ERROR_MESSENGER));
-
 		//if(this.tasks == null)
 			this.refresh();
 		
 	}
 
-	@Override public void onPause() {
-		super.onPause();	
-		this.getSherlockActivity().unregisterReceiver(messageReceiver);
-
-	}
 
 	@Override public void onSaveInstanceState(Bundle savedInstanceState) {
 		ArrayList<ParcelableTask> tasks = null;
@@ -113,6 +103,30 @@ public class TaskOverviewFragment extends SherlockFragment
 		}
 		savedInstanceState.putParcelableArrayList("tasks", tasks);
 		super.onSaveInstanceState(savedInstanceState);
+	}
+	
+	public void refreshOnTaskChanged(List<String> changedIds) {
+		if(this.tasks != null) {
+			boolean areTheseTasksAffected = false;
+			for(Task task : tasks) {
+				int pos = Collections.binarySearch(changedIds, task.getId());
+				if(pos >= 0) {
+					areTheseTasksAffected = true;
+					break;
+				}
+			}
+			if(areTheseTasksAffected)
+				this.refresh();
+		}
+	}
+	
+	public void refreshOnTaskAdded(List<ParcelableTask> tasks){
+		for(Task task : tasks) {
+			if(task.getDue() != null) {
+				this.refresh();
+				break;
+			}
+		}
 	}
 
 	public void refresh() {
@@ -366,34 +380,6 @@ public class TaskOverviewFragment extends SherlockFragment
 		
 	} 
 
-	private class TaskActivityMessageReceiver extends DefaultMessageReceiver{
-		public TaskActivityMessageReceiver(SherlockFragmentActivity activity) {
-			super(activity);
-		}
-		
-		@Override public void onTaskChanged(Context context, List<String> changedIds) {
-			if(TaskOverviewFragment.this.tasks != null) {
-				boolean areTheseTasksAffected = false;
-				for(Task task : tasks) {
-					int pos = Collections.binarySearch(changedIds, task.getId());
-					if(pos >= 0) {
-						areTheseTasksAffected = true;
-						break;
-					}
-				}
-				if(areTheseTasksAffected)
-					TaskOverviewFragment.this.refresh();
-			}
-		}
-		@Override public void onTaskAdded(Context context, List<ParcelableTask> tasks){
-			for(Task task : tasks) {
-				if(task.getDue() != null) {
-					TaskOverviewFragment.this.refresh();
-					break;
-				}
-			}
-		}
-	}
 	
 	@Override public boolean onGroupClick(ExpandableListView elv, View view,
 			int groupPosition, long id) {

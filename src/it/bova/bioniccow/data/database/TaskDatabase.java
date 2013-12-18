@@ -265,7 +265,9 @@ public class TaskDatabase {
 			String stringCol = columnsToString("T.", TaskTable.allColumns);
 			nestedSelect = "SELECT DISTINCT " + stringCol + " FROM " 
 					+ TaskTable.TABLE_TASK + " AS T LEFT JOIN " +  TagTable.TABLE_TAG
-					+ "AS T WHERE T." + TagTable.COLUMN_NAME + " IS NULL";
+					+ " AS TG ON T." + TaskTable.COLUMN_TASK_ID + " = "
+					+ "TG." + TagTable.COLUMN_TASK_ID + " WHERE TG." + TagTable.COLUMN_NAME
+					+ " IS NULL";
 			taskCursor = dB.rawQuery(nestedSelect, null);
 			break;	
 		case BY_COMPLETION_DATE :

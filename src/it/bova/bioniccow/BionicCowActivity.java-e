@@ -496,7 +496,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(FOLDER_FRAGMENT)) 
 				((FolderFragment) fragment).refresh();
 			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(OVERVIEW_FRAGMENT)) 
-				((TaskOverviewFragment) fragment).refresh();
+				((TaskOverviewFragment) fragment).refreshOnTaskChanged(changedId);
 		}
 			
 		@Override protected void onTaskAdded(Context context, List<ParcelableTask> addedTasks) {
@@ -507,7 +507,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(TAG_FRAGMENT)) 
 				((TagFragment) fragment).refresh();
 			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(OVERVIEW_FRAGMENT)) 
-				((TaskOverviewFragment) fragment).refresh();
+				((TaskOverviewFragment) fragment).refreshOnTaskAdded(addedTasks);
 		}
 			
 	}
