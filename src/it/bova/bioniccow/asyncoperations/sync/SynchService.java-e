@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.SystemClock;
+import android.util.Log;
 
 public class SynchService extends IntentService implements ErrorCoded{
 
@@ -178,19 +179,12 @@ public class SynchService extends IntentService implements ErrorCoded{
 		//retrieve last task map and last synch date
 		Preferences p = new Preferences(SynchService.this);
 		Date lastSynch = new Date(p.getLong(PrefParameter.LAST_SYNCH, 0L));
-		//lastSynch = new Date(0);
-		//Log.d("ciao", "last synch was " + lastSynch);
-		//Tasks tasks = new Tasks(this);
-		//Map<String,Task> taskMap = tasks.retrieve();
-		//Log.d("ciao", "retrieved " + taskMap.size() + " tasks");
 		boolean cleared = false;
 		try {
 			TaskDatabase.open(this);
 			if(lastSynch.getTime() == 0L) {
-				//Log.d("ciao", "clear");
 				TaskDatabase.clearAll();
 				cleared = true;
-				//new Tags(this).save(new TreeSet<String>());
 			}
 			SynchedTaskGetter stg = new SynchedTaskGetter(NOK_sync_phrase, SynchService.this); 
 			InquiryAnswer<SynchedTasks> answer = stg.executeSynchronously(lastSynch);
@@ -199,18 +193,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			if(answer.getCode() == OK) {
 				Date now = new Date();
 				SynchedTasks synchedTasks = answer.getResult();
-
-				//Log.d("ciao", "new tasks: " + synchedTasks.getTasks().size());
-				//Log.d("ciao", "deleted tasks: " + synchedTasks.getDeletedTasks().size());
-				//Log.d("ciao", "synching tasks up to " + now);
-
-				//cancel last synch so that if operation is stopped
-				//synch operation will be performed as it was the first time
-				p.putLong(PrefParameter.LAST_SYNCH, 0L);
-//				for(Task task : synchedTasks.getTasks()) {
-//					TagDatabase.(task);
-//					//Log.d("insert","" + task.getTags());
-//				}
+				
 				TaskDatabase.beginTransaction();
 				long entries = TaskDatabase.count();
 				long newEntries = entries;
@@ -225,23 +208,10 @@ public class SynchService extends IntentService implements ErrorCoded{
 						entries = newEntries;
 					}
 				}
+				for(DeletedTask task : synchedTasks.getDeletedTasks())
+					TaskDatabase.remove(task.getId());
 				TaskDatabase.endTransaction();
-				TaskDatabase.removeUsingTransactions(synchedTasks.getDeletedTasks());
 				p.putLong(PrefParameter.LAST_SYNCH, now.getTime());
-
-				/*//Log.d("ciao", "synching tags");
-				Set<String> tagSet = TaskDatabase.getDistinctTags();
-				//Log.d("(synch) tags", "" + tagSet.size());
-				new Tags_old2(this).save(tagSet);
-
-				//Log.d("ciao", "synching folders");
-				Map<String,Folder> folders = new Folders_old2(this).retrieveAsMap();
-				if(listMap == null)
-					listMap = new TaskLists_old2(this).retrieveAsMap();
-				if(locMap == null)
-					locMap = new Locations_old2(this).retrieveAsMap();
-				folderMap = TasksUpdater.updateFolders(folders, tagSet, listMap, locMap);
-				new Folders_old2(this).saveAsList(folderMap);*/
 
 				return synchedTasks;
 			}
@@ -252,7 +222,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			}
 			
 		}catch(Exception e) {
-			//Log.d("DB error", e.getMessage());
+			Log.d("DB error", e.getMessage());
 			return null;
 		}
 		finally {
@@ -264,57 +234,43 @@ public class SynchService extends IntentService implements ErrorCoded{
 
 	}
 	
-	public List<ParcelableTask> updateChangedTasks(ArrayList<ParcelableTask> changedTasks2) {
-		TasksUpdater changeUpdater =  new TasksUpdater(this) {
-			@Override protected void onUpdate(List<ParcelableTask> updatedTasks) {
-				try {
-					TaskDatabase.open(SynchService.this);
-					TaskDatabase.putUsingTransactions(updatedTasks);	
-				}catch(Exception e) {
-					//Log.d("changed error",e.getMessage());
-				}
-				finally {
-					TaskDatabase.close();
-				}
-			}
-		};
-		return changeUpdater.update(changedTasks2);
-	
+	public List<ParcelableTask> updateChangedTasks(ArrayList<ParcelableTask> changedTasks) {
+		try {
+			TaskDatabase.open(SynchService.this);
+			TaskDatabase.putUsingTransactions(changedTasks);	
+		} catch(Exception e) {
+			Log.d("changed error",e.getMessage());
+		}
+		finally {
+			TaskDatabase.close();
+		}
+		return changedTasks;
 	}
 	
 	public List<ParcelableTask> updateDeletedTasks(ArrayList<ParcelableTask> deletedTasks) {
-		TasksUpdater deleteUpdater =  new TasksUpdater(this) {
-			@Override protected void onUpdate(List<ParcelableTask> updatedTasks) {
-				try {
-					TaskDatabase.open(SynchService.this);
-					TaskDatabase.removeUsingTransactions(updatedTasks);	
-				}catch(Exception e) {
-					//Log.d("changed error",e.getMessage());
-				}
-				finally {
-					TaskDatabase.close();
-				}	
-			}
-		};
-		return deleteUpdater.update(deletedTasks);
-	
+		try {
+			TaskDatabase.open(SynchService.this);
+			TaskDatabase.removeUsingTransactions(deletedTasks);	
+		} catch(Exception e) {
+			Log.d("changed error",e.getMessage());
+		}
+		finally {
+			TaskDatabase.close();
+		}	
+		return deletedTasks;
 	}
 	
 	public List<ParcelableTask> updateAddedTasks(ArrayList<ParcelableTask> addedTasks) {
-		TasksUpdater changeUpdater =  new TasksUpdater(this) {
-			@Override protected void onUpdate(List<ParcelableTask> updatedTasks) {
-				try {
-					TaskDatabase.open(SynchService.this);
-					TaskDatabase.putUsingTransactions(updatedTasks);	
-				}catch(Exception e) {
-					//Log.d("changed error",e.getMessage());
-				}
-				finally {
-					TaskDatabase.close();
-				}		
-			}
-		};
-		return changeUpdater.update(addedTasks);
+		try {
+			TaskDatabase.open(SynchService.this);
+			TaskDatabase.putUsingTransactions(addedTasks);	
+		} catch(Exception e) {
+			Log.d("changed error",e.getMessage());
+		}
+		finally {
+			TaskDatabase.close();
+		}		
+		return addedTasks;
 	
 	}
 	
@@ -324,7 +280,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 		try {
 			messenger.send(msg);
 		} catch (android.os.RemoteException e1) {
-			//Log.d(getClass().getName(), "Exception sending message", e1);
+			Log.d(getClass().getName(), "Exception sending message", e1);
 		}
 	}
 	
