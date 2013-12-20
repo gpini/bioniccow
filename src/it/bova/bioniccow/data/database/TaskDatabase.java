@@ -32,6 +32,7 @@ public class TaskDatabase {
 			dBHelper = new DBHelper(context.getApplicationContext());
 		openedDBs++;
 		dB = dBHelper.getWritableDatabase();
+		dB.execSQL("PRAGMA foreign_keys=ON;");
 	}
 
 	public static synchronized void close() {

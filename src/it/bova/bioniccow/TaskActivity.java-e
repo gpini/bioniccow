@@ -853,14 +853,6 @@ public class TaskActivity extends SyncableActivity {
 		public TaskActivityMessageReceiver(SherlockActivity activity) {
 			super(activity);
 		}
-		
-		@Override protected void onTasklistsUpdated(Context context) {
-			TaskActivity.this.retrieveTasks(type);
-		}
-		
-		@Override protected void onLocationsUpdated(Context context) {
-			TaskActivity.this.retrieveTasks(type);
-		}
 				
 		@Override public void onTaskChanged(Context context, List<String> changedIds) {
 			boolean areTheseTasksAffected = false;
