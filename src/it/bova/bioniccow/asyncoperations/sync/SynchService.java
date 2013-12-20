@@ -195,7 +195,10 @@ public class SynchService extends IntentService implements ErrorCoded{
 				TaskDatabase.beginTransaction();
 				//update added and modified tasks
 				for(Task task : synchedTasks.getTasks()) {
-					TaskDatabase.put(task);
+					if(firstSynch)
+						TaskDatabase.populate(task);
+					else
+						TaskDatabase.put(task);
 					if(firstSynch)
 						changedTasks.add(task);
 					else {
@@ -211,8 +214,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 				for(DeletedTask task : synchedTasks.getDeletedTasks())
 					TaskDatabase.remove(task.getId());
 				//clean unused notes and contacts
-				//TaskDatabase.cleanNotes();
-				//TaskDatabase.cleanContacts();
+				TaskDatabase.cleanNotes();
+				TaskDatabase.cleanContacts();
 				TaskDatabase.endTransaction();
 				p.putLong(PrefParameter.LAST_SYNCH, now.getTime());
 

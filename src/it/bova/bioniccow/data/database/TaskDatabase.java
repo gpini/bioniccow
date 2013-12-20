@@ -110,6 +110,38 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
+	public static synchronized long populate(Task task) {
+		checkOrThrow();
+		if(task != null) {
+			ContentValues taskValues = TaskTable.values(task);
+			long insertId = dB.insertWithOnConflict(TaskTable.TABLE_TASK, null,
+					taskValues, SQLiteDatabase.CONFLICT_REPLACE);
+			//insert tags
+			for(String tag : task.getTags()) {
+				ContentValues tagValues = TagTable.values(task, tag);
+				dB.insert(TagTable.TABLE_TAG, null, tagValues);
+			}
+			//insert contacts
+			for(Contact contact : task.getParticipants()) {
+				ContentValues contactValues = ContactTable.values(contact);
+				dB.insertWithOnConflict(ContactTable.TABLE_CONTACT, null,
+						contactValues, SQLiteDatabase.CONFLICT_REPLACE);
+				ContentValues taskToContactValues = TaskToContactTable.values(task, contact);
+				dB.insert(TaskToContactTable.TABLE_TASK_TO_CONTACT, null, taskToContactValues);
+			}
+			//insert notes
+			for(Note note : task.getNotes()) {
+				ContentValues noteValues = NoteTable.values(note);
+				dB.insertWithOnConflict(NoteTable.TABLE_NOTE, null,
+						noteValues, SQLiteDatabase.CONFLICT_REPLACE);
+				ContentValues taskToNoteValues = TaskToNoteTable.values(task, note);
+				dB.insert(TaskToNoteTable.TABLE_TASK_TO_NOTE, null, taskToNoteValues);
+			}
+			return insertId;
+		}
+		else return -1;
+	}
+	
 	public static synchronized long insertNote(String taskId, Note note) {
 		checkOrThrow();
 		if(note != null) {
@@ -149,15 +181,15 @@ public class TaskDatabase {
 	
 	public static synchronized void cleanNotes() {
 		dB.execSQL("DELETE FROM note WHERE noteId IN ("
-				+ "SELECT N.noteId AS noteId from note AS N"
+				+ "SELECT N.noteId AS noteId from note AS N "
 				+ "LEFT JOIN task_to_note AS T2N ON T2N.noteId = N.noteId "
 				+ "WHERE T2N.taskId IS NULL)");
 	}
 	
 	public static synchronized void cleanContacts() {
 		dB.execSQL("DELETE FROM contact WHERE contactId IN ("
-				+ "SELECT C.contactId AS contactId from contact AS C"
-				+ "LEFT JOIN task_to_note AS T2C ON T2C.contactId = C.contactId "
+				+ "SELECT C.contactId AS contactId from contact AS C "
+				+ "LEFT JOIN task_to_contact AS T2C ON T2C.contactId = C.contactId "
 				+ "WHERE T2C.taskId IS NULL)");
 	}
 
