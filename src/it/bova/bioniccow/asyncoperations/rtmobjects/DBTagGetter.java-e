@@ -23,7 +23,7 @@ public class DBTagGetter extends AsyncTask<Void, Void, Set<String>>{
 	protected Set<String> doInBackground(Void... params) {
 		try {
 			TaskDatabase.open(this.context);
-			return TaskDatabase.getDistinctTags();
+			return TaskDatabase.getTags();
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new HashSet<String>();

@@ -40,9 +40,9 @@ public class TaskToContactTable {
 				+ oldVersion + " to " + newVersion);
 	}
 	
-	public static ContentValues values(Task task, Contact contact) {
+	public static ContentValues values(String taskId, Contact contact) {
 		ContentValues values = new ContentValues();
-		values.put(TaskToContactTable.COLUMN_TASK_ID, task.getId());
+		values.put(TaskToContactTable.COLUMN_TASK_ID, taskId);
 		values.put(TaskToContactTable.COLUMN_CONTACT_ID, contact.getId());
 		return values;
 	}

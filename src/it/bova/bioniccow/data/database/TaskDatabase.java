@@ -76,34 +76,20 @@ public class TaskDatabase {
 			long insertId = dB.insertWithOnConflict(TaskTable.TABLE_TASK, null,
 					taskValues, SQLiteDatabase.CONFLICT_REPLACE);
 			//insert tags
-			dB.delete(TagTable.TABLE_TAG,
-					TagTable.COLUMN_TASK_ID + "= ?",
-					new String[]{task.getId()});
+			removeTags(task.getId());
 			for(String tag : task.getTags()) {
 				ContentValues tagValues = TagTable.values(task, tag);
 				dB.insert(TagTable.TABLE_TAG, null, tagValues);
 			}
 			//insert contacts
-			dB.delete(TaskToContactTable.TABLE_TASK_TO_CONTACT,
-					TaskToContactTable.COLUMN_TASK_ID + "= ?",
-					new String[]{task.getId()});
+			removeContacts(task.getId());
 			for(Contact contact : task.getParticipants()) {
-				ContentValues contactValues = ContactTable.values(contact);
-				dB.insertWithOnConflict(ContactTable.TABLE_CONTACT, null,
-						contactValues, SQLiteDatabase.CONFLICT_REPLACE);
-				ContentValues taskToContactValues = TaskToContactTable.values(task, contact);
-				dB.insert(TaskToContactTable.TABLE_TASK_TO_CONTACT, null, taskToContactValues);
+				insertContact(task.getId(), contact);
 			}
 			//insert notes
-			dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE,
-					TaskToNoteTable.COLUMN_TASK_ID + "= ?",
-					new String[]{task.getId()});
+			removeNotes(task.getId());
 			for(Note note : task.getNotes()) {
-				ContentValues noteValues = NoteTable.values(note);
-				dB.insertWithOnConflict(NoteTable.TABLE_NOTE, null,
-						noteValues, SQLiteDatabase.CONFLICT_REPLACE);
-				ContentValues taskToNoteValues = TaskToNoteTable.values(task, note);
-				dB.insert(TaskToNoteTable.TABLE_TASK_TO_NOTE, null, taskToNoteValues);
+				insertNote(task.getId(), note);
 			}
 			return insertId;
 		}
@@ -123,20 +109,26 @@ public class TaskDatabase {
 			}
 			//insert contacts
 			for(Contact contact : task.getParticipants()) {
-				ContentValues contactValues = ContactTable.values(contact);
-				dB.insertWithOnConflict(ContactTable.TABLE_CONTACT, null,
-						contactValues, SQLiteDatabase.CONFLICT_REPLACE);
-				ContentValues taskToContactValues = TaskToContactTable.values(task, contact);
-				dB.insert(TaskToContactTable.TABLE_TASK_TO_CONTACT, null, taskToContactValues);
+				insertContact(task.getId(), contact);
 			}
 			//insert notes
 			for(Note note : task.getNotes()) {
-				ContentValues noteValues = NoteTable.values(note);
-				dB.insertWithOnConflict(NoteTable.TABLE_NOTE, null,
-						noteValues, SQLiteDatabase.CONFLICT_REPLACE);
-				ContentValues taskToNoteValues = TaskToNoteTable.values(task, note);
-				dB.insert(TaskToNoteTable.TABLE_TASK_TO_NOTE, null, taskToNoteValues);
+				insertNote(task.getId(), note);
 			}
+			return insertId;
+		}
+		else return -1;
+	}
+	
+	public static synchronized long insertContact(String taskId, Contact contact) {
+		checkOrThrow();
+		if(contact != null) {
+			ContentValues contactValues = ContactTable.values(contact);
+			long insertId = dB.insertWithOnConflict(ContactTable.TABLE_CONTACT, null,
+					contactValues, SQLiteDatabase.CONFLICT_REPLACE);
+			ContentValues taskToContactValues = TaskToContactTable.values(taskId, contact);
+			dB.insert(TaskToContactTable.TABLE_TASK_TO_CONTACT, null, taskToContactValues);
+
 			return insertId;
 		}
 		else return -1;
@@ -172,11 +164,30 @@ public class TaskDatabase {
 	
 	public static synchronized long removeNote(String noteId) {
 		checkOrThrow();
-		long deleteId = dB.delete(NoteTable.TABLE_NOTE,
+		return dB.delete(NoteTable.TABLE_NOTE,
 				NoteTable.COLUMN_NOTE_ID + "= ?",
 				new String[]{noteId});
-		//ON DELETE cancella anche la riga in TaskToNoteTable
-		return deleteId;
+	}
+	
+	public static synchronized long removeNotes(String taskId) {
+		checkOrThrow();
+		return dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE,
+				TaskToNoteTable.COLUMN_TASK_ID + "= ?",
+				new String[]{taskId});
+	}
+	
+	public static synchronized long removeContacts(String taskId) {
+		checkOrThrow();
+		return dB.delete(TaskToContactTable.TABLE_TASK_TO_CONTACT,
+				TaskToContactTable.COLUMN_TASK_ID + "= ?",
+				new String[]{taskId});
+	}
+	
+	public static synchronized long removeTags(String taskId) {
+		checkOrThrow();
+		return dB.delete(TagTable.TABLE_TAG,
+				TagTable.COLUMN_TASK_ID + "= ?",
+				new String[]{taskId});
 	}
 	
 	public static synchronized void cleanNotes() {
@@ -210,22 +221,6 @@ public class TaskDatabase {
 		else return -1;
 	}
 
-	public static synchronized void removeUsingTransactions(List<? extends Object> deletedTasks) {
-		beginTransaction();
-		if(deletedTasks.size() > 0) {
-			Object o = deletedTasks.get(0);
-			if(o instanceof Task) {
-				for(Object task : deletedTasks)
-					remove(((Task) task).getId());
-			}
-			else if(o instanceof DeletedTask) {
-				for(Object task : deletedTasks)
-					remove(((DeletedTask) task).getId());
-			}
-		}
-		endTransaction();
-	}
-
 	public static synchronized long clearAll() {
 		checkOrThrow();
 		long deleteId = dB.delete(TaskTable.TABLE_TASK, null, null);
@@ -238,15 +233,6 @@ public class TaskDatabase {
 		dB.delete(LocationTable.TABLE_LOCATION, null, null);
 		dB.delete(FolderTable.TABLE_FOLDER, null, null);
 		return deleteId;
-	}
-	
-	public static synchronized long count() {
-		String query =  "select count(*) from " + TaskTable.TABLE_TASK;
-		Cursor countCursor = dB.rawQuery(query, null);
-		countCursor.moveToFirst();
-		long count = countCursor.getLong(0);
-		countCursor.close();
-		return count;
 	}
 
 	public enum Mode {
@@ -499,7 +485,7 @@ public class TaskDatabase {
 		return folders;
 	}
 	
-	public static synchronized Set<String> getDistinctTags() {
+	public static synchronized Set<String> getTags() {
 		checkOrThrow();
 		Set<String> tags = new TreeSet<String>();
 		Cursor c = dB.query(true, TagTable.TABLE_TAG,

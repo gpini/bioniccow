@@ -256,7 +256,10 @@ public class SynchService extends IntentService implements ErrorCoded{
 	public List<ParcelableTask> updateDeletedTasks(ArrayList<ParcelableTask> deletedTasks) {
 		try {
 			TaskDatabase.open(SynchService.this);
-			TaskDatabase.removeUsingTransactions(deletedTasks);	
+			TaskDatabase.beginTransaction();
+			for(ParcelableTask task : deletedTasks)
+					TaskDatabase.remove(task.getId());
+			TaskDatabase.endTransaction();
 		} catch(Exception e) {
 			Log.d("changed error",e.getMessage());
 		}
