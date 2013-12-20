@@ -104,7 +104,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			synchSuccess = this.syncLists(forceSynch, sync_NOK);
 			if(synchSuccess)
 				this.sendMessage(messenger, SynchService.LISTS_SYNCHED);
-			SystemClock.sleep(1000);
+			SystemClock.sleep(700);
 		}
 		
 		//Locations
@@ -114,7 +114,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 				new Preferences(this).putBoolean(PrefParameter.FIRST_SYNC_DONE, true);
 				this.sendMessage(messenger, SynchService.LOCATIONS_SYNCHED);
 			}
-			SystemClock.sleep(1000);
+			SystemClock.sleep(700);
 		}
 		
 		
@@ -128,8 +128,6 @@ public class SynchService extends IntentService implements ErrorCoded{
 						synchedTasks.getDeletedTasks(), SynchService.TASKS_SYNCHED);
 				this.newTasks.clear();
 				this.changedTasks.clear();
-				//this.sendMessage(messenger, SynchService.TAGS_SYNCHED);
-				//this.sendMessage(messenger, SynchService.FOLDERS_SYNCHED);
 			}
 		}
 		
@@ -179,12 +177,12 @@ public class SynchService extends IntentService implements ErrorCoded{
 		//retrieve last task map and last synch date
 		Preferences p = new Preferences(SynchService.this);
 		Date lastSynch = new Date(p.getLong(PrefParameter.LAST_SYNCH, 0L));
-		boolean cleared = false;
+		boolean firstSynch = false;
 		try {
 			TaskDatabase.open(this);
 			if(lastSynch.getTime() == 0L) {
 				TaskDatabase.clearAll();
-				cleared = true;
+				firstSynch = true;
 			}
 			SynchedTaskGetter stg = new SynchedTaskGetter(NOK_sync_phrase, SynchService.this); 
 			InquiryAnswer<SynchedTasks> answer = stg.executeSynchronously(lastSynch);
@@ -195,21 +193,26 @@ public class SynchService extends IntentService implements ErrorCoded{
 				SynchedTasks synchedTasks = answer.getResult();
 				
 				TaskDatabase.beginTransaction();
-				long entries = TaskDatabase.count();
-				long newEntries = entries;
+				//update added and modified tasks
 				for(Task task : synchedTasks.getTasks()) {
 					TaskDatabase.put(task);
-					if(cleared)
+					if(firstSynch)
 						changedTasks.add(task);
 					else {
-						newEntries = TaskDatabase.count();
-						if(newEntries > entries) newTasks.add(task);
+						//se nuovo (se già inserito con smartAdd, lo ridà come nuovo, pace!)
+						if(task.getAdded().after(lastSynch)) {
+							newTasks.add(task);
+							Log.d("added", task.getName());
+						}
 						else changedTasks.add(task);
-						entries = newEntries;
 					}
 				}
+				//remove deleted tasks
 				for(DeletedTask task : synchedTasks.getDeletedTasks())
 					TaskDatabase.remove(task.getId());
+				//clean unused notes and contacts
+				//TaskDatabase.cleanNotes();
+				//TaskDatabase.cleanContacts();
 				TaskDatabase.endTransaction();
 				p.putLong(PrefParameter.LAST_SYNCH, now.getTime());
 

@@ -146,6 +146,20 @@ public class TaskDatabase {
 		//ON DELETE cancella anche la riga in TaskToNoteTable
 		return deleteId;
 	}
+	
+	public static synchronized void cleanNotes() {
+		dB.execSQL("DELETE FROM note WHERE noteId IN ("
+				+ "SELECT N.noteId AS noteId from note AS N"
+				+ "LEFT JOIN task_to_note AS T2N ON T2N.noteId = N.noteId "
+				+ "WHERE T2N.taskId IS NULL)");
+	}
+	
+	public static synchronized void cleanContacts() {
+		dB.execSQL("DELETE FROM contact WHERE contactId IN ("
+				+ "SELECT C.contactId AS contactId from contact AS C"
+				+ "LEFT JOIN task_to_note AS T2C ON T2C.contactId = C.contactId "
+				+ "WHERE T2C.taskId IS NULL)");
+	}
 
 	public static synchronized long remove(String taskId) {
 		checkOrThrow();
