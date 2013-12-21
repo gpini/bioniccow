@@ -1,7 +1,6 @@
 package it.bova.bioniccow.data.database;
 
 import it.bova.rtmapi.Contact;
-import it.bova.rtmapi.Task;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;

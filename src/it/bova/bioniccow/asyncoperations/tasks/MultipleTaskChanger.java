@@ -49,7 +49,9 @@ public class MultipleTaskChanger extends MultipleTaskInquirer {
 			if(servedChangers < 2)
 				MessageSender.sendMessage(this.getContext(), this.getOKPhrase());
 			else {
-				String oKMulti = new Formatter().format(getOKMultiPhrase(), servedChangers).toString();
+				Formatter formatter = new Formatter();
+				String oKMulti = formatter.format(getOKMultiPhrase(), servedChangers).toString();
+				formatter.close();
 				MessageSender.sendMessage(this.getContext(), oKMulti);
 			}
 		}
@@ -57,7 +59,9 @@ public class MultipleTaskChanger extends MultipleTaskInquirer {
 			MessageSender.sendMessage(this.getContext(), this.getNOKPhrase() + " - " + msg);
 		}
 		else {
-			String nOKMulti = new Formatter().format(getNOKMultiPhrase(), unsuccessfullModifications).toString();
+			Formatter formatter = new Formatter();
+			String nOKMulti = formatter.format(getNOKMultiPhrase(), unsuccessfullModifications).toString();
+			formatter.close();
 			MessageSender.sendMessage(this.getContext(), nOKMulti + " - " + msg);
 		}
 		isLoginIssue = false;

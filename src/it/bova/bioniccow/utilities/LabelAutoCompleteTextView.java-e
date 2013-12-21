@@ -1,11 +1,9 @@
 package it.bova.bioniccow.utilities;
 
-import it.bova.bioniccow.utilities.LabelAutoCompleteTextView.OnTextChangedListener;
 import android.content.Context;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.widget.MultiAutoCompleteTextView;
-import android.widget.TextView;
 
 public class LabelAutoCompleteTextView extends MultiAutoCompleteTextView {
 

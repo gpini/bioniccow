@@ -8,7 +8,6 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.DatePicker;
-import android.widget.Toast;
 
 public class ImprovedDatePickerDialog extends DatePickerDialog {
 	

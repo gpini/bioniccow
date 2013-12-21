@@ -6,10 +6,8 @@ import com.actionbarsherlock.app.ActionBar;
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.MessageReceiver;
 import it.bova.bioniccow.asyncoperations.sync.SyncHelper;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 
 
 public class StandardActivity extends SherlockActivity implements InterProcess {

@@ -8,7 +8,6 @@ import java.util.TreeSet;
 
 import it.bova.bioniccow.data.Folder;
 import it.bova.rtmapi.Contact;
-import it.bova.rtmapi.DeletedTask;
 import it.bova.rtmapi.Location;
 import it.bova.rtmapi.Note;
 import it.bova.rtmapi.Task;
@@ -164,10 +163,11 @@ public class TaskDatabase {
 	
 	public static synchronized long removeNote(String noteId) {
 		checkOrThrow();
-		return dB.delete(NoteTable.TABLE_NOTE,
-				NoteTable.COLUMN_NOTE_ID + "= ?",
+		return dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE,
+				TaskToNoteTable.COLUMN_NOTE_ID + "= ?",
 				new String[]{noteId});
 	}
+	
 	
 	public static synchronized long removeNotes(String taskId) {
 		checkOrThrow();

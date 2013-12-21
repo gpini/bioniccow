@@ -7,18 +7,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Map;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
-import it.bova.rtmapi.Contact;
-import it.bova.rtmapi.DateParser;
 import it.bova.rtmapi.Frequency;
 import it.bova.rtmapi.Location;
-import it.bova.rtmapi.Note;
-import it.bova.rtmapi.ParsingException;
 import it.bova.rtmapi.Recurrence;
 import it.bova.rtmapi.Recurrence.RecurrenceOption;
 import it.bova.rtmapi.Task;
@@ -62,6 +56,7 @@ public class TaskFormat {
 				String time = df2.format(due);
 				Formatter formatter = new Formatter();
 				String dateAndTime = formatter.format(dateFormatStrings[21], date, time).toString();
+				formatter.close();
 				sb.append(dateAndTime);
 			}
 			else 
@@ -215,6 +210,7 @@ public class TaskFormat {
 							DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT);
 							Formatter f2 = new Formatter();
 							sb.append(" " + f2.format(strings[11], df.format(cal.getTime())));
+							f2.close();
 						}
 					}
 				} catch (ParseException e) {
@@ -222,6 +218,7 @@ public class TaskFormat {
 				}
 				break;
 			}
+		f.close();
 		return sb.toString();
 	}
 	

@@ -60,14 +60,18 @@ public class MultipleTaskEditor extends MultipleTaskInquirer {
 			MessageSender.sendAuthErrorMessage(this.getContext());
 		else if(errorMap.size() == 0) {
 			if(successfullEditors > 0 ) {
-				String OK = new Formatter().format(this.getOKPhrase(), task.getName()).toString();
+				Formatter formatter = new Formatter();
+				String OK = formatter.format(this.getOKPhrase(), task.getName()).toString();
+				formatter.close();
 				MessageSender.sendMessage(this.getContext(), OK); //task %s added
 			}
 		}
 		else {
 			StringBuilder sb =  new StringBuilder("");
-			String NOK = new Formatter().format(this.getNOKPhrase(), task.getName()).toString();
+			Formatter formatter = new Formatter();
+			String NOK = formatter.format(this.getNOKPhrase(), task.getName()).toString();
 			sb.append(NOK); //"Impossible to edit task %s:"
+			formatter.close();
 			for(String errMsg : this.errorMap.keySet()) {
 				if(errorMap.get(errMsg).size() == 1)
 					sb.append("\nfield ");

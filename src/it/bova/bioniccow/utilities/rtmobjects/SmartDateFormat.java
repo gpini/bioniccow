@@ -7,8 +7,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import android.util.Log;
-
 public class SmartDateFormat {
 
 	boolean isPast(Date d){

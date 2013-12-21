@@ -1,6 +1,5 @@
 package it.bova.bioniccow.utilities.rtmobjects;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 

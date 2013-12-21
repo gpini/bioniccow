@@ -34,7 +34,9 @@ public class TaskAdder extends DefaultInquirer<String,Task> {
 			List<Task> tasks = new ArrayList<Task>();
 			tasks.add(result);
 			synchronizer.syncAddedTasks(tasks);	
-			String OK = new Formatter().format(getOKPhrase(), result.getName()).toString();
+			Formatter formatter = new Formatter();
+			String OK = formatter.format(getOKPhrase(), result.getName()).toString();
+			formatter.close();
 			MessageSender.sendMessage(this.getContext(), OK);
 		}
 	}

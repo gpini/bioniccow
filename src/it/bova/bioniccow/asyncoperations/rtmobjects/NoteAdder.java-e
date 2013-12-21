@@ -28,7 +28,9 @@ public class NoteAdder extends DefaultInquirer<String,Note> {
 		else note = api.tasksAddNote(timeline, "", "", "", "", "");
 		try {
 			TaskDatabase.open(this.getContext());
+			TaskDatabase.beginTransaction();
 			TaskDatabase.insertNote(params[0], note);
+			TaskDatabase.endTransaction();
 			MessageSender.notifyNoteAdded(getContext(), note, params[0]);
 		}catch(Exception e) {
 			//Log.d("changed error",e.getMessage());

@@ -2,23 +2,20 @@ package it.bova.bioniccow.utilities;
 
 import java.util.Calendar;
 
-import it.bova.bioniccow.R;
 import it.bova.bioniccow.utilities.rtmobjects.SmartDateFormat;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.widget.DatePicker;
-import android.widget.Toast;
 
 public class SimpleDatePickerDialog extends DatePickerDialog {
 	
-	private OnDateSetListener callBack;
+	//private OnDateSetListener callBack;
 	private String[] dateFormatStrings;
 	
     public SimpleDatePickerDialog(Context context, String[] dateFormatStrings,
     		OnDateSetListener callBack, int myYear, int monthOfYear, int dayOfMonth) {
         super(context, callBack, myYear, monthOfYear, dayOfMonth);
-        this.callBack = callBack;
+        //this.callBack = callBack;
         this.dateFormatStrings = dateFormatStrings;
         updateTitle(myYear, monthOfYear, dayOfMonth);
     }

@@ -1,16 +1,10 @@
 package it.bova.bioniccow.utilities;
 
-import java.util.Calendar;
-
 import it.bova.bioniccow.R;
-import it.bova.bioniccow.utilities.rtmobjects.SmartDateFormat;
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.format.DateFormat;
-import android.widget.DatePicker;
-import android.widget.Toast;
 
 public class ImprovedTimePickerDialog extends TimePickerDialog {
 	

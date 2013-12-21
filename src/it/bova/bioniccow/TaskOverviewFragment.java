@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.TaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBOverviewTaskGetter;
@@ -20,11 +19,8 @@ import it.bova.rtmapi.Priority;
 import it.bova.rtmapi.Task;
 import it.bova.rtmapi.TaskList;
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -42,7 +38,6 @@ public class TaskOverviewFragment extends SherlockFragment
 	implements InterProcess, OnGroupClickListener {
 
 	private ExpandableListView elv;
-	private RelativeLayout loadingBar;
 	private TaskOverviewAdapter adapter;
 
 

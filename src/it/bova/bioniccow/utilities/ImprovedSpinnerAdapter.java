@@ -1,19 +1,14 @@
 package it.bova.bioniccow.utilities;
 
-import it.bova.bioniccow.R;
 import it.bova.rtmapi.RtmObject;
-import it.bova.rtmapi.TaskList;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 

@@ -1,10 +1,7 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
 import it.bova.bioniccow.data.database.TaskDatabase;
-import it.bova.rtmapi.Location;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import android.content.Context;
