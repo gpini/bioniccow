@@ -146,9 +146,16 @@ public class SynchService extends IntentService implements ErrorCoded{
 		ListGetter lg = new ListGetter(NOK_sync_phrase, SynchService.this);
 		InquiryAnswer<List<TaskList>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
-			TaskDatabase.open(this);
-			TaskDatabase.putTasklists(answer.getResult());
-			TaskDatabase.close();
+			try {
+				TaskDatabase.open(this);
+				TaskDatabase.putTasklists(answer.getResult());
+			}catch(Exception e) {
+				Log.d("DB error", e.getMessage());
+				return false;
+			}
+			finally {
+				TaskDatabase.close();
+			}
 			return true;
 		}
 		else {
@@ -161,9 +168,16 @@ public class SynchService extends IntentService implements ErrorCoded{
 		LocationGetter lg = new LocationGetter(NOK_sync_phrase, SynchService.this);
 		InquiryAnswer<List<Location>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
-			TaskDatabase.open(this);
-			TaskDatabase.putLocations(answer.getResult());
-			TaskDatabase.close();
+			try {
+				TaskDatabase.open(this);
+				TaskDatabase.putLocations(answer.getResult());
+			}catch(Exception e) {
+				Log.d("DB error", e.getMessage());
+				return false;
+			}
+			finally {
+				TaskDatabase.close();
+			}
 			return true;
 		}
 		else {
