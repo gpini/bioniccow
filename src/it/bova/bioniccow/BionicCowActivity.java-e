@@ -91,7 +91,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			@Override public boolean onNavigationItemSelected(int position, long itemId) {
 				Preferences prefs = new Preferences(BionicCowActivity.this);
 				prefs.putInteger(PrefParameter.LAST_NAVIGATION_OPTION, position);
-				FragmentManager fm = BionicCowActivity.this.getSupportFragmentManager();
+				FragmentManager fm = BionicCowActivity.this.fm;
 				//empties the BackStack
 				if(fm.getBackStackEntryCount() > 0)
 					fm.popBackStack();

@@ -187,7 +187,7 @@ public class TaskFragmnet extends SherlockFragment {
 		else this.loadingBar.setVisibility(View.GONE);			
 	}
 	
-	@Override public void onSaveInstanceState(Bundle savedInstanceState) {
+	/*@Override public void onSaveInstanceState(Bundle savedInstanceState) {
 		ArrayList<CheckableTask> tasks = null;
 		if(completedTasks != null || uncompletedTasks != null) {
 			tasks = new ArrayList<CheckableTask>();
@@ -211,43 +211,46 @@ public class TaskFragmnet extends SherlockFragment {
 			this.footerButton.performClick();
 		}
 		//this.reloadActionButtons();
-	}
+	}*/
 	
     
-    protected Dialog onCreateDialog(int id) {
-        switch(id) {
-        case DIALOG_DELETE :
-    		AlertDialog.Builder builder = new AlertDialog.Builder(this)
-    		.setMessage(CONFIRM_DELETE)
-    		.setCancelable(false)
-    		.setPositiveButton(YES, new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int id) {
-    				MultipleTaskDeleter mtd = new MultipleTaskDeleter(OK1_delete, OK2_delete,
+	private static class DeleteDialogFragment extends DialogFragment {
+
+	    public static DeleteDialogFragment newInstance() {
+	    	DeleteDialogFragment frag = new DeleteDialogFragment();
+	    	return frag;
+	    }
+		
+		protected Dialog onCreateDialog(int id) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this)
+			.setMessage(CONFIRM_DELETE)
+			.setCancelable(false)
+			.setPositiveButton(YES, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					MultipleTaskDeleter mtd = new MultipleTaskDeleter(OK1_delete, OK2_delete,
 						NOK1_delete, NOK2_delete, TaskActivity.this){
-    					@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
-    						super.onPostExecute(changedTasks);
-    						TaskActivity.this.adapter.notifyDataSetChanged();
-    					}
-    				};
-    				//Log.d("selected", ""+TaskActivity.this.selectedTasks.size());
-    				for(CheckableTask task : TaskActivity.this.selectedTasks.values())
-    					mtd.add(new TaskDeleter(TaskActivity.this, task));
-    				Toast.makeText(TaskActivity.this, R.string.deleting, Toast.LENGTH_SHORT).show();
-                	TaskActivity.this.clearSelectedTasks();
+						@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
+							super.onPostExecute(changedTasks);
+							TaskActivity.this.adapter.notifyDataSetChanged();
+						}
+					};
+					//Log.d("selected", ""+TaskActivity.this.selectedTasks.size());
+					for(CheckableTask task : TaskActivity.this.selectedTasks.values())
+						mtd.add(new TaskDeleter(TaskActivity.this, task));
+					Toast.makeText(TaskActivity.this, R.string.deleting, Toast.LENGTH_SHORT).show();
+					TaskActivity.this.clearSelectedTasks();
 					TaskActivity.this.reloadActionButtons();
-    				mtd.execute();
-    			}
-    		})
-    		.setNegativeButton(NO, new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int id) {
-    				dialog.cancel();
-    			}
-    		});
-    		return builder.create();
-        default:
-            return null;
-        }
-    }
+					mtd.execute();
+				}
+			})
+			.setNegativeButton(NO, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+			});
+			return builder.create();
+		}
+	}
     
 	 @Override public void onAddActionPressed() {
 		Intent intent = new Intent(this, TaskAddActivity.class);
@@ -314,7 +317,8 @@ public class TaskFragmnet extends SherlockFragment {
 	}
 	
 	public void onDeletePressed(View v) {
-		this.showDialog(DIALOG_DELETE);
+		DialogFragment newFragment = DeleteDialogFragment.newInstance();
+	    newFragment.show(this.getFragmentManager(), "delete");
 	}
 	
 	public void refresh() {
