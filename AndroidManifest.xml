@@ -30,10 +30,13 @@
             android:name=".AuthenticationActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" >
         </activity>
-        <activity android:name=".TaskActivity" ></activity>
+        <activity
+			android:name=".TaskActivity"
+			android:configChanges="orientation|screenSize" >
+		</activity>
         <activity
             android:name=".TaskEditActivity"
-            android:configChanges="orientation|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
