@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-
 import com.actionbarsherlock.app.SherlockFragment;
 
 import it.bova.bioniccow.asyncoperations.MessageSender;

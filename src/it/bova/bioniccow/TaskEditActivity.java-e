@@ -51,6 +51,8 @@ import it.bova.rtmapi.Recurrence;
 import it.bova.rtmapi.Task;
 import it.bova.rtmapi.TaskList;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -762,7 +764,7 @@ public class TaskEditActivity extends TaskDetailActivity {
 	
 	private class TaskEditActivityMessageReceiver extends DetailMessageReceiver{
 	
-		public TaskEditActivityMessageReceiver(SherlockActivity activity) {
+		public TaskEditActivityMessageReceiver(SherlockFragmentActivity activity) {
 			super(activity);
 		}
 		

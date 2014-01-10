@@ -1,7 +1,7 @@
 package it.bova.bioniccow;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.MessageReceiver;
@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 
 
-public class StandardActivity extends SherlockActivity implements InterProcess {
+public class StandardActivity extends SherlockFragmentActivity implements InterProcess {
 	
 	protected SyncHelper syncHelper;
 	protected View whereAmIView;

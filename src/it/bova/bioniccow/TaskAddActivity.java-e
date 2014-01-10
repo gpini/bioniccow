@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
@@ -170,7 +170,7 @@ public class TaskAddActivity extends TaskDetailActivity{
 	
 	private class TaskAddActivityMessageReceiver extends DetailMessageReceiver{
 		
-		public TaskAddActivityMessageReceiver(SherlockActivity activity) {
+		public TaskAddActivityMessageReceiver(SherlockFragmentActivity activity) {
 			super(activity);
 		}
 		

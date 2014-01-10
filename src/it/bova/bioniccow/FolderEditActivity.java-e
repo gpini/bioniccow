@@ -1,10 +1,5 @@
 package it.bova.bioniccow;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderAdder;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderEditor;
@@ -12,8 +7,6 @@ import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.Folder.Applicability;
 import it.bova.bioniccow.data.Preferences;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
-import it.bova.rtmapi.Location;
-import it.bova.rtmapi.TaskList;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;

@@ -13,7 +13,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBFolderGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
@@ -978,7 +979,7 @@ public class TaskDetailActivity extends EditActivity {
 	
 	protected class DetailMessageReceiver extends DefaultMessageReceiver {
 	
-		public DetailMessageReceiver(SherlockActivity activity) {
+		public DetailMessageReceiver(SherlockFragmentActivity activity) {
 			super(activity);
 		}
 		

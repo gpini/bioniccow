@@ -1,83 +1,43 @@
 package it.bova.bioniccow;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBNotLocatedTaskGetter;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBNotTaggedTaskGetter;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBPrioritizedTaskGetter;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBRecentTaskGetter;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskGetterByLocation;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskGetterByTag;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskListsGetter;
-import it.bova.bioniccow.asyncoperations.rtmobjects.TaskGetter;
-import it.bova.bioniccow.asyncoperations.rtmobjects.DBTaskGetterByList;
-import it.bova.bioniccow.asyncoperations.rtmobjects.TaskGetterByListId;
-import it.bova.bioniccow.asyncoperations.tasks.MultipleTaskChanger;
-import it.bova.bioniccow.asyncoperations.tasks.MultipleTaskDeleter;
-import it.bova.bioniccow.asyncoperations.tasks.TaskCompleter;
-import it.bova.bioniccow.asyncoperations.tasks.TaskDeleter;
-import it.bova.bioniccow.asyncoperations.tasks.TaskPostponer;
-import it.bova.bioniccow.asyncoperations.tasks.TaskUncompleter;
-import it.bova.bioniccow.utilities.ImprovedArrayAdapter;
-import it.bova.bioniccow.utilities.SmartClickListener;
-import it.bova.bioniccow.utilities.rtmobjects.CheckableTask;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
-import it.bova.bioniccow.utilities.rtmobjects.SmartDateComparator;
-import it.bova.bioniccow.utilities.rtmobjects.SmartDateFormat;
-import it.bova.bioniccow.utilities.rtmobjects.TaskComparatorByCompletionDate;
-import it.bova.bioniccow.utilities.rtmobjects.TaskComparator;
-import it.bova.bioniccow.utilities.rtmobjects.TaskFormat;
-import it.bova.rtmapi.Location;
-import it.bova.rtmapi.Priority;
-import it.bova.rtmapi.Task;
-import it.bova.rtmapi.TaskList;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.text.Html;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 
 public class TaskActivity extends SyncableActivity {
 	
+	private int type;
+
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
 		this.messageReceiver = new TaskActivityMessageReceiver(this);
 		
 		setContentView(R.layout.task);
-
-		this.type = this.getIntent().getIntExtra(TYPE,0);	
+		this.type = this.getIntent().getIntExtra(TYPE,0);
+		String identifier = this.getIntent().getStringExtra(IDENTIFIER);;
+		String tag = this.getIntent().getStringExtra(NAME);
 		String name = this.getIntent().getStringExtra(NAME);
+		boolean isSmart = false;
+		if(this.type == LIST)
+			isSmart = this.getIntent().getBooleanExtra("isSmart",true);
+		TaskFragment taskFragment = new TaskFragment();
+		Bundle bundle = new Bundle();
+		bundle.putInt(TYPE, type);
+		bundle.putBool("isSmart", isSmart);
+		bundle.putString(IDENTIFIER, identifier);
+		bundle.putString(NAME, name);
+		taskFragment.setArguments(bundle);
+		FragmentManager fm = this.getSupportFragmentManager();
+		fm.beginTransaction()
+			.add(R.id.fragmentContainer, taskFragment, TASK_FRAGMENT)
+			.commit();
 
 		//"Where am I" TextViews
 		this.ab.setTitle(name);	
@@ -112,107 +72,60 @@ public class TaskActivity extends SyncableActivity {
     	switch (requestCode) {
     	case AUTHENTICATE :
     		if(resultCode != RESULT_CANCELED)
-    			TaskActivity.this.retrieveTasks(type);
+    			TaskActivity.this.reloadTasks();
     		break;
     	case TASK_EDIT :
     		if(resultCode != RESULT_CANCELED)
-    			TaskActivity.this.retrieveTasks(type);
+    			TaskActivity.this.reloadTasks();
     		break;
     	}
+    }
+    
+    @Override public void onAddActionPressed() {
+		Intent intent = new Intent(this, TaskAddActivity.class);
+		int type = this.getIntent().getIntExtra(TYPE, 0);
+		intent.putExtra(TYPE, type);
+		String id = this.getIntent().getStringExtra(IDENTIFIER);
+		intent.putExtra(IDENTIFIER, id);
+		this.startActivity(intent);
+	}
+    
+    private void reloadTasks() {
+    	FragmentManager fm = this.getSupportFragmentManager();
+		Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+		((TaskFragment) fragment).refresh();
     }
 
 	
 	private class TaskActivityMessageReceiver extends DefaultMessageReceiver{
-		public TaskActivityMessageReceiver(SherlockActivity activity) {
+		public TaskActivityMessageReceiver(SherlockFragmentActivity activity) {
 			super(activity);
 		}
 				
 		@Override public void onTaskChanged(Context context, List<String> changedIds) {
-			boolean areTheseTasksAffected = false;
-			if(type == LIST) {
-				boolean isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
-				if(isSmart) areTheseTasksAffected = true;
+			boolean isSmart = false;
+			if(type == LIST)
+				isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
+			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
+			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			boolean areTheseTasksAffected = ((TaskFragment) fragment).checkChangedTasks(type, isSmart, changedIds);
+
+			if(areTheseTasksAffected) {
+				TaskActivity.this.reloadTasks();
 			}
-			
-			if(!areTheseTasksAffected && 
-					TaskActivity.this.completedTasks != null &&
-					TaskActivity.this.uncompletedTasks != null) {
-				
-				for(Task task : completedTasks) {
-					int pos = Collections.binarySearch(changedIds, task.getId());
-					if(pos >= 0) {
-						areTheseTasksAffected = true;
-						break;
-					}
-				}
-				if(!areTheseTasksAffected) {
-					for(Task task : uncompletedTasks) {
-						int pos = Collections.binarySearch(changedIds, task.getId());
-						if(pos >= 0) {
-							areTheseTasksAffected = true;
-							break;
-						}
-					}
-				}
-			}
-			
-			//Log.d("affected", "" + areTheseTasksAffected);
-			if(areTheseTasksAffected) TaskActivity.this.retrieveTasks(type);
 		}
 		
 		@Override public void onTaskAdded(Context context, List<ParcelableTask> tasks){
-			boolean areTheseTasksAffected = false;
 			String idOrName = TaskActivity.this.getIntent().getStringExtra(IDENTIFIER);
-			switch(type) {
-			case(LIST) : {
-				boolean isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
-				if(isSmart) areTheseTasksAffected = true;
-				else {
-					for(Task task : tasks)
-						if(task.getListId().equals(idOrName))
-							areTheseTasksAffected = true;
-				}
+			boolean isSmart = false;
+			if(type == LIST)
+				isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
+			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
+			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			boolean areTheseTasksAffected = ((TaskFragment) fragment).checkAddedTasks(type, idOrName, isSmart, tasks);
+			if(areTheseTasksAffected) {
+				TaskActivity.this.reloadTasks();
 			}
-			break;
-			case(LOCATION) :
-				for(Task task : tasks)
-					if(task.getLocationId().equals(idOrName))
-						areTheseTasksAffected = true;
-			break;
-			case(TAG) : {
-				for(Task task : tasks) {
-					String[] tags = task.getTags();
-					for(String tag : tags) {
-						if(tag.equals(idOrName)) {
-							areTheseTasksAffected = true;
-							break;
-						}
-					}
-				}
-			}
-			break;
-			case(NO_TAG) :
-				for(Task task : tasks)
-					if(task.getTags().length == 0)
-						areTheseTasksAffected = true;
-			break;
-			case(NO_LOCATION) :
-				for(Task task : tasks)
-					if(!task.getLocationId().equals(null) && !task.getLocationId().equals(""))
-						areTheseTasksAffected = true;
-			break;
-			case(RECENTLY_COMPLETED) :
-				for(Task task : tasks)
-					if(task.getCompleted() != null)
-						areTheseTasksAffected = true;
-			break;
-			case(WITH_PRIORITY) :
-				for(Task task : tasks)
-					if(task.getPriority() != Priority.NONE)
-						areTheseTasksAffected = true;
-			break;
-			}
-			if(areTheseTasksAffected) TaskActivity.this.retrieveTasks(type);
 		}
 	}
 	

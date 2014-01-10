@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragment;
 
 import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
@@ -50,6 +51,7 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,7 +70,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TaskFragmnet extends SherlockFragment {
+public class TaskFragment extends SherlockFragment implements InterProcess {
 	
 	private RelativeLayout loadingBar;
 	private ListView lv;
@@ -87,7 +89,10 @@ public class TaskFragmnet extends SherlockFragment {
 	private HashMap<String,CheckableTask> selectedTasks;
 	
 	private TaskGetter taskGetter;
-	private int type;		
+	private int type;	
+	private String identifier;
+	private boolean isSmart;
+	private String name;
 	
 	//phrases
 	private String[] dateFormatStrings;
@@ -99,13 +104,13 @@ public class TaskFragmnet extends SherlockFragment {
 	private String LIGHT_GREY;
 	private String COMPLETE;
 	private String UNCOMPLETE;
-	private String CONFIRM_DELETE;
-	private String YES;
-	private String NO;
-	private String OK1_delete;
-	private String OK2_delete;
-	private String NOK1_delete;
-	private String NOK2_delete;
+	private static String CONFIRM_DELETE;
+	private static String YES;
+	private static String NO;
+	private static String OK1_delete;
+	private static String OK2_delete;
+	private static String NOK1_delete;
+	private static String NOK2_delete;
 	private String OK1_complete;
 	private String OK2_complete;
 	private String NOK1_complete;
@@ -118,9 +123,7 @@ public class TaskFragmnet extends SherlockFragment {
 	private String OK2_postpone;
 	private String NOK1_postpone;
 	private String NOK2_postpone;
-	
-	private static final int DIALOG_DELETE = 1;
-	
+
 	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		      Bundle savedInstanceState) {	  
@@ -140,10 +143,10 @@ public class TaskFragmnet extends SherlockFragment {
 		CONFIRM_DELETE = this.getResources().getString(R.string.confirmDelete);
 		YES = this.getResources().getString(R.string.yes);
 		NO = this.getResources().getString(R.string.no);
-		OK1_delete = TaskActivity.this.getResources().getString(R.string.task_deleted_OK1);
-		OK2_delete = TaskActivity.this.getResources().getString(R.string.task_deleted_OK2);
-		NOK1_delete = TaskActivity.this.getResources().getString(R.string.task_deleted_NOK1);
-		NOK2_delete = TaskActivity.this.getResources().getString(R.string.task_deleted_NOK2);
+		OK1_delete = TaskFragment.this.getResources().getString(R.string.task_deleted_OK1);
+		OK2_delete = TaskFragment.this.getResources().getString(R.string.task_deleted_OK2);
+		NOK1_delete = TaskFragment.this.getResources().getString(R.string.task_deleted_NOK1);
+		NOK2_delete = TaskFragment.this.getResources().getString(R.string.task_deleted_NOK2);
 		OK1_complete = this.getResources().getString(R.string.task_completed_OK1);
 		OK2_complete = this.getResources().getString(R.string.task_completed_OK2);
 		NOK1_complete = this.getResources().getString(R.string.task_completed_NOK1);
@@ -159,15 +162,20 @@ public class TaskFragmnet extends SherlockFragment {
 		
 		this.selectedTasks = new HashMap<String,CheckableTask>();
 		
+		this.type = this.getArguments().getInt(TYPE,0);
+		this.identifier = this.getArguments().getString(IDENTIFIER,0);
+		this.name = this.getArguments().getString(NAME,0);
+		this.isSmart = this.getArguments().getBool("isSmart",false);
+		
 		View view = inflater.inflate(R.layout.task_list,
 		        container, false);
 		this.loadingBar = (RelativeLayout) view.findViewById(R.id.loadingBar);
 		this.actionLayout = (RelativeLayout) view.findViewById(R.id.actionLayout);
 		this.completeButton = (Button) view.findViewById(R.id.completeButton);
 		
-		this.adapter = new TaskAdapter(this, new ArrayList<CheckableTask>());
-		this.footer = getLayoutInflater().inflate(R.layout.task_footer, null);
-		this.footerButton = (Button) view.footer.findViewById(R.id.footerText);
+		this.adapter = new TaskAdapter(this.getSherlockActivity(), new ArrayList<CheckableTask>());
+		this.footer = inflater.inflate(R.layout.task_footer, null);
+		this.footerButton = (Button) this.footer.findViewById(R.id.footerText);
 		this.header = view.findViewById(R.id.header);
 		this.lv = (ListView) view.findViewById(R.id.list);
 		this.lv.addFooterView(this.footer);
@@ -214,32 +222,32 @@ public class TaskFragmnet extends SherlockFragment {
 	}*/
 	
     
-	private static class DeleteDialogFragment extends DialogFragment {
+	public static class DeleteDialogFragment extends DialogFragment {
 
 	    public static DeleteDialogFragment newInstance() {
 	    	DeleteDialogFragment frag = new DeleteDialogFragment();
 	    	return frag;
 	    }
 		
-		protected Dialog onCreateDialog(int id) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this)
+	    @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity())
 			.setMessage(CONFIRM_DELETE)
 			.setCancelable(false)
 			.setPositiveButton(YES, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
+					final TaskFragment tf = ((TaskFragment) DeleteDialogFragment.this.getTargetFragment());
 					MultipleTaskDeleter mtd = new MultipleTaskDeleter(OK1_delete, OK2_delete,
-						NOK1_delete, NOK2_delete, TaskActivity.this){
+						NOK1_delete, NOK2_delete, DeleteDialogFragment.this.getActivity()){
 						@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
 							super.onPostExecute(changedTasks);
-							TaskActivity.this.adapter.notifyDataSetChanged();
+							tf.adapter.notifyDataSetChanged();
 						}
 					};
-					//Log.d("selected", ""+TaskActivity.this.selectedTasks.size());
-					for(CheckableTask task : TaskActivity.this.selectedTasks.values())
-						mtd.add(new TaskDeleter(TaskActivity.this, task));
-					Toast.makeText(TaskActivity.this, R.string.deleting, Toast.LENGTH_SHORT).show();
-					TaskActivity.this.clearSelectedTasks();
-					TaskActivity.this.reloadActionButtons();
+					for(CheckableTask task : tf.selectedTasks.values())
+						mtd.add(new TaskDeleter(tf.getSherlockActivity(), task));
+					Toast.makeText(tf.getSherlockActivity(), R.string.deleting, Toast.LENGTH_SHORT).show();
+					tf.clearSelectedTasks();
+					tf.reloadActionButtons();
 					mtd.execute();
 				}
 			})
@@ -251,50 +259,41 @@ public class TaskFragmnet extends SherlockFragment {
 			return builder.create();
 		}
 	}
-    
-	 @Override public void onAddActionPressed() {
-		Intent intent = new Intent(this, TaskAddActivity.class);
-		int type = this.getIntent().getIntExtra(TYPE, 0);
-		intent.putExtra(TYPE, type);
-		String id = this.getIntent().getStringExtra(IDENTIFIER);
-		intent.putExtra(IDENTIFIER, id);
-		this.startActivity(intent);
-	}
 	
 	public void onDismissPressed(View v) {
-        TaskActivity.this.clearSelectedTasks();
-		TaskActivity.this.reloadActionButtons();
+		TaskFragment.this.clearSelectedTasks();
+		TaskFragment.this.reloadActionButtons();
 	}
 	
 	public void onCompletePressed(View v) {
 		MultipleTaskChanger mtCompleter = new MultipleTaskChanger(OK1_complete, OK2_complete,
-		NOK1_complete, NOK2_complete, this) {
+		NOK1_complete, NOK2_complete, this.getSherlockActivity()) {
 			@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
 				super.onPostExecute(changedTasks);
-				TaskActivity.this.adapter.notifyDataSetChanged();
+				TaskFragment.this.adapter.notifyDataSetChanged();
 			}
 		};
 		MultipleTaskChanger mtUncompleter = new MultipleTaskChanger(OK1_uncomplete, OK2_uncomplete,
-			NOK1_uncomplete, NOK2_uncomplete, this) {
+			NOK1_uncomplete, NOK2_uncomplete, this.getSherlockActivity()) {
 			@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
 				super.onPostExecute(changedTasks);
-				TaskActivity.this.adapter.notifyDataSetChanged();
+				TaskFragment.this.adapter.notifyDataSetChanged();
 			}
 		};
 		for(CheckableTask task : this.selectedTasks.values()) {
 			if(task.getCompleted() == null)
-				mtCompleter.add(new TaskCompleter(this, task));
+				mtCompleter.add(new TaskCompleter(this.getSherlockActivity(), task));
 			else
-				mtUncompleter.add(new TaskUncompleter(this, task));
+				mtUncompleter.add(new TaskUncompleter(this.getSherlockActivity(), task));
 		}
-        TaskActivity.this.clearSelectedTasks();
-		TaskActivity.this.reloadActionButtons();
+		TaskFragment.this.clearSelectedTasks();
+		TaskFragment.this.reloadActionButtons();
 		if(mtCompleter.size() > 0) {
-			Toast.makeText(TaskActivity.this, R.string.completing, Toast.LENGTH_SHORT).show();
+			Toast.makeText(TaskFragment.this.getSherlockActivity(), R.string.completing, Toast.LENGTH_SHORT).show();
 			mtCompleter.execute();
 		}
 		if(mtUncompleter.size() > 0) {
-			Toast.makeText(TaskActivity.this, R.string.uncompleting, Toast.LENGTH_SHORT).show();
+			Toast.makeText(TaskFragment.this.getSherlockActivity(), R.string.uncompleting, Toast.LENGTH_SHORT).show();
 			mtUncompleter.execute();
 		}
 			
@@ -302,22 +301,23 @@ public class TaskFragmnet extends SherlockFragment {
 	
 	public void onPostponePressed(View v) {
 		MultipleTaskChanger mta = new MultipleTaskChanger(OK1_postpone, OK2_postpone,
-				NOK1_postpone, NOK2_postpone, this) {
+				NOK1_postpone, NOK2_postpone, this.getSherlockActivity()) {
 			@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
 				super.onPostExecute(changedTasks);
-				TaskActivity.this.adapter.notifyDataSetChanged();
+				TaskFragment.this.adapter.notifyDataSetChanged();
 			}
 		};
 		for(CheckableTask task : this.selectedTasks.values())
-			mta.add(new TaskPostponer(this, task));
-		TaskActivity.this.clearSelectedTasks();
-		TaskActivity.this.reloadActionButtons();
-		Toast.makeText(TaskActivity.this, R.string.postponing, Toast.LENGTH_SHORT).show();
+			mta.add(new TaskPostponer(this.getSherlockActivity(), task));
+		TaskFragment.this.clearSelectedTasks();
+		TaskFragment.this.reloadActionButtons();
+		Toast.makeText(TaskFragment.this.getSherlockActivity(), R.string.postponing, Toast.LENGTH_SHORT).show();
 		mta.execute();
 	}
 	
 	public void onDeletePressed(View v) {
 		DialogFragment newFragment = DeleteDialogFragment.newInstance();
+		newFragment.setTargetFragment(this, 0);
 	    newFragment.show(this.getFragmentManager(), "delete");
 	}
 	
@@ -328,19 +328,19 @@ public class TaskFragmnet extends SherlockFragment {
 	private void retrieveTasks(int type) {
 		//recupero liste e location, poi aggiorno i task
 		final int t = type;
-		final DBTaskListsGetter tlg = new DBTaskListsGetter(TaskActivity.this) {
+		final DBTaskListsGetter tlg = new DBTaskListsGetter(TaskFragment.this.getSherlockActivity()) {
 			@Override protected void onPostExecute(List<TaskList> tasklists) {
-				TaskActivity.this.listMap = new HashMap<String,TaskList>();
+				TaskFragment.this.listMap = new HashMap<String,TaskList>();
 				for(TaskList list : tasklists)
-					TaskActivity.this.listMap.put(list.getId(), list);
-				TaskActivity.this.getTasks(t);
+					TaskFragment.this.listMap.put(list.getId(), list);
+				TaskFragment.this.getTasks(t);
 			}
 		};
-		DBLocationsGetter lg = new DBLocationsGetter(TaskActivity.this) {
+		DBLocationsGetter lg = new DBLocationsGetter(TaskFragment.this.getSherlockActivity()) {
 			@Override protected void onPostExecute(List<Location> locations) {
-				TaskActivity.this.locMap = new HashMap<String,Location>();
+				TaskFragment.this.locMap = new HashMap<String,Location>();
 				for(Location loc : locations)
-					TaskActivity.this.locMap.put(loc.getId(), loc);
+					TaskFragment.this.locMap.put(loc.getId(), loc);
 				tlg.execute();
 			}
 		};
@@ -351,63 +351,63 @@ public class TaskFragmnet extends SherlockFragment {
 	private void getTasks(int type) {
 		switch(type) {
 		case LIST :
-			String listId = this.getIntent().getStringExtra(IDENTIFIER);
-			boolean isSmart = this.getIntent().getBooleanExtra("isSmart",true);
+			String listId = this.identifier;
+			boolean isSmart = this.isSmart;
 			if(!isSmart) {
-				this.taskGetter = new DBTaskGetterByList(this.task_NOK,this) {
+				this.taskGetter = new DBTaskGetterByList(this.task_NOK,this.getSherlockActivity()) {
 					@Override public void onResultObtained(List<Task> tasks) {
-						TaskActivity.this.onTasksObtained(tasks);
+						TaskFragment.this.onTasksObtained(tasks);
 					}
 					@Override public void onPreInquiry() {
-						TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+						TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 					}
 					@Override public void onPostInquiry() {
-						TaskActivity.this.loadingBar.setVisibility(View.GONE);
+						TaskFragment.this.loadingBar.setVisibility(View.GONE);
 					}
 				};
 				this.taskGetter.executeInBackground(listId);
 			}
 			else {
-				this.taskGetter = new TaskGetterByListId(this.task_NOK,this) {
+				this.taskGetter = new TaskGetterByListId(this.task_NOK,this.getSherlockActivity()) {
 					@Override public void onResultObtained(List<Task> tasks) {
-						TaskActivity.this.onTasksObtained(tasks);
+						TaskFragment.this.onTasksObtained(tasks);
 					}
 					@Override public void onPreInquiry() {
-						TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+						TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 					}
 					@Override public void onPostInquiry() {
-						TaskActivity.this.loadingBar.setVisibility(View.GONE);
+						TaskFragment.this.loadingBar.setVisibility(View.GONE);
 					}
 				};
 				this.taskGetter.executeInBackground(listId);
 			}
 			break;
 		case LOCATION :
-			String locId = this.getIntent().getStringExtra(IDENTIFIER);
-			this.taskGetter = new DBTaskGetterByLocation(this.task_NOK,this) {
+			String locId = this.identifier;
+			this.taskGetter = new DBTaskGetterByLocation(this.task_NOK,this.getSherlockActivity()) {
 				@Override public void onResultObtained(List<Task> tasks) {
-					TaskActivity.this.onTasksObtained(tasks);
+					TaskFragment.this.onTasksObtained(tasks);
 				}
 				@Override public void onPreInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+					TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 				}
 				@Override public void onPostInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.GONE);
+					TaskFragment.this.loadingBar.setVisibility(View.GONE);
 				}
 			};
 			this.taskGetter.executeInBackground(locId);
 			break;
 		case TAG :
-			String tag = this.getIntent().getStringExtra(NAME);
-			this.taskGetter = new DBTaskGetterByTag(this.task_NOK,this) {
+			String tag = this.name;
+			this.taskGetter = new DBTaskGetterByTag(this.task_NOK,this.getSherlockActivity()) {
 				@Override public void onResultObtained(List<Task> tasks) {
-					TaskActivity.this.onTasksObtained(tasks);
+					TaskFragment.this.onTasksObtained(tasks);
 				}
 				@Override public void onPreInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+					TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 				}
 				@Override public void onPostInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.GONE);
+					TaskFragment.this.loadingBar.setVisibility(View.GONE);
 				}
 			};
 			this.taskGetter.executeInBackground(tag);
@@ -415,57 +415,57 @@ public class TaskFragmnet extends SherlockFragment {
 		case RECENTLY_COMPLETED :
 			Calendar now = Calendar.getInstance();
 			now.add(Calendar.MONTH, -1);
-			this.taskGetter = new DBRecentTaskGetter(this.task_NOK,this) {
+			this.taskGetter = new DBRecentTaskGetter(this.task_NOK,this.getSherlockActivity()) {
 				@Override public void onResultObtained(List<Task> tasks) {
-					TaskActivity.this.onTasksObtained(tasks);
+					TaskFragment.this.onTasksObtained(tasks);
 				}
 				@Override public void onPreInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+					TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 				}
 				@Override public void onPostInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.GONE);
+					TaskFragment.this.loadingBar.setVisibility(View.GONE);
 				}
 			};
 			this.taskGetter.executeInBackground("" + now.getTime().getTime());	
 			break;
 		case NO_TAG :
-			this.taskGetter = new DBNotTaggedTaskGetter(this.task_NOK,this) {
+			this.taskGetter = new DBNotTaggedTaskGetter(this.task_NOK,this.getSherlockActivity()) {
 				@Override public void onResultObtained(List<Task> tasks) {
-					TaskActivity.this.onTasksObtained(tasks);
+					TaskFragment.this.onTasksObtained(tasks);
 				}
 				@Override public void onPreInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+					TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 				}
 				@Override public void onPostInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.GONE);
+					TaskFragment.this.loadingBar.setVisibility(View.GONE);
 				}
 			};
 			this.taskGetter.executeInBackground();	
 			break;
 		case NO_LOCATION :
-			this.taskGetter = new DBNotLocatedTaskGetter(this.task_NOK,this) {
+			this.taskGetter = new DBNotLocatedTaskGetter(this.task_NOK,this.getSherlockActivity()) {
 				@Override public void onResultObtained(List<Task> tasks) {
-					TaskActivity.this.onTasksObtained(tasks);
+					TaskFragment.this.onTasksObtained(tasks);
 				}
 				@Override public void onPreInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+					TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 				}
 				@Override public void onPostInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.GONE);
+					TaskFragment.this.loadingBar.setVisibility(View.GONE);
 				}
 			};
 			this.taskGetter.executeInBackground();	
 			break;
 		case WITH_PRIORITY :
-			this.taskGetter = new DBPrioritizedTaskGetter(this.task_NOK,this) {
+			this.taskGetter = new DBPrioritizedTaskGetter(this.task_NOK,this.getSherlockActivity()) {
 				@Override public void onResultObtained(List<Task> tasks) {
-					TaskActivity.this.onTasksObtained(tasks);
+					TaskFragment.this.onTasksObtained(tasks);
 				}
 				@Override public void onPreInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.VISIBLE);
+					TaskFragment.this.loadingBar.setVisibility(View.VISIBLE);
 				}
 				@Override public void onPostInquiry() {
-					TaskActivity.this.loadingBar.setVisibility(View.GONE);
+					TaskFragment.this.loadingBar.setVisibility(View.GONE);
 				}
 			};
 			this.taskGetter.executeInBackground();	
@@ -580,16 +580,16 @@ public class TaskFragmnet extends SherlockFragment {
 		if(this.selectedTasks.size() == 0) {
 			this.completeButton.setVisibility(View.GONE);
 			if(this.actionLayout.getVisibility() != View.GONE) {
-				Animation anim = AnimationUtils.loadAnimation(this, R.anim.disappear);
+				Animation anim = AnimationUtils.loadAnimation(this.getSherlockActivity(), R.anim.disappear);
 				anim.setAnimationListener(new AnimationListener(){
 					@Override public void onAnimationEnd(Animation anim) {
-						TaskActivity.this.actionLayout.setVisibility(View.GONE);
+						TaskFragment.this.actionLayout.setVisibility(View.GONE);
 					}
 					@Override public void onAnimationRepeat(Animation anim) {
 						// do nothing
 					}
 					@Override public void onAnimationStart(Animation anim) {
-						TaskActivity.this.actionLayout.setVisibility(View.INVISIBLE);	
+						TaskFragment.this.actionLayout.setVisibility(View.INVISIBLE);	
 					}
 					
 				});	
@@ -622,7 +622,7 @@ public class TaskFragmnet extends SherlockFragment {
 			}
 			//if(this.ab.isShowing()) this.ab.hide();
 			if(this.actionLayout.getVisibility() != View.VISIBLE) {
-				Animation anim = AnimationUtils.loadAnimation(this, R.anim.appear);
+				Animation anim = AnimationUtils.loadAnimation(this.getSherlockActivity(), R.anim.appear);
 				this.actionLayout.startAnimation(anim);
 				this.actionLayout.setVisibility(View.VISIBLE);
 			}
@@ -679,16 +679,16 @@ public class TaskFragmnet extends SherlockFragment {
 					@Override public void onCheckedChanged(CompoundButton checkBox, boolean isChecked) {
 						CheckableTask tmpTask = (CheckableTask) taskHolder.checkbox.getTag();
 						tmpTask.setChecked(checkBox.isChecked());
-						TaskActivity.this.lv.setItemChecked(pos, isChecked);
+						TaskFragment.this.lv.setItemChecked(pos, isChecked);
 						if(isChecked) {
-							TaskActivity.this.selectedTasks.put(tmpTask.getId(), tmpTask);
+							TaskFragment.this.selectedTasks.put(tmpTask.getId(), tmpTask);
 							//Log.d("add change", tmpTask.getName() + " - " + selectedTasks.size());
 						}
 						else {
-							TaskActivity.this.selectedTasks.remove(tmpTask.getId());
+							TaskFragment.this.selectedTasks.remove(tmpTask.getId());
 							//Log.d("remove change", tmpTask.getName() + " - " + selectedTasks.size());
 						}
-						TaskActivity.this.reloadActionButtons();
+						TaskFragment.this.reloadActionButtons();
 						//Toast.makeText(TaskActivity.this, "" + isChecked, Toast.LENGTH_SHORT).show();
 					}
 				});
@@ -704,7 +704,7 @@ public class TaskFragmnet extends SherlockFragment {
 
 			String header = task.getName();//tf.formatHeader(task, true);
 			String labels = tf.formatLabels(task, 
-					TaskActivity.this.listMap, TaskActivity.this.locMap, true);
+					TaskFragment.this.listMap, TaskFragment.this.locMap, true);
 			String date = tf.formatDate(task);
 			//String extra = tf.formatExtras(task);
 			if(task.getCompleted() != null) {
@@ -725,7 +725,7 @@ public class TaskFragmnet extends SherlockFragment {
 			holder.lab.setText(Html.fromHtml(labels));	
 			holder.head.setText(Html.fromHtml(header));
 			if(type == RECENTLY_COMPLETED) {
-				String completedOn = TaskActivity.this.getResources().getString(R.string.completePhrase);
+				String completedOn = TaskFragment.this.getResources().getString(R.string.completePhrase);
 				date = completedOn + " " + 
 				SmartDateFormat.format(dateFormatStrings, task.getCompleted());
 				holder.estimateIcon.setVisibility(View.GONE);
@@ -789,110 +789,99 @@ public class TaskFragmnet extends SherlockFragment {
 			holder.taskText.setOnClickListener(new SmartClickListener<CheckableTask>(task) {
 				@Override public void onClick(View v) {
 					//Toast.makeText(TaskActivity.this, "ciao", Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(TaskActivity.this,TaskEditActivity.class);
+					Intent intent = new Intent(TaskFragment.this.getSherlockActivity(),TaskEditActivity.class);
 					CheckableTask task = this.get();
 					intent.putExtra("task", (Parcelable) task);
-					TaskActivity.this.startActivityForResult(intent, TASK_EDIT);
+					TaskFragment.this.startActivityForResult(intent, TASK_EDIT);
 				}
 			});
 			return convertView;
 		}
 	}
 	
-	private class TaskActivityMessageReceiver extends DefaultMessageReceiver{
-		public TaskActivityMessageReceiver(SherlockActivity activity) {
-			super(activity);
-		}
-				
-		@Override public void onTaskChanged(Context context, List<String> changedIds) {
-			boolean areTheseTasksAffected = false;
-			if(type == LIST) {
-				boolean isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
-				if(isSmart) areTheseTasksAffected = true;
+	public boolean checkAddedTasks(int type, String idOrName, boolean isSmart, List<ParcelableTask> tasks) {
+		boolean areTheseTasksAffected = false;
+		switch(type) {
+		case(LIST) : {
+			if(isSmart) areTheseTasksAffected = true;
+			else {
+				for(Task task : tasks)
+					if(task.getListId().equals(idOrName))
+						areTheseTasksAffected = true;
 			}
+		}
+		break;
+		case(LOCATION) :
+			for(Task task : tasks)
+				if(task.getLocationId().equals(idOrName))
+					areTheseTasksAffected = true;
+		break;
+		case(TAG) : {
+			for(Task task : tasks) {
+				String[] tags = task.getTags();
+				for(String tag : tags) {
+					if(tag.equals(idOrName)) {
+						areTheseTasksAffected = true;
+						break;
+					}
+				}
+			}
+		}
+		break;
+		case(NO_TAG) :
+			for(Task task : tasks)
+				if(task.getTags().length == 0)
+					areTheseTasksAffected = true;
+		break;
+		case(NO_LOCATION) :
+			for(Task task : tasks)
+				if(!task.getLocationId().equals(null) && !task.getLocationId().equals(""))
+					areTheseTasksAffected = true;
+		break;
+		case(RECENTLY_COMPLETED) :
+			for(Task task : tasks)
+				if(task.getCompleted() != null)
+					areTheseTasksAffected = true;
+		break;
+		case(WITH_PRIORITY) :
+			for(Task task : tasks)
+				if(task.getPriority() != Priority.NONE)
+					areTheseTasksAffected = true;
+		break;
+		}
+		return areTheseTasksAffected;
+	}
+	
+	public boolean checkChangedTasks(int type, boolean isSmart, List<String> changedIds) {
+		boolean areTheseTasksAffected = false;
+		if(type == LIST) {
+			if(isSmart) areTheseTasksAffected = true;
+		}
+		
+		if(!areTheseTasksAffected && 
+				this.completedTasks != null &&
+				this.uncompletedTasks != null) {
 			
-			if(!areTheseTasksAffected && 
-					TaskActivity.this.completedTasks != null &&
-					TaskActivity.this.uncompletedTasks != null) {
-				
-				for(Task task : completedTasks) {
+			for(Task task : completedTasks) {
+				int pos = Collections.binarySearch(changedIds, task.getId());
+				if(pos >= 0) {
+					areTheseTasksAffected = true;
+					break;
+				}
+			}
+			if(!areTheseTasksAffected) {
+				for(Task task : uncompletedTasks) {
 					int pos = Collections.binarySearch(changedIds, task.getId());
 					if(pos >= 0) {
 						areTheseTasksAffected = true;
 						break;
 					}
 				}
-				if(!areTheseTasksAffected) {
-					for(Task task : uncompletedTasks) {
-						int pos = Collections.binarySearch(changedIds, task.getId());
-						if(pos >= 0) {
-							areTheseTasksAffected = true;
-							break;
-						}
-					}
-				}
 			}
-			
-			//Log.d("affected", "" + areTheseTasksAffected);
-			if(areTheseTasksAffected) TaskActivity.this.retrieveTasks(type);
 		}
-		
-		@Override public void onTaskAdded(Context context, List<ParcelableTask> tasks){
-			boolean areTheseTasksAffected = false;
-			String idOrName = TaskActivity.this.getIntent().getStringExtra(IDENTIFIER);
-			switch(type) {
-			case(LIST) : {
-				boolean isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
-				if(isSmart) areTheseTasksAffected = true;
-				else {
-					for(Task task : tasks)
-						if(task.getListId().equals(idOrName))
-							areTheseTasksAffected = true;
-				}
-			}
-			break;
-			case(LOCATION) :
-				for(Task task : tasks)
-					if(task.getLocationId().equals(idOrName))
-						areTheseTasksAffected = true;
-			break;
-			case(TAG) : {
-				for(Task task : tasks) {
-					String[] tags = task.getTags();
-					for(String tag : tags) {
-						if(tag.equals(idOrName)) {
-							areTheseTasksAffected = true;
-							break;
-						}
-					}
-				}
-			}
-			break;
-			case(NO_TAG) :
-				for(Task task : tasks)
-					if(task.getTags().length == 0)
-						areTheseTasksAffected = true;
-			break;
-			case(NO_LOCATION) :
-				for(Task task : tasks)
-					if(!task.getLocationId().equals(null) && !task.getLocationId().equals(""))
-						areTheseTasksAffected = true;
-			break;
-			case(RECENTLY_COMPLETED) :
-				for(Task task : tasks)
-					if(task.getCompleted() != null)
-						areTheseTasksAffected = true;
-			break;
-			case(WITH_PRIORITY) :
-				for(Task task : tasks)
-					if(task.getPriority() != Priority.NONE)
-						areTheseTasksAffected = true;
-			break;
-			}
-			if(areTheseTasksAffected) TaskActivity.this.retrieveTasks(type);
-		}
-	}
+		return areTheseTasksAffected;
 	
+	}
 
 	
 

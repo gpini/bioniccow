@@ -27,5 +27,6 @@ public interface InterProcess {
 	static final String FOLDER_FRAGMENT = "folders";
 	static final String OVERVIEW_FRAGMENT = "overview";
 	static final String SPECIAL_FRAGMENT = "specials";
+	static final String TASK_FRAGMENT = "task";
 	
 }
