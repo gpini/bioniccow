@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.MenuItem;
 
-import it.bova.bioniccow.asyncoperations.DefaultMessageReceiver;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBLocationsGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBNotLocatedTaskGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.DBNotTaggedTaskGetter;
@@ -55,6 +55,7 @@ import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -77,9 +78,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 	private View footer;
 	private Button footerButton;
 	private View header;
-	private RelativeLayout actionLayout;
 	private boolean areCompletedShown = false;
-	private Button completeButton;
 	private TaskAdapter adapter;
 
 	private Map<String,TaskList> listMap;
@@ -123,6 +122,8 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 	private String OK2_postpone;
 	private String NOK1_postpone;
 	private String NOK2_postpone;
+	
+	public ActionMode actionMode;
 
 	
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -163,23 +164,29 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 		this.selectedTasks = new HashMap<String,CheckableTask>();
 		
 		this.type = this.getArguments().getInt(TYPE,0);
-		this.identifier = this.getArguments().getString(IDENTIFIER,0);
-		this.name = this.getArguments().getString(NAME,0);
-		this.isSmart = this.getArguments().getBool("isSmart",false);
+		this.identifier = this.getArguments().getString(IDENTIFIER);
+		this.name = this.getArguments().getString(NAME);
+		this.isSmart = this.getArguments().getBoolean("isSmart",false);
 		
 		View view = inflater.inflate(R.layout.task_list,
 		        container, false);
 		this.loadingBar = (RelativeLayout) view.findViewById(R.id.loadingBar);
-		this.actionLayout = (RelativeLayout) view.findViewById(R.id.actionLayout);
-		this.completeButton = (Button) view.findViewById(R.id.completeButton);
 		
 		this.adapter = new TaskAdapter(this.getSherlockActivity(), new ArrayList<CheckableTask>());
 		this.footer = inflater.inflate(R.layout.task_footer, null);
 		this.footerButton = (Button) this.footer.findViewById(R.id.footerText);
+		this.footerButton.setOnClickListener(new OnClickListener() {
+			@Override public void onClick(View v) {
+				TaskFragment.this.showOrHideCompleted(v);
+			}
+		});
 		this.header = view.findViewById(R.id.header);
 		this.lv = (ListView) view.findViewById(R.id.list);
 		this.lv.addFooterView(this.footer);
-		this.lv.setAdapter(this.adapter);		
+		this.lv.setAdapter(this.adapter);	
+		this.lv.setItemsCanFocus(false);
+        this.lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		
 
 		return view;
 		
@@ -236,19 +243,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			.setPositiveButton(YES, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					final TaskFragment tf = ((TaskFragment) DeleteDialogFragment.this.getTargetFragment());
-					MultipleTaskDeleter mtd = new MultipleTaskDeleter(OK1_delete, OK2_delete,
-						NOK1_delete, NOK2_delete, DeleteDialogFragment.this.getActivity()){
-						@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
-							super.onPostExecute(changedTasks);
-							tf.adapter.notifyDataSetChanged();
-						}
-					};
-					for(CheckableTask task : tf.selectedTasks.values())
-						mtd.add(new TaskDeleter(tf.getSherlockActivity(), task));
-					Toast.makeText(tf.getSherlockActivity(), R.string.deleting, Toast.LENGTH_SHORT).show();
-					tf.clearSelectedTasks();
-					tf.reloadActionButtons();
-					mtd.execute();
+					tf.onDeleteConfimPressed();
 				}
 			})
 			.setNegativeButton(NO, new DialogInterface.OnClickListener() {
@@ -265,7 +260,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 		TaskFragment.this.reloadActionButtons();
 	}
 	
-	public void onCompletePressed(View v) {
+	public void onCompletePressed() {
 		MultipleTaskChanger mtCompleter = new MultipleTaskChanger(OK1_complete, OK2_complete,
 		NOK1_complete, NOK2_complete, this.getSherlockActivity()) {
 			@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
@@ -286,20 +281,19 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			else
 				mtUncompleter.add(new TaskUncompleter(this.getSherlockActivity(), task));
 		}
-		TaskFragment.this.clearSelectedTasks();
-		TaskFragment.this.reloadActionButtons();
+		this.clearSelectedTasks();
 		if(mtCompleter.size() > 0) {
-			Toast.makeText(TaskFragment.this.getSherlockActivity(), R.string.completing, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this.getSherlockActivity(), R.string.completing, Toast.LENGTH_SHORT).show();
 			mtCompleter.execute();
 		}
 		if(mtUncompleter.size() > 0) {
-			Toast.makeText(TaskFragment.this.getSherlockActivity(), R.string.uncompleting, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this.getSherlockActivity(), R.string.uncompleting, Toast.LENGTH_SHORT).show();
 			mtUncompleter.execute();
 		}
 			
 	}
 	
-	public void onPostponePressed(View v) {
+	public void onPostponePressed() {
 		MultipleTaskChanger mta = new MultipleTaskChanger(OK1_postpone, OK2_postpone,
 				NOK1_postpone, NOK2_postpone, this.getSherlockActivity()) {
 			@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
@@ -309,17 +303,33 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 		};
 		for(CheckableTask task : this.selectedTasks.values())
 			mta.add(new TaskPostponer(this.getSherlockActivity(), task));
-		TaskFragment.this.clearSelectedTasks();
-		TaskFragment.this.reloadActionButtons();
-		Toast.makeText(TaskFragment.this.getSherlockActivity(), R.string.postponing, Toast.LENGTH_SHORT).show();
+		this.clearSelectedTasks();
+		Toast.makeText(this.getSherlockActivity(), R.string.postponing, Toast.LENGTH_SHORT).show();
 		mta.execute();
 	}
 	
-	public void onDeletePressed(View v) {
+	public void onDeletePressed() {
 		DialogFragment newFragment = DeleteDialogFragment.newInstance();
 		newFragment.setTargetFragment(this, 0);
 	    newFragment.show(this.getFragmentManager(), "delete");
 	}
+	
+	public void onDeleteConfimPressed() {
+		MultipleTaskDeleter mtd = new MultipleTaskDeleter(OK1_delete, OK2_delete,
+			NOK1_delete, NOK2_delete, this.getSherlockActivity()){
+			@Override protected void onPostExecute(HashMap<String, Task> changedTasks) {
+				super.onPostExecute(changedTasks);
+				TaskFragment.this.adapter.notifyDataSetChanged();
+			}
+		};
+		for(CheckableTask task : this.selectedTasks.values())
+			mtd.add(new TaskDeleter(this.getSherlockActivity(), task));
+		Toast.makeText(this.getSherlockActivity(), R.string.deleting, Toast.LENGTH_SHORT).show();
+		this.clearSelectedTasks();
+		mtd.execute();
+	}
+	
+	
 	
 	public void refresh() {
 		this.retrieveTasks(this.type);
@@ -473,416 +483,24 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 		}
 	}
 	
-	private void onTasksObtained(List<? extends Task> tasks) {
+	private void onTasksObtained(List<Task> tasks) {
 		if(this.type == RECENTLY_COMPLETED)
 			Collections.sort(tasks, new TaskComparatorByCompletionDate());
 		else
 			Collections.sort(tasks, new TaskComparator());
+		Map<String, CheckableTask> oldSelectedTasks = new HashMap<String, CheckableTask>();
+		oldSelectedTasks.putAll(this.selectedTasks);
 		this.selectedTasks.clear();
 
 		ArrayList<CheckableTask> uncompletedTasks = new ArrayList<CheckableTask>();
 		ArrayList<CheckableTask> completedTasks = new ArrayList<CheckableTask>();
 		for(Task task : tasks) {
 			if(task.getCompleted() != null) {
-				if(task instanceof CheckableTask) {
+				/*if(task instanceof CheckableTask) {
 					CheckableTask checkable = (CheckableTask) task;
 					//Log.d("compl", checkable.getName() + " - " + checkable.isChecked());
 					completedTasks.add(new CheckableTask(checkable, checkable.isChecked()));
 					if(checkable.isChecked())
 						selectedTasks.put(checkable.getId(), checkable);
 				}
-				else
-					completedTasks.add(new CheckableTask(task, false)); //to be modified
-			}
-			else {
-				if(task instanceof CheckableTask) {
-					CheckableTask checkable = (CheckableTask) task;
-					//Log.d("uncompl", checkable.getName() + " - " + checkable.isChecked());
-					uncompletedTasks.add(new CheckableTask(checkable, checkable.isChecked()));
-					if(checkable.isChecked())
-						selectedTasks.put(checkable.getId(), checkable);
-				}
-				else
-					uncompletedTasks.add(new CheckableTask(task, false)); //to be modified
-			}
-		}
-		this.uncompletedTasks = uncompletedTasks;
-		this.completedTasks = completedTasks;
-
-		this.adapter.reloadAndNotify(this.uncompletedTasks);
-		
-		//Log.d("selTasks", "" + this.selectedTasks);
-		
-		//pseudo-header management
-		if(this.completedTasks.size() == 0 &&
-				this.uncompletedTasks.size() == 0)
-			this.header.setVisibility(View.VISIBLE);
-		else
-			this.header.setVisibility(View.GONE);
-		
-		//footer and (un)complete management
-		if(type == RECENTLY_COMPLETED) {
-			this.footerButton.performClick();
-			footer.setVisibility(View.GONE);
-		}
-		else if(completedTasks.size() != 0) {
-			footer.setVisibility(View.VISIBLE);
-			Formatter f = new Formatter();
-			f.format(SHOW_COMPLETED, completedTasks.size());
-			footerButton.setText(f.toString());
-			f.flush();
-			f.close();
-		}
-		else {
-			footer.setVisibility(View.GONE);
-		}
-		
-		this.reloadActionButtons();
-	}
-
-	
-	public void showOrHideCompleted(View v) {
-		Button b = (Button) v;
-		areCompletedShown = !areCompletedShown;
-		if(areCompletedShown) {
-			b.setText(HIDE_COMPLETED);
-			this.adapter.addAll(completedTasks);
-			this.adapter.notifyDataSetChanged();
-			//this.reloadActionButtons();
-		}
-		else {
-			Formatter f = new Formatter();
-			f.format(SHOW_COMPLETED, completedTasks.size());
-			b.setText(f.toString());
-			f.flush();
-			f.close();
-			for(CheckableTask task : completedTasks) {
-				task.setChecked(false);
-				this.selectedTasks.remove(task.getId());
-			}
-			this.adapter.reloadAndNotify(uncompletedTasks);
-			this.reloadActionButtons();
-		}
-		
-	}
-	
-	private void clearSelectedTasks() {
-		//clear selection
-		this.selectedTasks.clear();
-		for(CheckableTask task : completedTasks)
-			task.setChecked(false);
-		for(CheckableTask task : uncompletedTasks)
-			task.setChecked(false);	
-	}
-	
-	private void reloadActionButtons() {
-		//Log.d("reload", "" + selectedTasks.size());
-		if(this.selectedTasks.size() == 0) {
-			this.completeButton.setVisibility(View.GONE);
-			if(this.actionLayout.getVisibility() != View.GONE) {
-				Animation anim = AnimationUtils.loadAnimation(this.getSherlockActivity(), R.anim.disappear);
-				anim.setAnimationListener(new AnimationListener(){
-					@Override public void onAnimationEnd(Animation anim) {
-						TaskFragment.this.actionLayout.setVisibility(View.GONE);
-					}
-					@Override public void onAnimationRepeat(Animation anim) {
-						// do nothing
-					}
-					@Override public void onAnimationStart(Animation anim) {
-						TaskFragment.this.actionLayout.setVisibility(View.INVISIBLE);	
-					}
-					
-				});	
-				this.actionLayout.startAnimation(anim);
-			}
-		}
-		else {
-			boolean areAllCompleted = true;
-			boolean areAllUncompleted = true;
-			for(Task task : this.selectedTasks.values()) {
-				if(task.getCompleted() != null) {
-					areAllCompleted &= true;
-					areAllUncompleted &= false;
-				}
-				else {
-					areAllCompleted &= false;
-					areAllUncompleted &= true;
-				}
-			}
-			if(areAllCompleted) {
-				this.completeButton.setText(UNCOMPLETE);
-				this.completeButton.setVisibility(View.VISIBLE);
-			}
-			else if(areAllUncompleted) {
-				this.completeButton.setText(COMPLETE);
-				this.completeButton.setVisibility(View.VISIBLE);
-			}
-			else {
-				this.completeButton.setVisibility(View.GONE);
-			}
-			//if(this.ab.isShowing()) this.ab.hide();
-			if(this.actionLayout.getVisibility() != View.VISIBLE) {
-				Animation anim = AnimationUtils.loadAnimation(this.getSherlockActivity(), R.anim.appear);
-				this.actionLayout.startAnimation(anim);
-				this.actionLayout.setVisibility(View.VISIBLE);
-			}
-		}
-	}
-	
-	
-	private class TaskAdapter extends ImprovedArrayAdapter<CheckableTask> {
-		
-		TaskAdapter(Context context, List<CheckableTask> tasks) {
-			super(context, R.layout.task_row, tasks);
-		}
-		
-		private class TaskViewHolder {
-			public TextView im;
-			public TextView head;
-			//public TextView extras;
-			public TextView lab;
-			public TextView time;
-			public ImageView repeatIcon;
-			public ImageView estimateIcon;
-			public ImageView urlIcon;
-			public ImageView noteIcon;
-			public ImageView contactIcon;
-			public TextView noteCount;
-			public CheckBox checkbox;
-			public LinearLayout taskText;
-		}
-		
-		@Override public View getView(int position, View convertView, ViewGroup parent) {
-			CheckableTask task = this.getItem(position);
-			if(convertView == null) {
-				LayoutInflater inflater 
-					= (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				convertView = inflater.inflate(R.layout.task_row, null);  
-				final TaskViewHolder taskHolder = new TaskViewHolder();
-				taskHolder.im = (TextView) convertView.findViewById(R.id.priority);
-				taskHolder.lab = (TextView) convertView.findViewById(R.id.taskLabels);
-				taskHolder.time = (TextView) convertView.findViewById(R.id.taskTime);
-				taskHolder.head = (TextView) convertView.findViewById(R.id.taskHeader);
-				taskHolder.contactIcon = (ImageView) convertView.findViewById(R.id.contactIcon);
-				taskHolder.urlIcon = (ImageView) convertView.findViewById(R.id.urlIcon);
-				taskHolder.noteIcon = (ImageView) convertView.findViewById(R.id.noteIcon);
-				taskHolder.repeatIcon = (ImageView) convertView.findViewById(R.id.repeatIcon);
-				taskHolder.estimateIcon = (ImageView) convertView.findViewById(R.id.estimateIcon);
-				taskHolder.noteCount = (TextView) convertView.findViewById(R.id.noteCount);
-				//taskHolder.extras = (TextView) convertView.findViewById(R.id.taskExtras);
-				taskHolder.checkbox = (CheckBox) convertView.findViewById(R.id.checkBox);
-//				if(task.isChecked()) 
-//					taskHolder.checkbox.setChecked(true);
-//				else taskHolder.checkbox.setChecked(false);
-				final int pos = position;
-				taskHolder.checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-					@Override public void onCheckedChanged(CompoundButton checkBox, boolean isChecked) {
-						CheckableTask tmpTask = (CheckableTask) taskHolder.checkbox.getTag();
-						tmpTask.setChecked(checkBox.isChecked());
-						TaskFragment.this.lv.setItemChecked(pos, isChecked);
-						if(isChecked) {
-							TaskFragment.this.selectedTasks.put(tmpTask.getId(), tmpTask);
-							//Log.d("add change", tmpTask.getName() + " - " + selectedTasks.size());
-						}
-						else {
-							TaskFragment.this.selectedTasks.remove(tmpTask.getId());
-							//Log.d("remove change", tmpTask.getName() + " - " + selectedTasks.size());
-						}
-						TaskFragment.this.reloadActionButtons();
-						//Toast.makeText(TaskActivity.this, "" + isChecked, Toast.LENGTH_SHORT).show();
-					}
-				});
-				taskHolder.taskText = (LinearLayout) convertView.findViewById(R.id.taskText);
-				convertView.setTag(taskHolder);
-				taskHolder.checkbox.setTag(task);
-			}
-			else
-				((TaskViewHolder) convertView.getTag()).checkbox.setTag(task);
-			TaskViewHolder holder = (TaskViewHolder) convertView.getTag();
-			TaskFormat tf = new TaskFormat(dateFormatStrings, BLUE, ORANGE);
-			
-
-			String header = task.getName();//tf.formatHeader(task, true);
-			String labels = tf.formatLabels(task, 
-					TaskFragment.this.listMap, TaskFragment.this.locMap, true);
-			String date = tf.formatDate(task);
-			//String extra = tf.formatExtras(task);
-			if(task.getCompleted() != null) {
-				holder.head.setPaintFlags(holder.head.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-			//	header = /*"<font color=\"" + LIGHT_GREY + "\">*/"<I>" + header + "</I>"/*</font>*/;
-			}
-			else {
-				holder.head.setPaintFlags( holder.head.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
-			}
-			if(task.getDue() != null) {
-				Date due = task.getDue();
-				Date now = new Date();
-				if(SmartDateComparator.isToday(now, due))
-					header = "<B>" + header + "</B>";
-				else if(SmartDateComparator.isOverdue(now, due))
-					header = "<B><U>" + header + "</U></B>";
-			}
-			holder.lab.setText(Html.fromHtml(labels));	
-			holder.head.setText(Html.fromHtml(header));
-			if(type == RECENTLY_COMPLETED) {
-				String completedOn = TaskFragment.this.getResources().getString(R.string.completePhrase);
-				date = completedOn + " " + 
-				SmartDateFormat.format(dateFormatStrings, task.getCompleted());
-				holder.estimateIcon.setVisibility(View.GONE);
-				holder.repeatIcon.setVisibility(View.GONE);
-			}
-			else {
-				if(task.getEstimateDetail().length > 0)
-					holder.estimateIcon.setVisibility(View.VISIBLE);
-				else holder.estimateIcon.setVisibility(View.GONE);
-				if(task.getRecurrence() != null)
-					holder.repeatIcon.setVisibility(View.VISIBLE);
-				else holder.repeatIcon.setVisibility(View.GONE);
-			}
-			holder.time.setText(date);
-			
-			//holder.extras.setText(extra);
-			if(task.getUrl() != null && !task.getUrl().equals(""))
-				holder.urlIcon.setVisibility(View.VISIBLE);
-			else holder.urlIcon.setVisibility(View.GONE);
-			if(task.getParticipants().length > 0)
-				holder.contactIcon.setVisibility(View.VISIBLE);
-			else holder.contactIcon.setVisibility(View.GONE);
-			if(task.getNotes().length > 0) {
-				holder.noteIcon.setVisibility(View.VISIBLE);
-				holder.noteCount.setVisibility(View.VISIBLE);
-				holder.noteCount.setText("" + task.getNotes().length);
-			}
-			else {
-				holder.noteIcon.setVisibility(View.GONE);
-				holder.noteCount.setVisibility(View.GONE);
-			}
-			String filler = "<br>";
-			if(!date.equals("")) {
-				filler = "<br><br>";
-				holder.time.setVisibility(View.VISIBLE);
-			}
-			else {
-				holder.time.setVisibility(View.GONE);
-			}
-			holder.im.setText(Html.fromHtml(filler));
-			if(task.getPriority() == Priority.HIGH) 
-				holder.im.setBackgroundResource(R.color.priority_high);
-			else if(task.getPriority() == Priority.MEDIUM)
-				holder.im.setBackgroundResource(R.color.priority_medium);
-			else if(task.getPriority() == Priority.LOW) 
-				holder.im.setBackgroundResource(R.color.priority_low);
-			else
-				holder.im.setBackgroundResource(0);
-			
-			holder.checkbox.setChecked(task.isChecked());
-//			if(task.isChecked()) {
-//				TaskActivity.this.selectedTasks.add(task);
-//				//Log.d("add", task.getName() + " - " + selectedTasks.size());
-//			}
-//			else {
-//				TaskActivity.this.selectedTasks.remove(task);
-//				//Log.d("remove", task.getName() + " - " + selectedTasks.size());
-//			}
-			//TaskActivity.this.reloadActionButtons();
-
-			holder.taskText.setOnClickListener(new SmartClickListener<CheckableTask>(task) {
-				@Override public void onClick(View v) {
-					//Toast.makeText(TaskActivity.this, "ciao", Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(TaskFragment.this.getSherlockActivity(),TaskEditActivity.class);
-					CheckableTask task = this.get();
-					intent.putExtra("task", (Parcelable) task);
-					TaskFragment.this.startActivityForResult(intent, TASK_EDIT);
-				}
-			});
-			return convertView;
-		}
-	}
-	
-	public boolean checkAddedTasks(int type, String idOrName, boolean isSmart, List<ParcelableTask> tasks) {
-		boolean areTheseTasksAffected = false;
-		switch(type) {
-		case(LIST) : {
-			if(isSmart) areTheseTasksAffected = true;
-			else {
-				for(Task task : tasks)
-					if(task.getListId().equals(idOrName))
-						areTheseTasksAffected = true;
-			}
-		}
-		break;
-		case(LOCATION) :
-			for(Task task : tasks)
-				if(task.getLocationId().equals(idOrName))
-					areTheseTasksAffected = true;
-		break;
-		case(TAG) : {
-			for(Task task : tasks) {
-				String[] tags = task.getTags();
-				for(String tag : tags) {
-					if(tag.equals(idOrName)) {
-						areTheseTasksAffected = true;
-						break;
-					}
-				}
-			}
-		}
-		break;
-		case(NO_TAG) :
-			for(Task task : tasks)
-				if(task.getTags().length == 0)
-					areTheseTasksAffected = true;
-		break;
-		case(NO_LOCATION) :
-			for(Task task : tasks)
-				if(!task.getLocationId().equals(null) && !task.getLocationId().equals(""))
-					areTheseTasksAffected = true;
-		break;
-		case(RECENTLY_COMPLETED) :
-			for(Task task : tasks)
-				if(task.getCompleted() != null)
-					areTheseTasksAffected = true;
-		break;
-		case(WITH_PRIORITY) :
-			for(Task task : tasks)
-				if(task.getPriority() != Priority.NONE)
-					areTheseTasksAffected = true;
-		break;
-		}
-		return areTheseTasksAffected;
-	}
-	
-	public boolean checkChangedTasks(int type, boolean isSmart, List<String> changedIds) {
-		boolean areTheseTasksAffected = false;
-		if(type == LIST) {
-			if(isSmart) areTheseTasksAffected = true;
-		}
-		
-		if(!areTheseTasksAffected && 
-				this.completedTasks != null &&
-				this.uncompletedTasks != null) {
-			
-			for(Task task : completedTasks) {
-				int pos = Collections.binarySearch(changedIds, task.getId());
-				if(pos >= 0) {
-					areTheseTasksAffected = true;
-					break;
-				}
-			}
-			if(!areTheseTasksAffected) {
-				for(Task task : uncompletedTasks) {
-					int pos = Collections.binarySearch(changedIds, task.getId());
-					if(pos >= 0) {
-						areTheseTasksAffected = true;
-						break;
-					}
-				}
-			}
-		}
-		return areTheseTasksAffected;
-	
-	}
-
-	
-
-}
+				else {*/

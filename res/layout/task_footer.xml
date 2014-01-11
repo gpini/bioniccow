@@ -12,7 +12,6 @@
         android:layout_centerInParent="true"
 		android:gravity="center"
         android:background="@drawable/selector_dotted"
-        android:onClick="showOrHideCompleted"
         android:padding="5dp"
         android:textColor="@color/grey"
         android:textSize="14sp"/>

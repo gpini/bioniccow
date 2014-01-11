@@ -22,7 +22,6 @@ public class TaskActivity extends SyncableActivity {
 		setContentView(R.layout.task);
 		this.type = this.getIntent().getIntExtra(TYPE,0);
 		String identifier = this.getIntent().getStringExtra(IDENTIFIER);;
-		String tag = this.getIntent().getStringExtra(NAME);
 		String name = this.getIntent().getStringExtra(NAME);
 		boolean isSmart = false;
 		if(this.type == LIST)
@@ -30,7 +29,7 @@ public class TaskActivity extends SyncableActivity {
 		TaskFragment taskFragment = new TaskFragment();
 		Bundle bundle = new Bundle();
 		bundle.putInt(TYPE, type);
-		bundle.putBool("isSmart", isSmart);
+		bundle.putBoolean("isSmart", isSmart);
 		bundle.putString(IDENTIFIER, identifier);
 		bundle.putString(NAME, name);
 		taskFragment.setArguments(bundle);
