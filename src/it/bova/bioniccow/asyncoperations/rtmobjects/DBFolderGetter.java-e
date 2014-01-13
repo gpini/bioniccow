@@ -1,6 +1,7 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
 import it.bova.bioniccow.data.Folder;
+import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ public class DBFolderGetter extends AsyncTask<Void, Void, List<Folder>>{
 
 	@Override
 	protected List<Folder> doInBackground(Void... params) {
+		TaskDatabase db = new ReadableTaskDB();
 		try {
-			TaskDatabase db = new ReadableTaskDB();
 			db.open(this.context);
 			return db.getFolders();
 		}catch(Exception e) {

@@ -1,6 +1,7 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
 import it.bova.bioniccow.data.database.TaskDatabase;
+import it.bova.bioniccow.data.database.WriteableTaskDB;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -21,8 +22,8 @@ public class DBFolderDeleter extends AsyncTask<Integer, Void, Boolean>{
 	protected Boolean doInBackground(Integer... params) {
 		if(params.length > 0) {
 			int folderId = params[0];
+			TaskDatabase db = new WriteableTaskDB();
 			try {
-				TaskDatabase db = new WriteableTaskDB();
 				db.open(this.context);
 				long id = db.removeFolder(folderId);
 				if(id >= 0)

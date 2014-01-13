@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.bioniccow.data.database.TaskDatabase.Mode;
 import it.bova.rtmapi.RtmApiException;
@@ -19,9 +20,9 @@ public class DBPrioritizedTaskGetter extends TaskGetter {
 	}
 	
 	@Override public List<Task> inquire(String... prios) throws ServerException, RtmApiException, IOException {
+		TaskDatabase db = new ReadableTaskDB();
 		try {
-			TaskDatabase db = new ReadableTaskDB();
-			db.open(this.context);
+			db.open(this.getContext());
 			return db.get(Mode.WITH_PRIORITY);
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());

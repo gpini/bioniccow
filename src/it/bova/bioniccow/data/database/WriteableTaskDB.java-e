@@ -1,23 +1,8 @@
 package it.bova.bioniccow.data.database;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import it.bova.bioniccow.data.Folder;
-import it.bova.rtmapi.Contact;
-import it.bova.rtmapi.Location;
-import it.bova.rtmapi.Note;
-import it.bova.rtmapi.Task;
-import it.bova.rtmapi.TaskList;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class TaskDatabase {
+public class WriteableTaskDB extends TaskDatabase {
 
 	private static DBHelper dBHelper;
 
@@ -31,7 +16,7 @@ public class TaskDatabase {
 	}
 	
 	@Override public void open(Context context) {
-		getHelperSingleton(context)
+		getHelperSingleton(context);
 		openedDBs++;
 		this.dB = dBHelper.getWritableDatabase();
 		this.dB.execSQL("PRAGMA foreign_keys=ON;");

@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,8 +19,8 @@ public class DBTagGetter extends AsyncTask<Void, Void, Set<String>>{
 
 	@Override
 	protected Set<String> doInBackground(Void... params) {
+		TaskDatabase db = new ReadableTaskDB();
 		try {
-			TaskDatabase db = new ReadableTaskDB();
 			db.open(this.context);
 			return db.getTags();
 		}catch(Exception e) {

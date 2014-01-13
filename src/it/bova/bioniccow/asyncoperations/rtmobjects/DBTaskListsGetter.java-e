@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.rtmapi.TaskList;
 
@@ -19,8 +20,8 @@ public class DBTaskListsGetter extends AsyncTask<Void, Void, List<TaskList>>{
 
 	@Override
 	protected List<TaskList> doInBackground(Void... params) {
+		TaskDatabase db = new ReadableTaskDB();
 		try {
-			TaskDatabase db = new ReadableTaskDB();
 			db.open(this.context);
 			return db.getTasklists();
 		}catch(Exception e) {

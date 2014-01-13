@@ -4,6 +4,7 @@ import it.bova.bioniccow.asyncoperations.DefaultInquirer;
 import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.data.ApiSingleton;
 import it.bova.bioniccow.data.database.TaskDatabase;
+import it.bova.bioniccow.data.database.WriteableTaskDB;
 import it.bova.rtmapi.Note;
 import it.bova.rtmapi.RtmApi;
 import it.bova.rtmapi.RtmApiException;
@@ -26,9 +27,9 @@ public class NoteModifier extends DefaultInquirer<String,Note> {
 		Note note;
 		if(params.length > 2) note = api.tasksEditNote(timeline, params[0], params[1], params[2]);
 		else note = api.tasksEditNote(timeline, "", "", "");
+		TaskDatabase db = new WriteableTaskDB();
 		try {
-			TaskDatabase db = new WriteableTaskDB();
-			db.open(this.context);
+			db.open(this.getContext());
 			db.updateNote(note);	
 			MessageSender.notifyNoteEdited(getContext(), note);
 		}catch(Exception e) {

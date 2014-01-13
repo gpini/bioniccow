@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.rtmapi.Location;
 import java.util.ArrayList;
@@ -18,8 +19,8 @@ public class DBLocationsGetter extends AsyncTask<Void, Void, List<Location>>{
 
 	@Override
 	protected List<Location> doInBackground(Void... params) {
+		TaskDatabase db = new ReadableTaskDB();
 		try {
-			TaskDatabase db = new ReadableTaskDB();
 			db.open(this.context);
 			return db.getLocations();
 		}catch(Exception e) {

@@ -4,6 +4,7 @@ import it.bova.bioniccow.asyncoperations.DefaultInquirer;
 import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.data.ApiSingleton;
 import it.bova.bioniccow.data.database.TaskDatabase;
+import it.bova.bioniccow.data.database.WriteableTaskDB;
 import it.bova.rtmapi.RtmApi;
 import it.bova.rtmapi.RtmApiException;
 import it.bova.rtmapi.ServerException;
@@ -26,9 +27,9 @@ public class NoteDeleter extends DefaultInquirer<String,Boolean> {
 		if(noteIds.length > 0) ok = api.tasksDeleteNote(timeline, noteIds[0]);
 		else ok = false;
 		if(ok) {
+			TaskDatabase db = new WriteableTaskDB();
 			try {
-				TaskDatabase db = new WriteableTaskDB();
-				db.open(this.context);
+				db.open(this.getContext());
 				db.removeNote(noteIds[0]);
 				MessageSender.notifyNoteDeleted(getContext(), noteIds[0]);
 			}catch(Exception e) {

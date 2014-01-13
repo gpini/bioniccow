@@ -2,6 +2,7 @@ package it.bova.bioniccow.asyncoperations.rtmobjects;
 
 import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.database.TaskDatabase;
+import it.bova.bioniccow.data.database.WriteableTaskDB;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -18,8 +19,8 @@ public class DBFolderEditor extends AsyncTask<Folder, Void, Boolean>{
 	protected Boolean doInBackground(Folder... folders) {
 		if(folders.length > 0) {
 			Folder folder = folders[0];
+			TaskDatabase db = new WriteableTaskDB();
 			try {
-				TaskDatabase db = new WriteableTaskDB();
 				db.open(this.context);
 				long updatedRows = db.updateFolder(folder);
 				if(updatedRows >= 0)

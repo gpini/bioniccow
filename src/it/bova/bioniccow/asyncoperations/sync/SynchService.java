@@ -9,6 +9,7 @@ import it.bova.bioniccow.asyncoperations.rtmobjects.SynchedTaskGetter;
 import it.bova.bioniccow.data.Preferences;
 import it.bova.bioniccow.data.Preferences.PrefParameter;
 import it.bova.bioniccow.data.database.TaskDatabase;
+import it.bova.bioniccow.data.database.WriteableTaskDB;
 import it.bova.bioniccow.utilities.rtmobjects.ParcelableTask;
 import it.bova.rtmapi.DeletedTask;
 import it.bova.rtmapi.Location;
@@ -146,8 +147,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 		ListGetter lg = new ListGetter(NOK_sync_phrase, SynchService.this);
 		InquiryAnswer<List<TaskList>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
+			TaskDatabase db = new WriteableTaskDB();
 			try {
-				TaskDatabase db = new WriteableTaskDB();
 				db.open(this);
 				db.putTasklists(answer.getResult());
 			}catch(Exception e) {
@@ -169,8 +170,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 		LocationGetter lg = new LocationGetter(NOK_sync_phrase, SynchService.this);
 		InquiryAnswer<List<Location>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
+			TaskDatabase db = new WriteableTaskDB();
 			try {
-				TaskDatabase db = new WriteableTaskDB();
 				db.open(this);
 				db.putLocations(answer.getResult());
 			}catch(Exception e) {
@@ -194,8 +195,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 		Preferences p = new Preferences(SynchService.this);
 		Date lastSynch = new Date(p.getLong(PrefParameter.LAST_SYNCH, 0L));
 		boolean firstSynch = false;
+		TaskDatabase db = new WriteableTaskDB();
 		try {
-			TaskDatabase db = new WriteableTaskDB();
 			db.open(this);
 			if(lastSynch.getTime() == 0L) {
 				db.clearAll();
@@ -258,8 +259,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 	}
 	
 	public List<ParcelableTask> updateChangedTasks(ArrayList<ParcelableTask> changedTasks) {
+		TaskDatabase db = new WriteableTaskDB();
 		try {
-			TaskDatabase db = new WriteableTaskDB();
 			db.open(SynchService.this);
 			db.putUsingTransactions(changedTasks);	
 		} catch(Exception e) {
@@ -272,8 +273,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 	}
 	
 	public List<ParcelableTask> updateDeletedTasks(ArrayList<ParcelableTask> deletedTasks) {
+		TaskDatabase db = new WriteableTaskDB();
 		try {
-			TaskDatabase db = new WriteableTaskDB();
 			db.open(SynchService.this);
 			db.beginTransaction();
 			for(ParcelableTask task : deletedTasks)
@@ -289,8 +290,8 @@ public class SynchService extends IntentService implements ErrorCoded{
 	}
 	
 	public List<ParcelableTask> updateAddedTasks(ArrayList<ParcelableTask> addedTasks) {
+		TaskDatabase db = new WriteableTaskDB();
 		try {
-			TaskDatabase db = new WriteableTaskDB();
 			db.open(SynchService.this);
 			db.putUsingTransactions(addedTasks);	
 		} catch(Exception e) {

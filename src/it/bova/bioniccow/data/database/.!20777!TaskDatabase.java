@@ -1,5 +1,6 @@
 package it.bova.bioniccow.data.database;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +20,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 public abstract class TaskDatabase {
 
-	private SQLiteDatabase dB = null;
+	protected SQLiteDatabase dB = null;
 
-	public abstract  void open(Context context);
+	public abstract  void open(Context context) throws IOException;
 
 	public abstract void close();
 	
