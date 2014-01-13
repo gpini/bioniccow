@@ -147,14 +147,15 @@ public class SynchService extends IntentService implements ErrorCoded{
 		InquiryAnswer<List<TaskList>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
 			try {
-				TaskDatabase.open(this);
-				TaskDatabase.putTasklists(answer.getResult());
+				TaskDatabase db = new WriteableTaskDB();
+				db.open(this);
+				db.putTasklists(answer.getResult());
 			}catch(Exception e) {
 				Log.d("DB error", e.getMessage());
 				return false;
 			}
 			finally {
-				TaskDatabase.close();
+				db.close();
 			}
 			return true;
 		}
@@ -169,14 +170,15 @@ public class SynchService extends IntentService implements ErrorCoded{
 		InquiryAnswer<List<Location>> answer = lg.executeSynchronously();
 		if(answer.getCode() == OK) {
 			try {
-				TaskDatabase.open(this);
-				TaskDatabase.putLocations(answer.getResult());
+				TaskDatabase db = new WriteableTaskDB();
+				db.open(this);
+				db.putLocations(answer.getResult());
 			}catch(Exception e) {
 				Log.d("DB error", e.getMessage());
 				return false;
 			}
 			finally {
-				TaskDatabase.close();
+				db.close();
 			}
 			return true;
 		}
@@ -193,9 +195,10 @@ public class SynchService extends IntentService implements ErrorCoded{
 		Date lastSynch = new Date(p.getLong(PrefParameter.LAST_SYNCH, 0L));
 		boolean firstSynch = false;
 		try {
-			TaskDatabase.open(this);
+			TaskDatabase db = new WriteableTaskDB();
+			db.open(this);
 			if(lastSynch.getTime() == 0L) {
-				TaskDatabase.clearAll();
+				db.clearAll();
 				firstSynch = true;
 			}
 			SynchedTaskGetter stg = new SynchedTaskGetter(NOK_sync_phrase, SynchService.this); 
@@ -206,13 +209,13 @@ public class SynchService extends IntentService implements ErrorCoded{
 				Date now = new Date();
 				SynchedTasks synchedTasks = answer.getResult();
 				
-				TaskDatabase.beginTransaction();
+				db.beginTransaction();
 				//update added and modified tasks
 				for(Task task : synchedTasks.getTasks()) {
 					if(firstSynch)
-						TaskDatabase.populate(task);
+						db.populate(task);
 					else
-						TaskDatabase.put(task);
+						db.put(task);
 					if(firstSynch)
 						changedTasks.add(task);
 					else {
@@ -226,11 +229,11 @@ public class SynchService extends IntentService implements ErrorCoded{
 				}
 				//remove deleted tasks
 				for(DeletedTask task : synchedTasks.getDeletedTasks())
-					TaskDatabase.remove(task.getId());
+					db.remove(task.getId());
 				//clean unused notes and contacts
-				TaskDatabase.cleanNotes();
-				TaskDatabase.cleanContacts();
-				TaskDatabase.endTransaction();
+				db.cleanNotes();
+				db.cleanContacts();
+				db.endTransaction();
 				p.putLong(PrefParameter.LAST_SYNCH, now.getTime());
 
 				return synchedTasks;
@@ -246,7 +249,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			return null;
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 			//Log.d("ciao", "last task synch" + lastSynch);
 
@@ -256,42 +259,45 @@ public class SynchService extends IntentService implements ErrorCoded{
 	
 	public List<ParcelableTask> updateChangedTasks(ArrayList<ParcelableTask> changedTasks) {
 		try {
-			TaskDatabase.open(SynchService.this);
-			TaskDatabase.putUsingTransactions(changedTasks);	
+			TaskDatabase db = new WriteableTaskDB();
+			db.open(SynchService.this);
+			db.putUsingTransactions(changedTasks);	
 		} catch(Exception e) {
 			Log.d("changed error",e.getMessage());
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 		return changedTasks;
 	}
 	
 	public List<ParcelableTask> updateDeletedTasks(ArrayList<ParcelableTask> deletedTasks) {
 		try {
-			TaskDatabase.open(SynchService.this);
-			TaskDatabase.beginTransaction();
+			TaskDatabase db = new WriteableTaskDB();
+			db.open(SynchService.this);
+			db.beginTransaction();
 			for(ParcelableTask task : deletedTasks)
-					TaskDatabase.remove(task.getId());
-			TaskDatabase.endTransaction();
+				db.remove(task.getId());
+			db.endTransaction();
 		} catch(Exception e) {
 			Log.d("changed error",e.getMessage());
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}	
 		return deletedTasks;
 	}
 	
 	public List<ParcelableTask> updateAddedTasks(ArrayList<ParcelableTask> addedTasks) {
 		try {
-			TaskDatabase.open(SynchService.this);
-			TaskDatabase.putUsingTransactions(addedTasks);	
+			TaskDatabase db = new WriteableTaskDB();
+			db.open(SynchService.this);
+			db.putUsingTransactions(addedTasks);	
 		} catch(Exception e) {
 			Log.d("changed error",e.getMessage());
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}		
 		return addedTasks;
 	

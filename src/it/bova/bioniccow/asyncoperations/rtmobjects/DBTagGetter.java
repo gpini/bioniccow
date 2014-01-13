@@ -19,14 +19,15 @@ public class DBTagGetter extends AsyncTask<Void, Void, Set<String>>{
 	@Override
 	protected Set<String> doInBackground(Void... params) {
 		try {
-			TaskDatabase.open(this.context);
-			return TaskDatabase.getTags();
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
+			return db.getTags();
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new HashSet<String>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

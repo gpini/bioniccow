@@ -19,8 +19,9 @@ public class DBFolderAdder extends AsyncTask<Folder, Void, Boolean>{
 		if(folders.length > 0) {
 			Folder folder = folders[0];
 			try {
-				TaskDatabase.open(this.context);
-				long id = TaskDatabase.putFolder(folder);
+				TaskDatabase db = new WriteableTaskDB();
+				db.open(this.context);
+				long id = db.putFolder(folder);
 				if(id >= 0)
 					return true;
 				else
@@ -30,7 +31,7 @@ public class DBFolderAdder extends AsyncTask<Folder, Void, Boolean>{
 				return false;
 			}
 			finally {
-				TaskDatabase.close();
+				db.close();
 			}
 		}
 		else return false;

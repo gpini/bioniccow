@@ -17,58 +17,39 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class TaskDatabase {
+public abstract class TaskDatabase {
 
-	private static DBHelper dBHelper;
-	private static SQLiteDatabase dB;
+	private SQLiteDatabase dB = null;
 
-	private static int openedDBs = 0;
+	public abstract  void open(Context context);
 
-	public static synchronized void open(Context context) {
-		if(context == null)
-			throw new IllegalArgumentException("Context must be provided");
-		if(dBHelper == null) 
-			dBHelper = new DBHelper(context.getApplicationContext());
-		openedDBs++;
-		dB = dBHelper.getWritableDatabase();
-		dB.execSQL("PRAGMA foreign_keys=ON;");
-	}
-
-	public static synchronized void close() {
-		openedDBs--;
-		if(openedDBs < 1) {
-			if(dB.inTransaction())
-				dB.endTransaction();
-			if(dB != null)
-				dB.close();
-		}
-	}
+	public abstract void close();
 	
-	public static synchronized void beginTransaction() {
+	public void beginTransaction() {
 		checkOrThrow();
 		dB.beginTransaction();
 	}
 	
-	public static synchronized void endTransaction() {
+	public void endTransaction() {
 		dB.setTransactionSuccessful();
 		dB.endTransaction();
 	}
 
-	public static synchronized void putUsingTransactions(List<? extends Task> updatedTasks) {
+	public void putUsingTransactions(List<? extends Task> updatedTasks) {
 		beginTransaction();
 		for(Task task : updatedTasks)
 			put(task);
 		endTransaction();
 	}
 
-	public static synchronized long putUsingTransactions(Task task) {
+	public long putUsingTransactions(Task task) {
 		beginTransaction();
 		long id = put(task);
 		endTransaction();
 		return id;
 	}
 
-	public static synchronized long put(Task task) {
+	public long put(Task task) {
 		checkOrThrow();
 		if(task != null) {
 			ContentValues taskValues = TaskTable.values(task);
@@ -95,7 +76,7 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized long populate(Task task) {
+	public long populate(Task task) {
 		checkOrThrow();
 		if(task != null) {
 			ContentValues taskValues = TaskTable.values(task);
@@ -119,7 +100,7 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized long insertContact(String taskId, Contact contact) {
+	public long insertContact(String taskId, Contact contact) {
 		checkOrThrow();
 		if(contact != null) {
 			ContentValues contactValues = ContactTable.values(contact);
@@ -133,7 +114,7 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized long insertNote(String taskId, Note note) {
+	public long insertNote(String taskId, Note note) {
 		checkOrThrow();
 		if(note != null) {
 			ContentValues noteValues = NoteTable.values(note);
@@ -147,7 +128,8 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized int updateNote(Note note) {
+	public int updateNote(Note note) {
+		checkOrThrow();
 		ContentValues values = new ContentValues();
 		values.put(NoteTable.COLUMN_TITLE, note.getTitle());
 		values.put(NoteTable.COLUMN_TEXT, note.getText());
@@ -161,7 +143,7 @@ public class TaskDatabase {
 		return updatedRows;
 	}
 	
-	public static synchronized long removeNote(String noteId) {
+	public long removeNote(String noteId) {
 		checkOrThrow();
 		return dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE,
 				TaskToNoteTable.COLUMN_NOTE_ID + "= ?",
@@ -169,42 +151,44 @@ public class TaskDatabase {
 	}
 	
 	
-	public static synchronized long removeNotes(String taskId) {
+	public long removeNotes(String taskId) {
 		checkOrThrow();
 		return dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE,
 				TaskToNoteTable.COLUMN_TASK_ID + "= ?",
 				new String[]{taskId});
 	}
 	
-	public static synchronized long removeContacts(String taskId) {
+	public long removeContacts(String taskId) {
 		checkOrThrow();
 		return dB.delete(TaskToContactTable.TABLE_TASK_TO_CONTACT,
 				TaskToContactTable.COLUMN_TASK_ID + "= ?",
 				new String[]{taskId});
 	}
 	
-	public static synchronized long removeTags(String taskId) {
+	public long removeTags(String taskId) {
 		checkOrThrow();
 		return dB.delete(TagTable.TABLE_TAG,
 				TagTable.COLUMN_TASK_ID + "= ?",
 				new String[]{taskId});
 	}
 	
-	public static synchronized void cleanNotes() {
+	public void cleanNotes() {
+		checkOrThrow();
 		dB.execSQL("DELETE FROM note WHERE noteId IN ("
 				+ "SELECT N.noteId AS noteId from note AS N "
 				+ "LEFT JOIN task_to_note AS T2N ON T2N.noteId = N.noteId "
 				+ "WHERE T2N.taskId IS NULL)");
 	}
 	
-	public static synchronized void cleanContacts() {
+	public void cleanContacts() {
+		checkOrThrow();
 		dB.execSQL("DELETE FROM contact WHERE contactId IN ("
 				+ "SELECT C.contactId AS contactId from contact AS C "
 				+ "LEFT JOIN task_to_contact AS T2C ON T2C.contactId = C.contactId "
 				+ "WHERE T2C.taskId IS NULL)");
 	}
 
-	public static synchronized long remove(String taskId) {
+	public long remove(String taskId) {
 		checkOrThrow();
 		long deleteId = dB.delete(TaskTable.TABLE_TASK,
 				TaskTable.COLUMN_TASK_ID + "= ?",
@@ -214,14 +198,14 @@ public class TaskDatabase {
 		return deleteId;
 	}
 
-	public static synchronized long remove(Task task) {
+	public long remove(Task task) {
 		checkOrThrow();
 		if(task != null)
 			return remove(task.getId());
 		else return -1;
 	}
 
-	public static synchronized long clearAll() {
+	public long clearAll() {
 		checkOrThrow();
 		long deleteId = dB.delete(TaskTable.TABLE_TASK, null, null);
 		dB.delete(TagTable.TABLE_TAG, null, null);
@@ -239,7 +223,7 @@ public class TaskDatabase {
 		BY_LIST, BY_LOCATION, BY_TAG, BY_COMPLETION_DATE, WITH_DUE_DATE, WITH_PRIORITY, NOT_LOCATED, NOT_TAGGED;
 	}
 
-	public static synchronized List<Task> get(Mode mode, String... parameters) {
+	public List<Task> get(Mode mode, String... parameters) {
 		checkOrThrow();
 		Cursor taskCursor = null;
 		Cursor tagCursor = null;
@@ -385,7 +369,7 @@ public class TaskDatabase {
 
 	}
 	
-	public static synchronized long putTasklists(List<TaskList> tasklists) {
+	public long putTasklists(List<TaskList> tasklists) {
 		checkOrThrow();
 		if(tasklists != null) {
 			//erase previous tasklists
@@ -405,7 +389,8 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized List<TaskList> getTasklists() {
+	public List<TaskList> getTasklists() {
+		checkOrThrow();
 		Cursor tasklistCursor = dB.query(TaskListTable.TABLE_TASKLIST, null,
 				"archived = 0", null, null, null, null);
 		List<TaskList> tasklists = new ArrayList<TaskList>();
@@ -416,7 +401,7 @@ public class TaskDatabase {
 		return tasklists;
 	}
 	
-	public static synchronized long putLocations(List<Location> locations) {
+	public long putLocations(List<Location> locations) {
 		checkOrThrow();
 		if(locations != null) {
 			//erase previous locations
@@ -436,7 +421,8 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized List<Location> getLocations() {
+	public List<Location> getLocations() {
+		checkOrThrow();
 		Cursor locationCursor = dB.query(LocationTable.TABLE_LOCATION, null, null,
 				null, null, null, null);
 		List<Location> locations = new ArrayList<Location>();
@@ -447,7 +433,7 @@ public class TaskDatabase {
 		return locations;
 	}
 	
-	public static synchronized long putFolder(Folder folder) {
+	public long putFolder(Folder folder) {
 		checkOrThrow();
 		if(folder != null) {
 			ContentValues folderValues = FolderTable.values(folder);
@@ -458,7 +444,8 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized int updateFolder(Folder folder) {
+	public int updateFolder(Folder folder) {
+		checkOrThrow();
 		ContentValues folderValues = FolderTable.values(folder);
 		int updatedRows = dB.update(FolderTable.TABLE_FOLDER,
 				folderValues, FolderTable.COLUMN_FOLDER_ID + " = " + folder.getId(), null);
@@ -466,7 +453,7 @@ public class TaskDatabase {
 	}
 	
 	
-	public static synchronized long removeFolder(int folderId) {
+	public long removeFolder(int folderId) {
 		checkOrThrow();
 		long deletedId = -1;
 		deletedId = dB.delete(FolderTable.TABLE_FOLDER,
@@ -474,7 +461,8 @@ public class TaskDatabase {
 		return deletedId;
 	}
 	
-	public static synchronized List<Folder> getFolders() {
+	public List<Folder> getFolders() {
+		checkOrThrow();
 		Cursor folderCursor = dB.query(FolderTable.TABLE_FOLDER, null, null,
 				null, null, null, null);
 		List<Folder> folders = new ArrayList<Folder>();
@@ -485,7 +473,7 @@ public class TaskDatabase {
 		return folders;
 	}
 	
-	public static synchronized Set<String> getTags() {
+	public Set<String> getTags() {
 		checkOrThrow();
 		Set<String> tags = new TreeSet<String>();
 		Cursor c = dB.query(true, TagTable.TABLE_TAG,
@@ -515,9 +503,7 @@ public class TaskDatabase {
 		
 	}
 
-	private static void checkOrThrow() {
-		if(dBHelper == null)
-			throw new IllegalArgumentException("DatabaseSingleton not set");
+	private void checkOrThrow() {
 		if(dB == null)
 			throw new IllegalArgumentException("Database not opened");
 	}

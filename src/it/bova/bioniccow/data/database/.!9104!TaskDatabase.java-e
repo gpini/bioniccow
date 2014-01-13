@@ -17,58 +17,39 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class TaskDatabase {
+public abstract class TaskDatabase {
 
-	private static DBHelper dBHelper;
-	private static SQLiteDatabase dB;
+	private SQLiteDatabase dB = null;
 
-	private static int openedDBs = 0;
+	public abstract  void open(Context context);
 
-	public static synchronized void open(Context context) {
-		if(context == null)
-			throw new IllegalArgumentException("Context must be provided");
-		if(dBHelper == null) 
-			dBHelper = new DBHelper(context.getApplicationContext());
-		openedDBs++;
-		dB = dBHelper.getWritableDatabase();
-		dB.execSQL("PRAGMA foreign_keys=ON;");
-	}
-
-	public static synchronized void close() {
-		openedDBs--;
-		if(openedDBs < 1) {
-			if(dB.inTransaction())
-				dB.endTransaction();
-			if(dB != null)
-				dB.close();
-		}
-	}
+	public abstract void close();
 	
-	public static synchronized void beginTransaction() {
+	public void beginTransaction() {
 		checkOrThrow();
 		dB.beginTransaction();
 	}
 	
-	public static synchronized void endTransaction() {
+	public void endTransaction() {
 		dB.setTransactionSuccessful();
 		dB.endTransaction();
 	}
 
-	public static synchronized void putUsingTransactions(List<? extends Task> updatedTasks) {
+	public void putUsingTransactions(List<? extends Task> updatedTasks) {
 		beginTransaction();
 		for(Task task : updatedTasks)
 			put(task);
 		endTransaction();
 	}
 
-	public static synchronized long putUsingTransactions(Task task) {
+	public long putUsingTransactions(Task task) {
 		beginTransaction();
 		long id = put(task);
 		endTransaction();
 		return id;
 	}
 
-	public static synchronized long put(Task task) {
+	public long put(Task task) {
 		checkOrThrow();
 		if(task != null) {
 			ContentValues taskValues = TaskTable.values(task);
@@ -95,7 +76,7 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized long populate(Task task) {
+	public long populate(Task task) {
 		checkOrThrow();
 		if(task != null) {
 			ContentValues taskValues = TaskTable.values(task);
@@ -119,7 +100,7 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized long insertContact(String taskId, Contact contact) {
+	public long insertContact(String taskId, Contact contact) {
 		checkOrThrow();
 		if(contact != null) {
 			ContentValues contactValues = ContactTable.values(contact);
@@ -133,7 +114,7 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized long insertNote(String taskId, Note note) {
+	public long insertNote(String taskId, Note note) {
 		checkOrThrow();
 		if(note != null) {
 			ContentValues noteValues = NoteTable.values(note);
@@ -147,7 +128,8 @@ public class TaskDatabase {
 		else return -1;
 	}
 	
-	public static synchronized int updateNote(Note note) {
+	public int updateNote(Note note) {
+		checkOrThrow();
 		ContentValues values = new ContentValues();
 		values.put(NoteTable.COLUMN_TITLE, note.getTitle());
 		values.put(NoteTable.COLUMN_TEXT, note.getText());
@@ -161,7 +143,7 @@ public class TaskDatabase {
 		return updatedRows;
 	}
 	
-	public static synchronized long removeNote(String noteId) {
+	public long removeNote(String noteId) {
 		checkOrThrow();
 		return dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE,
 				TaskToNoteTable.COLUMN_NOTE_ID + "= ?",
@@ -169,42 +151,44 @@ public class TaskDatabase {
 	}
 	
 	
-	public static synchronized long removeNotes(String taskId) {
+	public long removeNotes(String taskId) {
 		checkOrThrow();
 		return dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE,
 				TaskToNoteTable.COLUMN_TASK_ID + "= ?",
 				new String[]{taskId});
 	}
 	
-	public static synchronized long removeContacts(String taskId) {
+	public long removeContacts(String taskId) {
 		checkOrThrow();
 		return dB.delete(TaskToContactTable.TABLE_TASK_TO_CONTACT,
 				TaskToContactTable.COLUMN_TASK_ID + "= ?",
 				new String[]{taskId});
 	}
 	
-	public static synchronized long removeTags(String taskId) {
+	public long removeTags(String taskId) {
 		checkOrThrow();
 		return dB.delete(TagTable.TABLE_TAG,
 				TagTable.COLUMN_TASK_ID + "= ?",
 				new String[]{taskId});
 	}
 	
-	public static synchronized void cleanNotes() {
+	public void cleanNotes() {
+		checkOrThrow();
 		dB.execSQL("DELETE FROM note WHERE noteId IN ("
 				+ "SELECT N.noteId AS noteId from note AS N "
 				+ "LEFT JOIN task_to_note AS T2N ON T2N.noteId = N.noteId "
 				+ "WHERE T2N.taskId IS NULL)");
 	}
 	
-	public static synchronized void cleanContacts() {
+	public void cleanContacts() {
+		checkOrThrow();
 		dB.execSQL("DELETE FROM contact WHERE contactId IN ("
 				+ "SELECT C.contactId AS contactId from contact AS C "
 				+ "LEFT JOIN task_to_contact AS T2C ON T2C.contactId = C.contactId "
 				+ "WHERE T2C.taskId IS NULL)");
 	}
 
-	public static synchronized long remove(String taskId) {
+	public long remove(String taskId) {
 		checkOrThrow();
 		long deleteId = dB.delete(TaskTable.TABLE_TASK,
 				TaskTable.COLUMN_TASK_ID + "= ?",

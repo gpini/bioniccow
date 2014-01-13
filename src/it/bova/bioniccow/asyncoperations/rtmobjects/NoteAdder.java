@@ -27,16 +27,17 @@ public class NoteAdder extends DefaultInquirer<String,Note> {
 		if(params.length > 4) note = api.tasksAddNote(timeline, params[0], params[1], params[2], params[3], params[4]);
 		else note = api.tasksAddNote(timeline, "", "", "", "", "");
 		try {
-			TaskDatabase.open(this.getContext());
-			TaskDatabase.beginTransaction();
-			TaskDatabase.insertNote(params[0], note);
-			TaskDatabase.endTransaction();
+			TaskDatabase db = new WriteableTaskDB();
+			db.open(this.context);
+			db.beginTransaction();
+			db.insertNote(params[0], note);
+			db.endTransaction();
 			MessageSender.notifyNoteAdded(getContext(), note, params[0]);
 		}catch(Exception e) {
 			//Log.d("changed error",e.getMessage());
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}	
 		return note;
 	}

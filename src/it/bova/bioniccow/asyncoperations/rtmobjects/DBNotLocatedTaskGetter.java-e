@@ -20,15 +20,16 @@ public class DBNotLocatedTaskGetter extends TaskGetter {
 	
 	@Override public List<Task> inquire(String... locIds) throws ServerException, RtmApiException, IOException {
 		try {
-			TaskDatabase.open(this.getContext());
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
 			//if(listIds.length < 1) return new ArrayList<Task>();
-			return TaskDatabase.get(Mode.NOT_LOCATED);
+			return db.get(Mode.NOT_LOCATED);
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new ArrayList<Task>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

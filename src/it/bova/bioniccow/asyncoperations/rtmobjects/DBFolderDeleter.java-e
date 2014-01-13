@@ -22,8 +22,9 @@ public class DBFolderDeleter extends AsyncTask<Integer, Void, Boolean>{
 		if(params.length > 0) {
 			int folderId = params[0];
 			try {
-				TaskDatabase.open(this.context);
-				long id = TaskDatabase.removeFolder(folderId);
+				TaskDatabase db = new WriteableTaskDB();
+				db.open(this.context);
+				long id = db.removeFolder(folderId);
 				if(id >= 0)
 					return true;
 				else
@@ -33,7 +34,7 @@ public class DBFolderDeleter extends AsyncTask<Integer, Void, Boolean>{
 				return false;
 			}
 			finally {
-				TaskDatabase.close();
+				db.close();
 			}
 		}
 		else return false;

@@ -20,14 +20,15 @@ public class DBPrioritizedTaskGetter extends TaskGetter {
 	
 	@Override public List<Task> inquire(String... prios) throws ServerException, RtmApiException, IOException {
 		try {
-			TaskDatabase.open(this.getContext());
-			return TaskDatabase.get(Mode.WITH_PRIORITY);
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
+			return db.get(Mode.WITH_PRIORITY);
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new ArrayList<Task>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

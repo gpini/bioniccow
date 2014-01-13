@@ -20,14 +20,15 @@ public class DBTaskListsGetter extends AsyncTask<Void, Void, List<TaskList>>{
 	@Override
 	protected List<TaskList> doInBackground(Void... params) {
 		try {
-			TaskDatabase.open(this.context);
-			return TaskDatabase.getTasklists();
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
+			return db.getTasklists();
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new ArrayList<TaskList>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

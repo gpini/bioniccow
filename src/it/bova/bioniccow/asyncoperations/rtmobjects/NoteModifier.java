@@ -27,14 +27,15 @@ public class NoteModifier extends DefaultInquirer<String,Note> {
 		if(params.length > 2) note = api.tasksEditNote(timeline, params[0], params[1], params[2]);
 		else note = api.tasksEditNote(timeline, "", "", "");
 		try {
-			TaskDatabase.open(this.getContext());
-			TaskDatabase.updateNote(note);	
+			TaskDatabase db = new WriteableTaskDB();
+			db.open(this.context);
+			db.updateNote(note);	
 			MessageSender.notifyNoteEdited(getContext(), note);
 		}catch(Exception e) {
 			//Log.d("changed error",e.getMessage());
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}	
 		return note;
 	}

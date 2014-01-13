@@ -19,14 +19,15 @@ public class DBLocationsGetter extends AsyncTask<Void, Void, List<Location>>{
 	@Override
 	protected List<Location> doInBackground(Void... params) {
 		try {
-			TaskDatabase.open(this.context);
-			return TaskDatabase.getLocations();
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
+			return db.getLocations();
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new ArrayList<Location>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

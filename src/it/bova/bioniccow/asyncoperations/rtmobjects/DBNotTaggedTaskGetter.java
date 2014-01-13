@@ -20,14 +20,15 @@ public class DBNotTaggedTaskGetter extends TaskGetter {
 	
 	@Override public List<Task> inquire(String... tags) throws ServerException, RtmApiException, IOException {
 		try {
-			TaskDatabase.open(this.getContext());
-			return TaskDatabase.get(Mode.NOT_TAGGED);
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
+			return db.get(Mode.NOT_TAGGED);
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new ArrayList<Task>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

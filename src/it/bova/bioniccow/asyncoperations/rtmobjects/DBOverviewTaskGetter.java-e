@@ -20,14 +20,15 @@ public class DBOverviewTaskGetter extends TaskGetter {
 	
 	@Override public List<Task> inquire(String... none) throws ServerException, RtmApiException, IOException {
 		try {
-			TaskDatabase.open(this.getContext());
-			return TaskDatabase.get(Mode.WITH_DUE_DATE);
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
+			return db.get(Mode.WITH_DUE_DATE);
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new ArrayList<Task>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

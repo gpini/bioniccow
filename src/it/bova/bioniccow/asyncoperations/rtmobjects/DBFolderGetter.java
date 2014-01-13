@@ -19,14 +19,15 @@ public class DBFolderGetter extends AsyncTask<Void, Void, List<Folder>>{
 	@Override
 	protected List<Folder> doInBackground(Void... params) {
 		try {
-			TaskDatabase.open(this.context);
-			return TaskDatabase.getFolders();
+			TaskDatabase db = new ReadableTaskDB();
+			db.open(this.context);
+			return db.getFolders();
 		}catch(Exception e) {
 			Log.d("DB error", e.getMessage());
 			return new ArrayList<Folder>();
 		}
 		finally {
-			TaskDatabase.close();
+			db.close();
 		}
 	}
 

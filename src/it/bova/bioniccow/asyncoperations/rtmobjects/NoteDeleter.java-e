@@ -27,14 +27,15 @@ public class NoteDeleter extends DefaultInquirer<String,Boolean> {
 		else ok = false;
 		if(ok) {
 			try {
-				TaskDatabase.open(this.getContext());
-				TaskDatabase.removeNote(noteIds[0]);
+				TaskDatabase db = new WriteableTaskDB();
+				db.open(this.context);
+				db.removeNote(noteIds[0]);
 				MessageSender.notifyNoteDeleted(getContext(), noteIds[0]);
 			}catch(Exception e) {
 				//Log.d("changed error",e.getMessage());
 			}
 			finally {
-				TaskDatabase.close();	
+				db.close();	
 			}
 		}
 		return ok;		
