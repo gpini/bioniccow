@@ -3,6 +3,7 @@ package it.bova.bioniccow.asyncoperations.sync;
 import it.bova.bioniccow.R;
 import it.bova.bioniccow.asyncoperations.ErrorCoded;
 import it.bova.bioniccow.asyncoperations.InquiryAnswer;
+import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.asyncoperations.rtmobjects.ListGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.LocationGetter;
 import it.bova.bioniccow.asyncoperations.rtmobjects.SynchedTaskGetter;
@@ -152,7 +153,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 				db.open(this);
 				db.putTasklists(answer.getResult());
 			}catch(Exception e) {
-				MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
+				MessageSender.sendMessage(this, "DB error: " + e.getMessage());
 				return false;
 			}
 			finally {
@@ -175,7 +176,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 				db.open(this);
 				db.putLocations(answer.getResult());
 			}catch(Exception e) {
-				MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
+				MessageSender.sendMessage(this, "DB error: " + e.getMessage());
 				return false;
 			}
 			finally {
@@ -246,7 +247,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			}
 			
 		}catch(Exception e) {
-			MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
+			MessageSender.sendMessage(this, "DB error: " + e.getMessage());
 			return null;
 		}
 		finally {
