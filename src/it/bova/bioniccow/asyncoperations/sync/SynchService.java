@@ -152,7 +152,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 				db.open(this);
 				db.putTasklists(answer.getResult());
 			}catch(Exception e) {
-				Log.d("DB error", e.getMessage());
+				MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
 				return false;
 			}
 			finally {
@@ -175,7 +175,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 				db.open(this);
 				db.putLocations(answer.getResult());
 			}catch(Exception e) {
-				Log.d("DB error", e.getMessage());
+				MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
 				return false;
 			}
 			finally {
@@ -246,7 +246,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			}
 			
 		}catch(Exception e) {
-			Log.d("DB error", e.getMessage());
+			MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
 			return null;
 		}
 		finally {

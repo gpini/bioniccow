@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.bioniccow.data.database.WriteableTaskDB;
 import android.content.Context;
@@ -31,7 +32,7 @@ public class DBFolderDeleter extends AsyncTask<Integer, Void, Boolean>{
 				else
 					return false;
 			}catch(Exception e) {
-				Log.d("DB error", e.getMessage());
+				MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
 				return false;
 			}
 			finally {

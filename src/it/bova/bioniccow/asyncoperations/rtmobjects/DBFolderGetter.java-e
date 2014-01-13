@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.data.Folder;
 import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
@@ -24,7 +25,7 @@ public class DBFolderGetter extends AsyncTask<Void, Void, List<Folder>>{
 			db.open(this.context);
 			return db.getFolders();
 		}catch(Exception e) {
-			Log.d("DB error", e.getMessage());
+			MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
 			return new ArrayList<Folder>();
 		}
 		finally {

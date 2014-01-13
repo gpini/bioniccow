@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.bioniccow.data.database.TaskDatabase.Mode;
@@ -25,7 +26,7 @@ public class DBNotTaggedTaskGetter extends TaskGetter {
 			db.open(this.getContext());
 			return db.get(Mode.NOT_TAGGED);
 		}catch(Exception e) {
-			Log.d("DB error", e.getMessage());
+			MessageSender.sendMessage(this.getContext(), "DB error: " + e.getMessage());
 			return new ArrayList<Task>();
 		}
 		finally {

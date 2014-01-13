@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.rtmapi.TaskList;
@@ -25,7 +26,7 @@ public class DBTaskListsGetter extends AsyncTask<Void, Void, List<TaskList>>{
 			db.open(this.context);
 			return db.getTasklists();
 		}catch(Exception e) {
-			Log.d("DB error", e.getMessage());
+			MessageSender.sendMessage(this.context, "DB error: " + e.getMessage());
 			return new ArrayList<TaskList>();
 		}
 		finally {

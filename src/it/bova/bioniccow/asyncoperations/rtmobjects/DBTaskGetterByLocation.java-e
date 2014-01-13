@@ -1,5 +1,6 @@
 package it.bova.bioniccow.asyncoperations.rtmobjects;
 
+import it.bova.bioniccow.asyncoperations.MessageSender;
 import it.bova.bioniccow.data.database.ReadableTaskDB;
 import it.bova.bioniccow.data.database.TaskDatabase;
 import it.bova.bioniccow.data.database.TaskDatabase.Mode;
@@ -26,7 +27,7 @@ public class DBTaskGetterByLocation extends TaskGetter {
 			//if(listIds.length < 1) return new ArrayList<Task>();
 			return db.get(Mode.BY_LOCATION, locIds[0]);
 		}catch(Exception e) {
-			Log.d("DB error", e.getMessage());
+			MessageSender.sendMessage(this.getContext(), "DB error: " + e.getMessage());
 			return new ArrayList<Task>();
 		}
 		finally {
