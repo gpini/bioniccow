@@ -32,7 +32,7 @@
         </activity>
         <activity
 			android:name=".TaskActivity"
-			android:configChanges="orientation|screenSize" >
+			android:configChanges="keyboard|keyboardHidden|orientation|screenSize" >
 		</activity>
         <activity
             android:name=".TaskEditActivity"

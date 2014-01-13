@@ -53,6 +53,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -194,6 +195,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 
 	
 	public void onResume() {
+		//Log.w("pippo","pippo "+ uncompletedTasks);
 		super.onResume();	
 		if(this.uncompletedTasks == null)
 			this.refresh();
@@ -488,43 +490,43 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			Collections.sort(tasks, new TaskComparatorByCompletionDate());
 		else
 			Collections.sort(tasks, new TaskComparator());
-		Map<String, CheckableTask> oldSelectedTasks = new HashMap<String, CheckableTask>();
-		oldSelectedTasks.putAll(this.selectedTasks);
+		//Map<String, CheckableTask> oldSelectedTasks = new HashMap<String, CheckableTask>();
+		//oldSelectedTasks.putAll(this.selectedTasks);
 		this.selectedTasks.clear();
 
 		ArrayList<CheckableTask> uncompletedTasks = new ArrayList<CheckableTask>();
 		ArrayList<CheckableTask> completedTasks = new ArrayList<CheckableTask>();
 		for(Task task : tasks) {
 			if(task.getCompleted() != null) {
-				/*if(task instanceof CheckableTask) {
+				if(task instanceof CheckableTask) {
 					CheckableTask checkable = (CheckableTask) task;
 					//Log.d("compl", checkable.getName() + " - " + checkable.isChecked());
 					completedTasks.add(new CheckableTask(checkable, checkable.isChecked()));
 					if(checkable.isChecked())
 						selectedTasks.put(checkable.getId(), checkable);
 				}
-				else {*/
-					if(oldSelectedTasks.get(task.getId()) != null) //se era giˆ selezionato
+				else {
+					/*if(oldSelectedTasks.get(task.getId()) != null) //se era giˆ selezionato
 						completedTasks.add(new CheckableTask(task, true));
-					else
+					else*/
 						completedTasks.add(new CheckableTask(task, false));
-				//}
+				}
 					
 			}
 			else {
-				/*if(task instanceof CheckableTask) {
+				if(task instanceof CheckableTask) {
 					CheckableTask checkable = (CheckableTask) task;
 					//Log.d("uncompl", checkable.getName() + " - " + checkable.isChecked());
 					uncompletedTasks.add(new CheckableTask(checkable, checkable.isChecked()));
 					if(checkable.isChecked())
 						selectedTasks.put(checkable.getId(), checkable);
 				}
-				else {*/
-					if(oldSelectedTasks.get(task.getId()) != null) //se era giˆ selezionato
+				else {
+					/*if(oldSelectedTasks.get(task.getId()) != null) //se era giˆ selezionato
 						uncompletedTasks.add(new CheckableTask(task, true));
-					else
+					else*/
 						uncompletedTasks.add(new CheckableTask(task, false));
-				//}
+				}
 			}
 		}
 		this.uncompletedTasks = uncompletedTasks;
