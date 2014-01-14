@@ -109,15 +109,15 @@ public class FolderEditActivity extends EditActivity {
         case FOLDER_HELP_DIALOG :
         	LayoutInflater inflater 
 					= (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			TextView tv = (TextView) inflater.inflate(R.layout.light_dialog, null); 
+			//TextView tv = (TextView) inflater.inflate(R.layout.light_dialog, null); 
 			//tv.setText(R.string.folderHelp);
-        	//String FOLDER_HELP_TEXT = this.getResources().getString(R.string.folderHelp);
+        	String FOLDER_HELP_TEXT = this.getResources().getString(R.string.folderHelp);
 			String FOLDER_HELP_TITLE = this.getResources().getString(R.string.howToTitle);
         	String OK = this.getResources().getString(R.string.proceed);
         	AlertDialog.Builder builder = new AlertDialog.Builder(this)
 			.setTitle(FOLDER_HELP_TITLE)
-    		//.setMessage(FOLDER_HELP_TEXT)
-    		.setView(tv)
+    		.setMessage(FOLDER_HELP_TEXT)
+    		//.setView(tv)
     		.setCancelable(false)
     		.setPositiveButton(OK, new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int id) {
