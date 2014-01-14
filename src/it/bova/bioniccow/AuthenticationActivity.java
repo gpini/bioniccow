@@ -52,6 +52,7 @@ public class AuthenticationActivity extends SherlockActivity implements ErrorCod
 		
 		this.progressBar = (ProgressBar) this.findViewById(R.id.progressBar);
 		this.progressBar.setMax(100);
+		this.progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progress));
 		this.getSupportActionBar().hide();
 		// Makes Progress bar Visible
 		//getWindow().setFeatureInt( Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
@@ -84,8 +85,8 @@ public class AuthenticationActivity extends SherlockActivity implements ErrorCod
 			
 			@Override public void onPageStarted(WebView view, String url, Bitmap favicon) {
 				if(AuthenticationActivity.this.progressBar.getVisibility() != View.VISIBLE) {
-					Animation anim = AnimationUtils.loadAnimation(AuthenticationActivity.this, R.anim.appear);
-					AuthenticationActivity.this.progressBar.startAnimation(anim);
+					//Animation anim = AnimationUtils.loadAnimation(AuthenticationActivity.this, R.anim.appear);
+					//AuthenticationActivity.this.progressBar.startAnimation(anim);
 					AuthenticationActivity.this.progressBar.setVisibility(View.VISIBLE);
 				}
 			}
