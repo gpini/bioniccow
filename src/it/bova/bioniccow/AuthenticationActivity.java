@@ -52,7 +52,7 @@ public class AuthenticationActivity extends SherlockActivity implements ErrorCod
 		
 		this.progressBar = (ProgressBar) this.findViewById(R.id.progressBar);
 		this.progressBar.setMax(100);
-		this.progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progress));
+		this.progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progress_horizontal));
 		this.getSupportActionBar().hide();
 		// Makes Progress bar Visible
 		//getWindow().setFeatureInt( Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
