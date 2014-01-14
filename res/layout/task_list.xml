@@ -5,7 +5,18 @@
     android:layout_height="match_parent"
     android:layout_alignParentTop="true"
     android:orientation="vertical" >
-
+    
+    <TextView
+        android:id="@+id/title_header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/white"
+		android:background="@color/dark_grey"
+		android:visibility="gone"/>
+    
     <RelativeLayout
         android:id="@+id/loadingBar"
         android:layout_width="fill_parent"
@@ -32,22 +43,12 @@
             android:layout_toRightOf="@+id/loadingText" />
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/title_header"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:padding="2dp"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@color/white"
-		android:background="@color/dark_grey"
-		android:visibility="gone"/>
+
 		
     <TextView
         android:id="@+id/header"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:gravity="center"
         android:padding="5dp"
         android:text="@string/empty"
