@@ -79,6 +79,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 	private View footer;
 	private Button footerButton;
 	private View header;
+	private TextView titleHeader;
 	private boolean areCompletedShown = false;
 	private TaskAdapter adapter;
 
@@ -168,6 +169,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 		this.identifier = this.getArguments().getString(IDENTIFIER);
 		this.name = this.getArguments().getString(NAME);
 		this.isSmart = this.getArguments().getBoolean("isSmart",false);
+		boolean isSinglePane = this.getArguments().getBoolean("isSinglePane",false);
 		
 		View view = inflater.inflate(R.layout.task_list,
 		        container, false);
@@ -182,12 +184,45 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			}
 		});
 		this.header = view.findViewById(R.id.header);
+		this.titleHeader = (TextView) view.findViewById(R.id.title_header);
 		this.lv = (ListView) view.findViewById(R.id.list);
 		this.lv.addFooterView(this.footer);
 		this.lv.setAdapter(this.adapter);	
 		this.lv.setItemsCanFocus(false);
         this.lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		
+		if(!isSinglePane) {
+			titleHeader.setVisibility(View.VISIBLE);
+			String title = ""; 
+			switch(type) {
+			case LIST : 
+				title += name + " - ";
+				title += this.getResources().getString(R.string.list); break;
+			case LOCATION : 
+				title += name + " - ";
+				this.getResources().getString(R.string.location); break;
+			case TAG :
+				title += name + " - ";
+				title += this.getResources().getString(R.string.tag); break;
+			case NO_TAG :
+				String no_tag = this.getResources().getStringArray(R.array.specials)[0];
+				title += no_tag + " - ";
+				title += this.getResources().getString(R.string.specials); break;
+			case NO_LOCATION :
+				String no_loc = this.getResources().getStringArray(R.array.specials)[1];
+				title += no_loc + " - ";
+				title += this.getResources().getString(R.string.specials);break;
+			case RECENTLY_COMPLETED :
+				String rec_compl = this.getResources().getStringArray(R.array.specials)[2];
+				title += rec_compl + " - ";
+				title += this.getResources().getString(R.string.specials);break;
+			case WITH_PRIORITY :
+				String with_prio = this.getResources().getStringArray(R.array.specials)[3];
+				title += with_prio + " - ";
+				title += this.getResources().getString(R.string.specials);break;
+			}
+			titleHeader.setText(title);
+		}
 
 		return view;
 		

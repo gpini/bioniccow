@@ -32,6 +32,7 @@ public class TaskActivity extends SyncableActivity {
 		bundle.putBoolean("isSmart", isSmart);
 		bundle.putString(IDENTIFIER, identifier);
 		bundle.putString(NAME, name);
+		bundle.putBoolean("isSinglePane", true);
 		taskFragment.setArguments(bundle);
 		FragmentManager fm = this.getSupportFragmentManager();
 		fm.beginTransaction()
