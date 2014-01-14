@@ -214,8 +214,6 @@ public abstract class TaskDatabase {
 		dB.delete(NoteTable.TABLE_NOTE, null, null);
 		dB.delete(TaskToContactTable.TABLE_TASK_TO_CONTACT, null, null);
 		dB.delete(TaskToNoteTable.TABLE_TASK_TO_NOTE, null, null);
-		dB.delete(TaskListTable.TABLE_TASKLIST, null, null);
-		dB.delete(LocationTable.TABLE_LOCATION, null, null);
 		dB.delete(FolderTable.TABLE_FOLDER, null, null);
 		return deleteId;
 	}
@@ -373,10 +371,10 @@ public abstract class TaskDatabase {
 	public long putTasklists(List<TaskList> tasklists) {
 		checkOrThrow();
 		if(tasklists != null) {
-			//erase previous tasklists
-			dB.delete(TaskListTable.TABLE_TASKLIST, null, null);
 			//insert tasklists
 			dB.beginTransaction();
+			//erase previous tasklists
+			dB.delete(TaskListTable.TABLE_TASKLIST, null, null);
 			long insertId = -1;
 			for(TaskList tasklist : tasklists) {
 				ContentValues tasklistValues = TaskListTable.values(tasklist);
@@ -405,10 +403,10 @@ public abstract class TaskDatabase {
 	public long putLocations(List<Location> locations) {
 		checkOrThrow();
 		if(locations != null) {
-			//erase previous locations
-			dB.delete(LocationTable.TABLE_LOCATION, null, null);
 			//insert locations
 			dB.beginTransaction();
+			//erase previous locations
+			dB.delete(LocationTable.TABLE_LOCATION, null, null);
 			long insertId = -1;
 			for(Location location : locations) {
 				ContentValues locationValues = LocationTable.values(location);
