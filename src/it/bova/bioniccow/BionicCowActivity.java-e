@@ -60,6 +60,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 	private static final int SPECIALS = 5;
 	
 	private boolean isCreated = false;
+	private boolean isDualPane = false;
 
 	/** Called when the activity is first created. */
 	@Override protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,10 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 		
 		//views
 		this.popup = this.findViewById(R.id.popup);
+		
+		//dual pane check
+		if(this.findViewById(R.id.taskContainer) != null)
+			this.isDualPane = true;
 
 		//expandable list
 		final String[] groupArray = new String[6];
@@ -271,6 +276,32 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	public void openTaskFragment(int type, String identifier, String name, boolean isSmart, String filter) {
+		if(this.isDualPane) {
+			TaskFragment taskFragment = new TaskFragment();
+			Bundle bundle = new Bundle();
+			bundle.putInt(TYPE, type);
+			bundle.putBoolean("isSmart", isSmart);
+			bundle.putString(IDENTIFIER, identifier);
+			bundle.putString(NAME, name);
+			//bundle.putString(FILTER, filter);
+			taskFragment.setArguments(bundle);
+			FragmentManager fm = this.getSupportFragmentManager();
+			fm.beginTransaction()
+				.replace(R.id.taskContainer, taskFragment, TASK_FRAGMENT)
+				.commit();
+		}
+		else {
+			Intent intent = new Intent(this,TaskActivity.class);
+			intent.putExtra(TYPE, type);
+			intent.putExtra(NAME, "" + name);
+			intent.putExtra(IDENTIFIER, identifier);
+			intent.putExtra("isSmart", isSmart);
+			intent.putExtra(FILTER, filter);
+			this.startActivity(intent);
 		}
 	}
 	

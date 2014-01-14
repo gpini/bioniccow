@@ -37,29 +37,16 @@ public class SpecialsFragment extends SherlockFragment implements InterProcess, 
 		Intent intent = new Intent(this.getSherlockActivity(),TaskActivity.class);
 		switch(position) {
 		case 0 : 
-			intent.putExtra(TYPE, NO_TAG);
-			intent.putExtra(NAME, "");
-			intent.putExtra(IDENTIFIER, "");
-			this.startActivity(intent);
+			((BionicCowActivity) SpecialsFragment.this.getSherlockActivity()).openTaskFragment(NO_TAG, "", "", false, null);
 			break;
 		case 1 :
-			intent.putExtra(TYPE, NO_LOCATION);
-			intent.putExtra(NAME, "");
-			intent.putExtra(IDENTIFIER, "");
-			this.startActivity(intent);
+			((BionicCowActivity) SpecialsFragment.this.getSherlockActivity()).openTaskFragment(NO_LOCATION, "", "", false, null);
 			break;
 		case 2 : 
-			intent.putExtra(TYPE, RECENTLY_COMPLETED);
-			intent.putExtra(NAME, "");
-			intent.putExtra(IDENTIFIER, "");
-			this.startActivity(intent);
+			((BionicCowActivity) SpecialsFragment.this.getSherlockActivity()).openTaskFragment(RECENTLY_COMPLETED, "", "", false, null);
 			break;
 		case 3 :
-			intent.putExtra(TYPE, WITH_PRIORITY);
-			//intent.putExtra(FILTER, "NOT priority:none");
-			intent.putExtra(NAME, "");
-			intent.putExtra(IDENTIFIER, "");
-			this.startActivity(intent);
+			((BionicCowActivity) SpecialsFragment.this.getSherlockActivity()).openTaskFragment(WITH_PRIORITY, "", "", false, null);
 			break;
 		case 4 :
 			FolderFragment fragment = new FolderFragment();

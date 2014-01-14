@@ -196,7 +196,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 	public void onResume() {
 		super.onResume();	
 		if(this.uncompletedTasks == null)
-			this.refresh();
+			this.retrieveTasks(type);
 		if(this.taskGetter != null && this.taskGetter.isDoing())
 			this.loadingBar.setVisibility(View.VISIBLE);
 		else this.loadingBar.setVisibility(View.GONE);			

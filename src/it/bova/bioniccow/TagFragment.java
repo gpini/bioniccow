@@ -83,12 +83,7 @@ public class TagFragment extends SherlockFragment implements InterProcess{
 			holder.button.setOnClickListener(new SmartClickListener<String>(tag) {
 				public void onClick(View v){
 					String text = this.get();
-					Intent intent = new Intent(TagFragment.this.getSherlockActivity(),TaskActivity.class);
-					intent.putExtra(TYPE, TAG);
-					intent.putExtra(NAME, text);
-					//intent.putExtra(FILTER, "tag:\"" + text + "\"");
-					intent.putExtra(IDENTIFIER, text);
-					TagFragment.this.startActivity(intent);
+					((BionicCowActivity) TagFragment.this.getSherlockActivity()).openTaskFragment(TAG, text, text, false, null);
 					//Toast.makeText(TaskListActivity.this,text,Toast.LENGTH_SHORT).show();
 				}
 			});
