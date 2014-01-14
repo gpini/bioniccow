@@ -52,7 +52,7 @@
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="5dp"
         android:layout_below="@+id/auth_bar"
         android:layout_centerHorizontal="true"
         android:visibility="gone" />
