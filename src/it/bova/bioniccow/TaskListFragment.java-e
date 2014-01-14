@@ -91,15 +91,10 @@ public class TaskListFragment extends SherlockFragment implements InterProcess {
 			holder.button.setOnClickListener(new SmartClickListener<TaskList>(tasklist) {
 				public void onClick(View v){
 					String id = this.get().getId();
-					Intent intent = new Intent(TaskListFragment.this.getSherlockActivity(),TaskActivity.class);
-					intent.putExtra(TYPE, LIST);
-					intent.putExtra(NAME, "" + this.get().getName());
-					intent.putExtra(IDENTIFIER, id);
+					boolean isSmart = false;
 					if(this.get().isSmart())
-						intent.putExtra("isSmart", true);
-					else
-						intent.putExtra("isSmart", false);
-					TaskListFragment.this.startActivity(intent);
+						isSmart = true;
+					((BionicCowActivity) TaskListFragment.this.getSherlockActivity()).openTaskFragment(LIST, id, this.get().getName(), isSmart, null);
 				}
 			});
 			return convertView;

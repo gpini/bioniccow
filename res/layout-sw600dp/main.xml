@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal" >
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <fragment
+            android:id="@+id/headerFragment"
+            android:name="it.bova.bioniccow.HeaderFragment"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </fragment>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal" >
+
+            <RelativeLayout
+                android:id="@+id/fragmentContainer"
+                android:layout_width="300dip"
+                android:layout_height="fill_parent" >
+            </RelativeLayout>
+            
+            <View android:layout_width="2dip"
+                android:layout_height="fill_parent"
+                android:background="@color/light_grey"/>
+
+            <RelativeLayout
+                android:id="@+id/taskContainer"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" >
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:background="@drawable/popup_bg"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/navigation_hint_title"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/navigation_hint"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/closePopup"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/selector_standard"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="@string/ok" />
+    </LinearLayout>
+
+</FrameLayout>

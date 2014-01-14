@@ -36,7 +36,7 @@ public class TaskActivity extends SyncableActivity {
 		taskFragment.setArguments(bundle);
 		FragmentManager fm = this.getSupportFragmentManager();
 		fm.beginTransaction()
-			.add(R.id.fragmentContainer, taskFragment, TASK_FRAGMENT)
+			.add(R.id.taskContainer, taskFragment, TASK_FRAGMENT)
 			.commit();
 
 		//"Where am I" TextViews
@@ -92,7 +92,7 @@ public class TaskActivity extends SyncableActivity {
     
     private void reloadTasks() {
     	FragmentManager fm = this.getSupportFragmentManager();
-		Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+    	Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
 		((TaskFragment) fragment).refresh();
     }
 
@@ -107,7 +107,7 @@ public class TaskActivity extends SyncableActivity {
 			if(type == LIST)
 				isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
 			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
-			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
 			boolean areTheseTasksAffected = ((TaskFragment) fragment).checkChangedTasks(type, isSmart, changedIds);
 
 			if(areTheseTasksAffected) {
@@ -121,7 +121,7 @@ public class TaskActivity extends SyncableActivity {
 			if(type == LIST)
 				isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
 			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
-			Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
+			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
 			boolean areTheseTasksAffected = ((TaskFragment) fragment).checkAddedTasks(type, idOrName, isSmart, tasks);
 			if(areTheseTasksAffected) {
 				TaskActivity.this.reloadTasks();

@@ -303,13 +303,7 @@ public class TaskOverviewFragment extends SherlockFragment
 			holder.taskText.setOnClickListener(new SmartClickListener<String>(task.getListId()) {
 				@Override public void onClick(View v) {
 					String id = this.get();
-					Intent intent = new Intent(TaskOverviewFragment.this.getSherlockActivity(),TaskActivity.class);
-					intent.putExtra(TYPE, LIST);
-					intent.putExtra(NAME, "" + listMap.get(id).getName());
-					intent.putExtra(FILTER, id);
-					intent.putExtra(IDENTIFIER, id);
-					intent.putExtra("isSmart", false);
-					TaskOverviewFragment.this.startActivity(intent);
+					((BionicCowActivity) TaskOverviewFragment.this.getSherlockActivity()).openTaskFragment(LIST, id, listMap.get(id).getName(), false, id);
 				}
 			});
 			
