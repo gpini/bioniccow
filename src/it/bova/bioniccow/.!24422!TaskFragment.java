@@ -197,18 +197,25 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			switch(type) {
 			case LIST : 
 				title = name;
+				break;
 			case LOCATION : 
 				title = name;
+				break;
 			case TAG :
 				title = name;
+				break;
 			case NO_TAG :
 				title = this.getResources().getStringArray(R.array.specials)[0];
+				break;
 			case NO_LOCATION :
 				title = this.getResources().getStringArray(R.array.specials)[1];
+				break;
 			case RECENTLY_COMPLETED :
 				title = this.getResources().getStringArray(R.array.specials)[2];
+				break;
 			case WITH_PRIORITY :
 				title = this.getResources().getStringArray(R.array.specials)[3];
+				break;
 			}
 			titleHeader.setText(title);
 		}

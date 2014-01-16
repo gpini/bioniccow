@@ -197,18 +197,25 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			switch(type) {
 			case LIST : 
 				title = name;
+				break;
 			case LOCATION : 
 				title = name;
+				break;
 			case TAG :
 				title = name;
+				break;
 			case NO_TAG :
 				title = this.getResources().getStringArray(R.array.specials)[0];
+				break;
 			case NO_LOCATION :
 				title = this.getResources().getStringArray(R.array.specials)[1];
+				break;
 			case RECENTLY_COMPLETED :
 				title = this.getResources().getStringArray(R.array.specials)[2];
+				break;
 			case WITH_PRIORITY :
 				title = this.getResources().getStringArray(R.array.specials)[3];
+				break;
 			}
 			titleHeader.setText(title);
 		}
@@ -850,21 +857,21 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			if(isSmart) areTheseTasksAffected = true;
 			else {
 				for(Task task : tasks)
-					if(task.getListId().equals(idOrName))
+					if(task.getListId().equals(identifier))
 						areTheseTasksAffected = true;
 			}
 		}
 		break;
 		case(LOCATION) :
 			for(Task task : tasks)
-				if(task.getLocationId().equals(idOrName))
+				if(task.getLocationId().equals(identifier))
 					areTheseTasksAffected = true;
 		break;
 		case(TAG) : {
 			for(Task task : tasks) {
 				String[] tags = task.getTags();
 				for(String tag : tags) {
-					if(tag.equals(idOrName)) {
+					if(tag.equals(identifier)) {
 						areTheseTasksAffected = true;
 						break;
 					}
@@ -897,7 +904,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 			this.refresh();
 	}
 	
-	public boolean refreshOnTaskChanged(List<String> changedIds) {
+	public void refreshOnTaskChanged(List<String> changedIds) {
 		boolean areTheseTasksAffected = false;
 		if(type == LIST) {
 			if(isSmart) areTheseTasksAffected = true;

@@ -103,11 +103,13 @@ public class TaskActivity extends SyncableActivity {
 		}
 				
 		@Override public void onTaskChanged(Context context, List<String> changedIds) {
+			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
 			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
 			((TaskFragment) fragment).refreshOnTaskChanged(changedIds);
 		}
 		
 		@Override public void onTaskAdded(Context context, List<ParcelableTask> tasks){
+			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
 			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
 			((TaskFragment) fragment).refreshOnTaskAdded(tasks);
 		}
