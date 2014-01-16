@@ -257,8 +257,6 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 						String text = element.nameOrId;
 						intent.putExtra(IDENTIFIER, text);
 						intent.putExtra(NAME, text);
-						//intent.putExtra(FILTER, "tag:\"" + element.nameOrId + "\"");
-						//Toast.makeText(FolderActivity.this, element.nameOrId, Toast.LENGTH_SHORT).show();
 						break;
 					case LIST : 
 						intent.putExtra(TYPE, LIST);
@@ -271,8 +269,6 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 							else
 								intent.putExtra("isSmart", false);
 						}
-						//intent.putExtra(FILTER, element.nameOrId);
-						//Toast.makeText(FolderActivity.this, element.nameOrId, Toast.LENGTH_SHORT).show();
 						break;
 					case LOCATION : 
 						intent.putExtra(TYPE, LOCATION);
@@ -282,15 +278,10 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 							intent.putExtra(IDENTIFIER, loc.getId());
 							intent.putExtra(NAME, loc.getName());
 						}
-						//if(loc != null)
-						//	intent.putExtra(FILTER, "location:\"" + loc.getName() + "\"");
-						//else intent.putExtra(FILTER, "location:\" \"");
-						//Toast.makeText(FolderActivity.this, element.nameOrId, Toast.LENGTH_SHORT).show();
 						break;
 					}
 					
 					FolderFragment.this.startActivity(intent);
-					//Toast.makeText(TaskListActivity.this,text,Toast.LENGTH_SHORT).show();
 				}
 			});
 			return convertView;

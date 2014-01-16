@@ -137,7 +137,7 @@ public class TaskOverviewFragment extends SherlockFragment
 	}
 	
 	
-	private void retrieveTasks(/*String filter*/) {
+	private void retrieveTasks() {
 		this.taskGetter = new DBOverviewTaskGetter(this.task_NOK,this.getSherlockActivity()) {
 			@Override public void onResultObtained(List<Task> tasks) {
 				List<ParcelableTask> taskList = new ArrayList<ParcelableTask>();
@@ -152,7 +152,7 @@ public class TaskOverviewFragment extends SherlockFragment
 			//	TaskOverviewFragment.this.loadingBar.setVisibility(View.GONE);
 			//}
 		};
-		this.taskGetter.executeInBackground(/*filter*/);	
+		this.taskGetter.executeInBackground();	
 	}
 
 	private void onTasksObtained(List<ParcelableTask> tasks2) {

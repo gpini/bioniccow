@@ -287,7 +287,6 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			bundle.putBoolean("isSmart", isSmart);
 			bundle.putString(IDENTIFIER, identifier);
 			bundle.putString(NAME, name);
-			//bundle.putString(FILTER, filter);
 			taskFragment.setArguments(bundle);
 			FragmentManager fm = this.getSupportFragmentManager();
 			fm.beginTransaction()
@@ -300,7 +299,6 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			intent.putExtra(NAME, "" + name);
 			intent.putExtra(IDENTIFIER, identifier);
 			intent.putExtra("isSmart", isSmart);
-			intent.putExtra(FILTER, filter);
 			this.startActivity(intent);
 		}
 	}

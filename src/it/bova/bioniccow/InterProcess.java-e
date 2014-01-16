@@ -4,7 +4,6 @@ public interface InterProcess {
 	int AUTHENTICATE = 1;
 	int TASK_EDIT = 2;
 	String ERROR_MESSENGER = "it.bova.ERROR_MESSENGER";
-	String FILTER = "filter";
 	String TYPE = "type";
 	String IDENTIFIER = "identifier";
 	String NAME = "name";
