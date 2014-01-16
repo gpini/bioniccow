@@ -854,7 +854,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 		}
 	}
 	
-	public boolean checkAddedTasks(int type, String idOrName, boolean isSmart, List<ParcelableTask> tasks) {
+	public void refreshOnTaskAdded(List<ParcelableTask> tasks) {
 		boolean areTheseTasksAffected = false;
 		switch(type) {
 		case(LIST) : {
@@ -904,10 +904,11 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 					areTheseTasksAffected = true;
 		break;
 		}
-		return areTheseTasksAffected;
+		if(areTheseTasksAffected)
+			this.refresh();
 	}
 	
-	public boolean checkChangedTasks(int type, boolean isSmart, List<String> changedIds) {
+	public boolean refreshOnTaskChanged(List<String> changedIds) {
 		boolean areTheseTasksAffected = false;
 		if(type == LIST) {
 			if(isSmart) areTheseTasksAffected = true;
@@ -934,7 +935,8 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 				}
 			}
 		}
-		return areTheseTasksAffected;
+		if(areTheseTasksAffected)
+			this.refresh();
 	
 	}
 	

@@ -103,29 +103,13 @@ public class TaskActivity extends SyncableActivity {
 		}
 				
 		@Override public void onTaskChanged(Context context, List<String> changedIds) {
-			boolean isSmart = false;
-			if(type == LIST)
-				isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
-			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
 			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
-			boolean areTheseTasksAffected = ((TaskFragment) fragment).checkChangedTasks(type, isSmart, changedIds);
-
-			if(areTheseTasksAffected) {
-				TaskActivity.this.reloadTasks();
-			}
+			((TaskFragment) fragment).refreshOnTaskChanged(changedIds);
 		}
 		
 		@Override public void onTaskAdded(Context context, List<ParcelableTask> tasks){
-			String idOrName = TaskActivity.this.getIntent().getStringExtra(IDENTIFIER);
-			boolean isSmart = false;
-			if(type == LIST)
-				isSmart = TaskActivity.this.getIntent().getBooleanExtra("isSmart", true);
-			FragmentManager fm = TaskActivity.this.getSupportFragmentManager();
 			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
-			boolean areTheseTasksAffected = ((TaskFragment) fragment).checkAddedTasks(type, idOrName, isSmart, tasks);
-			if(areTheseTasksAffected) {
-				TaskActivity.this.reloadTasks();
-			}
+			((TaskFragment) fragment).refreshOnTaskAdded(tasks);
 		}
 	}
 	

@@ -516,7 +516,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 				((FolderListFragment) fragment).refresh();
 		}
 			
-		@Override protected void onTaskChanged(Context context, List<String> changedId) {
+		@Override protected void onTaskChanged(Context context, List<String> changedIds) {
 			FragmentManager fm = BionicCowActivity.this.fm;
 			Fragment headFragment = fm.findFragmentById(R.id.headerFragment);
 			((HeaderFragment) headFragment).refresh();
@@ -526,7 +526,10 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(FOLDER_FRAGMENT)) 
 				((FolderFragment) fragment).refresh();
 			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(OVERVIEW_FRAGMENT)) 
-				((TaskOverviewFragment) fragment).refreshOnTaskChanged(changedId);
+				((TaskOverviewFragment) fragment).refreshOnTaskChanged(changedIds);
+			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
+			if(fragment != null)
+				((TaskFragment) fragment).refreshOnTaskChanged(changedIds);
 		}
 			
 		@Override protected void onTaskAdded(Context context, List<ParcelableTask> addedTasks) {
@@ -538,6 +541,9 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 				((TagFragment) fragment).refresh();
 			if(fragment != null && fragment.getTag() != null && fragment.getTag().equals(OVERVIEW_FRAGMENT)) 
 				((TaskOverviewFragment) fragment).refreshOnTaskAdded(addedTasks);
+			Fragment fragment = fm.findFragmentByTag(TASK_FRAGMENT);
+			if(fragment != null)
+				((TaskFragment) fragment).refreshOnTaskAdded(addedTasks);
 		}
 			
 	}
