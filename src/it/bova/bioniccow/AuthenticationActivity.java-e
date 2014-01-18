@@ -47,15 +47,12 @@ public class AuthenticationActivity extends SherlockActivity implements ErrorCod
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//this.getWindow().requestFeature(Window.FEATURE_PROGRESS);	
 		setContentView(R.layout.auth);
 		
 		this.progressBar = (ProgressBar) this.findViewById(R.id.progressBar);
 		this.progressBar.setMax(100);
 		this.progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progress_horizontal));
 		this.getSupportActionBar().hide();
-		// Makes Progress bar Visible
-		//getWindow().setFeatureInt( Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
 		
 		//resources initialization
 		NOK = this.getResources().getString(R.string.authentication_NOK);
@@ -85,8 +82,6 @@ public class AuthenticationActivity extends SherlockActivity implements ErrorCod
 			
 			@Override public void onPageStarted(WebView view, String url, Bitmap favicon) {
 				if(AuthenticationActivity.this.progressBar.getVisibility() != View.VISIBLE) {
-					//Animation anim = AnimationUtils.loadAnimation(AuthenticationActivity.this, R.anim.appear);
-					//AuthenticationActivity.this.progressBar.startAnimation(anim);
 					AuthenticationActivity.this.progressBar.setVisibility(View.VISIBLE);
 				}
 			}
@@ -94,16 +89,6 @@ public class AuthenticationActivity extends SherlockActivity implements ErrorCod
 				AuthenticationActivity.this.progressBar.setVisibility(View.GONE);
 			}
 		});
-		
-		//these two lines are for a completely zoomed out page
-		//wv.getSettings().setLoadWithOverviewMode(true);
-		//wv.getSettings().setUseWideViewPort(true);
-		
-		//these lines keep linear-layout, otherwise disappears
-		//WebViewClient webViewClient = new WebViewClient();
-		//wv.setWebViewClient(webViewClient);
-		
-		//wv.zoomIn();
 	}
 	
 	public void onResume() {
@@ -144,19 +129,6 @@ public class AuthenticationActivity extends SherlockActivity implements ErrorCod
         }
     }
     
-	@Override public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putString("frob", frob);
-		savedInstanceState.putString("url", url);
-		savedInstanceState.putString("token", token);
-		super.onSaveInstanceState(savedInstanceState);
-	}
-	
-	@Override public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		frob = savedInstanceState.getString("frob");
-		url = savedInstanceState.getString("url");
-		token = savedInstanceState.getString("token");
-	}
 	
 	@Override public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);

@@ -29,13 +29,16 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,6 +70,8 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 		super.onCreate(savedInstanceState);
 		
 		this.messageReceiver = new MainMessageReceiver(this);
+		
+		this.fm = this.getSupportFragmentManager();
 		
 		//Action Bar
 		setContentView(R.layout.main);
@@ -190,7 +195,6 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 		this.registerReceiver(messageReceiver, new IntentFilter(ERROR_MESSENGER));
 		this.syncHelper.attachToUI();
 
-		this.fm = this.getSupportFragmentManager();
 		this.backStackListener = new OnBackStackChangedListener() {
 			@Override public void onBackStackChanged() {
 				Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
@@ -237,7 +241,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 		switch (requestCode) {
 		case AUTHENTICATE :
 			if(resultCode != RESULT_CANCELED) {
-				Fragment sf = this.getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+				Fragment sf = this.fm.findFragmentById(R.id.fragmentContainer);
 				if(sf != null && sf.getTag().equals(OVERVIEW_FRAGMENT))
 					((TaskOverviewFragment) sf).refresh();
 			}
@@ -257,7 +261,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			FragmentManager fm = this.getSupportFragmentManager();
+			FragmentManager fm = this.fm;
 			fm.popBackStack();
 			return true;
 		case R.id.add:
@@ -281,6 +285,16 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 	
 	public void openTaskFragment(int type, String identifier, String name, boolean isSmart, String filter) {
 		if(this.isDualPane) {
+			/*RelativeLayout taskContainer = (RelativeLayout) this.findViewById(R.id.taskContainer);
+			if(taskContainer != null) {
+				LayoutParams lp = taskContainer.getLayoutParams();
+				if(lp.width == LayoutParams.MATCH_PARENT) {
+					int newWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
+					RelativeLayout.LayoutParams newLp = new RelativeLayout.LayoutParams(newWidth, RelativeLayout.LayoutParams.MATCH_PARENT);
+					taskContainer.setLayoutParams(newLp);
+				}
+			}*/
+				
 			TaskFragment taskFragment = new TaskFragment();
 			Bundle bundle = new Bundle();
 			bundle.putInt(TYPE, type);
@@ -288,8 +302,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 			bundle.putString(IDENTIFIER, identifier);
 			bundle.putString(NAME, name);
 			taskFragment.setArguments(bundle);
-			FragmentManager fm = this.getSupportFragmentManager();
-			fm.beginTransaction()
+			this.fm.beginTransaction()
 				.replace(R.id.taskContainer, taskFragment, TASK_FRAGMENT)
 				.commit();
 		}
@@ -305,17 +318,17 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 	
 	public void showEraseConfirmDialog() {
 	    DialogFragment newFragment = EraseConfirmDialogFragment.newInstance();
-	    newFragment.show(this.getSupportFragmentManager(), "erase_confirm");
+	    newFragment.show(this.fm, "erase_confirm");
 	}
 	
 	public void showForgetConfirmDialog() {
 	    DialogFragment newFragment = ForgetConfirmDialogFragment.newInstance();
-	    newFragment.show(this.getSupportFragmentManager(), "forget_confirm");
+	    newFragment.show(this.fm, "forget_confirm");
 	}
 	
 	public void showVoteHintDialog() {
 	    DialogFragment newFragment = VoteHintDialogFragment.newInstance();
-	    newFragment.show(this.getSupportFragmentManager(), "vote_hint");
+	    newFragment.show(this.fm, "vote_hint");
 	}
 		
 	public static class EraseConfirmDialogFragment extends DialogFragment {
