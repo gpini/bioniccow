@@ -101,17 +101,21 @@ public class SynchService extends IntentService implements ErrorCoded{
 		
 		boolean forceSynch = intent.getBooleanExtra("forceSync", false);
 		
+		boolean stopSynch = false;
+		
 		//Lists
 		if(intent.getBooleanExtra("syncLists", false)) {
 			synchSuccess = this.syncLists(forceSynch, sync_NOK);
+			stopSynch = !synchSuccess;
 			if(synchSuccess)
 				this.sendMessage(messenger, SynchService.LISTS_SYNCHED);
 			SystemClock.sleep(700);
 		}
 		
 		//Locations
-		if(intent.getBooleanExtra("syncLocations", false)) {
+		if(!stopSynch && intent.getBooleanExtra("syncLocations", false)) {
 			synchSuccess = this.syncLocations(forceSynch, sync_NOK);
+			stopSynch = !synchSuccess;
 			if(synchSuccess) {
 				new Preferences(this).putBoolean(PrefParameter.FIRST_SYNC_DONE, true);
 				this.sendMessage(messenger, SynchService.LOCATIONS_SYNCHED);
@@ -121,7 +125,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 		
 		
 		//Task&Co
-		if(intent.getBooleanExtra("syncTasksAndRelated", false)){
+		if(!stopSynch && intent.getBooleanExtra("syncTasksAndRelated", false)){
 			SynchedTasks synchedTasks = this.syncTasksAndRelated(forceSynch, sync_NOK);
 			//Log.d("sync", "" + synchedTasks);
 			synchSuccess = (synchedTasks == null) ? false : true;
