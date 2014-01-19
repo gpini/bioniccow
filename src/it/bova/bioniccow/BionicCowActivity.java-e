@@ -283,7 +283,7 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 		}
 	}
 	
-	public void openTaskFragment(int type, String identifier, String name, boolean isSmart, String filter) {
+	public void openTaskFragment(int type, String identifier, String name, boolean isSmart) {
 		if(this.isDualPane) {
 			/*RelativeLayout taskContainer = (RelativeLayout) this.findViewById(R.id.taskContainer);
 			if(taskContainer != null) {

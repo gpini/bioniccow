@@ -94,7 +94,7 @@ public class TaskListFragment extends SherlockFragment implements InterProcess {
 					boolean isSmart = false;
 					if(this.get().isSmart())
 						isSmart = true;
-					((BionicCowActivity) TaskListFragment.this.getSherlockActivity()).openTaskFragment(LIST, id, this.get().getName(), isSmart, null);
+					((BionicCowActivity) TaskListFragment.this.getSherlockActivity()).openTaskFragment(LIST, id, this.get().getName(), isSmart);
 				}
 			});
 			return convertView;

@@ -85,7 +85,7 @@ public class LocationFragment extends SherlockFragment implements InterProcess{
 			holder.button.setOnClickListener(new SmartClickListener<Location>(location) {
 				public void onClick(View v){
 					Location loc = this.get();
-					((BionicCowActivity) LocationFragment.this.getSherlockActivity()).openTaskFragment(LOCATION, loc.getId(), loc.getName(), false, "location:\"" + loc.getName() + "\"");
+					((BionicCowActivity) LocationFragment.this.getSherlockActivity()).openTaskFragment(LOCATION, loc.getId(), loc.getName(), false);
 					//Toast.makeText(TaskListActivity.this,text,Toast.LENGTH_SHORT).show();
 				}
 			});

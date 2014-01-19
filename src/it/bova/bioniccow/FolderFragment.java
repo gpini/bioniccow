@@ -250,38 +250,38 @@ public class FolderFragment extends SherlockFragment implements InterProcess {
 			holder.button.setOnClickListener(new SmartClickListener<FolderElement>(element) {
 				public void onClick(View v){
 					FolderElement element = this.get();
-					Intent intent = new Intent(FolderFragment.this.getSherlockActivity(),TaskActivity.class);
+					int type = LIST;
+					String name = "";
+					String id = "";
+					boolean isSmart = false;
 					switch(element.type) {
 					case TAG : 
-						intent.putExtra(TYPE, TAG);
+						type = TAG;
 						String text = element.nameOrId;
-						intent.putExtra(IDENTIFIER, text);
-						intent.putExtra(NAME, text);
+						id = text;
+						name = text;
 						break;
 					case LIST : 
-						intent.putExtra(TYPE, LIST);
+						type = LIST;
 						TaskList tasklist = listMap.get(element.nameOrId);
 						if(tasklist != null) {
-							intent.putExtra(IDENTIFIER, tasklist.getId());
-							intent.putExtra(NAME, tasklist.getName());
+							id = tasklist.getId();
+							name = tasklist.getName();
 							if(tasklist.isSmart())
-								intent.putExtra("isSmart", true);
-							else
-								intent.putExtra("isSmart", false);
+								isSmart = true;
 						}
 						break;
 					case LOCATION : 
-						intent.putExtra(TYPE, LOCATION);
-						intent.putExtra(NAME, "" + locMap.get(element.nameOrId).getName());
+						type = LOCATION;
+						name = "" + locMap.get(element.nameOrId).getName();
 						Location loc = locMap.get(element.nameOrId);
 						if(loc != null) {
-							intent.putExtra(IDENTIFIER, loc.getId());
-							intent.putExtra(NAME, loc.getName());
+							id = loc.getId();
+							name = loc.getName();
 						}
 						break;
 					}
-					
-					FolderFragment.this.startActivity(intent);
+					((BionicCowActivity) FolderFragment.this.getSherlockActivity()).openTaskFragment(type, id, name, isSmart);
 				}
 			});
 			return convertView;
