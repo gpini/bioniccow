@@ -117,7 +117,6 @@ public class SynchService extends IntentService implements ErrorCoded{
 			synchSuccess = this.syncLocations(forceSynch, sync_NOK);
 			stopSynch = !synchSuccess;
 			if(synchSuccess) {
-				new Preferences(this).putBoolean(PrefParameter.FIRST_SYNC_DONE, true);
 				this.sendMessage(messenger, SynchService.LOCATIONS_SYNCHED);
 			}
 			SystemClock.sleep(700);
@@ -130,6 +129,7 @@ public class SynchService extends IntentService implements ErrorCoded{
 			//Log.d("sync", "" + synchedTasks);
 			synchSuccess = (synchedTasks == null) ? false : true;
 			if(synchSuccess) {
+				new Preferences(this).putBoolean(PrefParameter.FIRST_SYNC_DONE, true);
 				this.notifyTaskSynched(messenger, this.newTasks, this.changedTasks,
 						synchedTasks.getDeletedTasks(), SynchService.TASKS_SYNCHED);
 				this.newTasks.clear();

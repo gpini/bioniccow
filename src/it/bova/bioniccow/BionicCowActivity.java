@@ -246,7 +246,6 @@ public class BionicCowActivity extends MainActivity implements InterProcess {
 					((TaskOverviewFragment) sf).refresh();
 			}
 			break;
-		}
     	case TASK_EDIT :
     		if(resultCode != RESULT_CANCELED) {
     			Fragment tf = fm.findFragmentByTag(TASK_FRAGMENT);
