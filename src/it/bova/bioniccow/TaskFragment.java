@@ -843,7 +843,7 @@ public class TaskFragment extends SherlockFragment implements InterProcess {
 					Intent intent = new Intent(TaskFragment.this.getSherlockActivity(),TaskEditActivity.class);
 					CheckableTask task = this.get();
 					intent.putExtra("task", (Parcelable) task);
-					TaskFragment.this.startActivityForResult(intent, TASK_EDIT);
+					TaskFragment.this.getSherlockAcitivty().startActivityForResult(intent, TASK_EDIT);
 				}
 			});
 			return convertView;
